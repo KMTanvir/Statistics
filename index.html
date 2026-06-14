@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Statistics for Non-Statisticians | K.M. Tanvir</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --muted: #64748b;
+  --primary: #2563eb; --primary-dark: #1d4ed8; --primary-light: #dbeafe;
+  --accent: #4f46e5; --success: #059669; --success-light: #d1fae5;
+  --neutral: #64748b; --neutral-light: #f1f5f9;
+  --border: #e2e8f0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.04);
+  --radius: 14px; --radius-sm: 10px;
+  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+body {
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+.app { max-width: 1180px; margin: 0 auto; padding: 28px 22px 80px; }
+
+/* HERO */
+.hero {
+  background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
+  color: white; padding: 44px 36px; border-radius: var(--radius);
+  margin-bottom: 22px; box-shadow: var(--shadow-lg);
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ""; position: absolute; top: -50%; right: -10%;
+  width: 420px; height: 420px;
+  background: radial-gradient(circle, rgba(255,255,255,0.12), transparent 70%);
+  border-radius: 50%;
+}
+.hero-inner { position: relative; z-index: 1; }
+.kicker {
+  display: inline-block; background: rgba(255,255,255,0.18);
+  padding: 6px 14px; border-radius: 999px; font-size: 0.78rem;
+  font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
+  margin-bottom: 14px; backdrop-filter: blur(4px);
+}
+.hero h1 {
+  font-size: clamp(1.9rem, 4vw, 2.75rem); font-weight: 800;
+  letter-spacing: -0.03em; margin-bottom: 8px; line-height: 1.15;
+}
+.hero p.tagline {
+  font-size: 1rem; opacity: 0.88; max-width: 560px; line-height: 1.55;
+}
+.hero-meta {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px; margin-top: 22px; padding-top: 22px;
+  border-top: 1px solid rgba(255,255,255,0.2);
+}
+.hero-meta div { font-size: 0.9rem; opacity: 0.95; }
+.hero-meta strong { display: block; font-weight: 700; margin-bottom: 2px; letter-spacing: 0.3px; }
+
+/* STATUS */
+.status-card {
+  background: var(--card); padding: 18px 24px; border-radius: var(--radius);
+  margin-bottom: 28px; box-shadow: var(--shadow); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 14px;
+}
+.status-info { display: flex; align-items: center; gap: 12px; }
+.status-dot {
+  width: 10px; height: 10px; border-radius: 50%; background: var(--success);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(5,150,105,0.5); }
+  50% { box-shadow: 0 0 0 8px rgba(5,150,105,0); }
+}
+.status-text { font-size: 0.95rem; color: var(--text); }
+.status-text strong { color: var(--success); font-weight: 700; }
+.counters { display: flex; gap: 22px; font-size: 0.88rem; }
+.counter { display: flex; align-items: baseline; gap: 6px; }
+.counter-num { font-size: 1.5rem; font-weight: 800; color: var(--primary); line-height: 1; }
+.counter-label { color: var(--muted); font-weight: 500; }
+.progress-wrap { flex: 1; min-width: 180px; max-width: 320px; }
+.progress-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--success), #10b981);
+  border-radius: 4px; width: 0%; transition: width 0.6s ease;
+}
+.progress-label { font-size: 0.8rem; color: var(--muted); margin-top: 4px; font-weight: 500; }
+
+/* SECTION */
+.section-title {
+  font-size: 1.1rem; font-weight: 700; color: var(--text);
+  margin: 8px 0 16px; display: flex; align-items: center; gap: 10px;
+}
+.section-title::before {
+  content: ""; width: 4px; height: 20px;
+  background: var(--primary); border-radius: 2px;
+}
+
+/* GRID */
+.module-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px;
+}
+.module-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 22px;
+  transition: all var(--transition); display: flex; flex-direction: column;
+  position: relative; overflow: hidden; min-height: 195px;
+}
+.module-card::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px; background: var(--primary); opacity: 0.85;
+}
+.module-card.available { cursor: pointer; }
+.module-card.available:hover {
+  border-color: var(--primary); box-shadow: var(--shadow-lg); transform: translateY(-3px);
+}
+.module-card.locked {
+  opacity: 0.72; cursor: not-allowed;
+  background: linear-gradient(to bottom, #fafbfc, #f1f5f9);
+}
+
+.card-head {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 12px; margin-bottom: 12px;
+}
+.module-num {
+  font-size: 0.72rem; font-weight: 800; color: var(--primary);
+  background: var(--primary-light); padding: 4px 10px; border-radius: 6px;
+  letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap;
+}
+.status-badge {
+  font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 999px;
+  letter-spacing: 0.3px; text-transform: uppercase; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.badge-available { color: var(--success); background: var(--success-light); }
+.badge-locked { color: var(--muted); background: var(--neutral-light); }
+.badge-checking { color: var(--primary); background: var(--primary-light); }
+.badge-available::before { content: ""; width: 6px; height: 6px; background: var(--success); border-radius: 50%; }
+.badge-locked::before { content: "🔒"; font-size: 0.8em; }
+.badge-checking::before {
+  content: ""; width: 8px; height: 8px;
+  border: 2px solid var(--primary); border-top-color: transparent;
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.module-title {
+  font-size: 1.08rem; font-weight: 700; color: var(--text);
+  margin-bottom: 8px; line-height: 1.3; letter-spacing: -0.01em;
+}
+.module-desc {
+  font-size: 0.875rem; color: var(--muted); line-height: 1.55;
+  flex: 1; margin-bottom: 14px;
+}
+.card-foot {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 12px; border-top: 1px solid var(--border);
+}
+.card-meta { font-size: 0.78rem; color: var(--muted); font-weight: 500; }
+.action {
+  font-size: 0.85rem; font-weight: 700; color: var(--primary);
+  display: flex; align-items: center; gap: 4px; transition: gap var(--transition);
+}
+.module-card.available:hover .action { gap: 8px; }
+.module-card.locked .action { color: var(--muted); }
+
+/* FOOTER */
+.footer {
+  margin-top: 50px; padding: 24px; text-align: center;
+  background: var(--card); border-radius: var(--radius);
+  border: 1px solid var(--border); color: var(--muted); font-size: 0.88rem;
+}
+.footer strong { color: var(--text); }
+.footer-links { margin-top: 10px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+.footer-links a { color: var(--primary); text-decoration: none; font-weight: 500; }
+.footer-links a:hover { text-decoration: underline; }
+
+@media (max-width: 640px) {
+  .app { padding: 18px 14px 60px; }
+  .hero { padding: 32px 22px; }
+  .status-card { flex-direction: column; align-items: stretch; }
+  .counters { justify-content: space-around; }
+  .module-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="hero">
+    <div class="hero-inner">
+      <span class="kicker">Introduction to Statistics</span>
+      <h1>Statistics for Non-Statisticians</h1>
+      <p class="tagline">Statistical intuition and literacy for everyone, built on real stories, real data, and everyday reasoning.</p>
+      <div class="hero-meta">
+        <div><strong>Instructor</strong>K.M. Tanvir</div>
+        <div><strong>Modules</strong>16</div>
+        <div><strong>Prerequisite</strong>None</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="status-card">
+    <div class="status-info">
+      <span class="status-dot"></span>
+      <span class="status-text">Course is <strong>live</strong> — modules unlock as we progress</span>
+    </div>
+    <div class="counters">
+      <div class="counter"><span class="counter-num" id="count-available">0</span><span class="counter-label">Available</span></div>
+      <div class="counter"><span class="counter-num" id="count-upcoming">16</span><span class="counter-label">Upcoming</span></div>
+      <div class="counter"><span class="counter-num" id="count-total">16</span><span class="counter-label">Total</span></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="progress-label" id="progress-label">0 of 16 modules released</div>
+    </div>
+  </div>
+
+  <!-- BLOCK 1 -->
+  <h2 class="section-title">Block 1 · Descriptive Statistics</h2>
+  <div class="module-grid">
+
+    <div class="module-card" data-url="Module 1 - Introduction to Statistics/index.html">
+      <div class="card-head">
+        <span class="module-num">Module 1</span>
+        <span class="status-badge badge-checking">Checking...</span>
+      </div>
+      <h3 class="module-title">Introduction to Statistics</h3>
+      <p class="module-desc">What statistics is, why data varies, populations vs samples, variable types, and how we collect data reliably without measuring everyone.</p>
+      <div class="card-foot">
+        <span class="action">Open module →</span>
+      </div>
+    </div>
+
+    <div class="module-card" data-url="Module 2 - Organizing and Visualizing Data/index.html">
+      <div class="card-head">
+        <span class="module-num">Module 2</span>
+        <span class="status-badge badge-checking">Checking...</span>
+      </div>
+      <h3 class="module-title">Organizing and Visualizing Data</h3>
+      <p class="module-desc">Frequency tables, bar charts, histograms, frequency polygons, and cumulative curves. Turning a pile of numbers into a picture that tells a story.</p>
+      <div class="card-foot">
+        <span class="action">Open module →</span>
+      </div>
+    </div>
+
+    <div class="module-card" data-url="Module 3 - Measures of Central Tendency/index.html">
+      <div class="card-head">
+        <span class="module-num">Module 3</span>
+        <span class="status-badge badge-checking">Checking...</span>
+      </div>
+      <h3 class="module-title">Measures of Central Tendency</h3>
+      <p class="module-desc">Mean, median, and mode for raw and grouped data. When each measure is the right choice, and when the "average" is the most misleading number in the room.</p>
+      <div class="card-foot">
+        <span class="action">Open module →</span>
+      </div>
+    </div>
+
+    <div class="module-card" data-url="Module 4 - Dispersion Shape and Spread/index.html">
+      <div class="card-head">
+        <span class="module-num">Module 4</span>
+        <span class="status-badge badge-checking">Checking...</span>
+      </div>
+      <h3 class="module-title">Dispersion, Shape, and Spread</h3>
+      <p class="module-desc">Range, IQR, variance, standard deviation, CV, moments, skewness, and kurtosis. Two batsmen with the same average can be completely different players.</p>
+      <div class="card-foot">
+        <span class="action">Open module →</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BLOCK 2 -->
+  <h2 class="section-title" style="margin-top:36px;">Block 2 · Relationships in Data</h2>
+  <div class="module-grid">
+
+    <div class="module-card" data-url="Module 5 - Correlation/index.html">
+      <div class="card-head">
+        <span class="module-num">Module 5</span>
+        <span class="status-badge badge-checking">Checking...</span>
+      </div>
+      <h3 class="module-title">Correlation</h3>
+      <p class="module-desc">Scatter plots, Pearson's r, interpreting strength and direction, and the most common trap in statistics: mistaking correlation for causation.</p>
+      <div class="card-foot">
+        <span class="action">Open module →</span>
+      </div>
+    </div>
+
+    <div class="module-card" data-url="Module 6 - Simple Linear Regression/index.html">
+      <div class="card-head">
+        <span class="module-num">Module 6</span>
+        <span class="status-badge badge-checking">Checking...</span>
+      </div>
+      <h3 class="module-title">Simple Linear Regression</h3>
+      <p class="module-desc">The regression line, what the slope and intercept mean in plain English, prediction, and what R-squared actually tells you about a model.</p>
+      <div class="card-foot">
+        <span class="action">Open module →</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BLOCK 3 -->
+  <h2 class="section-title" style="margin-top:36px;">Block 3 · Probability and Distributions</h2>
+  <div class="module-grid">
+
+    <div class="module-card" data-url="Module 7 - Elementary Probability/index.html">
+      <div class="card-head">
+        <span class="module-num">Module 7</span>
+        <span class="status-badge badge-checking">Checking...</span>
+      </div>
+      <h3 class="module-title">Elementary Probability</h3>
+      <p class="module-desc">Sample spaces, events, probability rules, conditional probability, and independence. Why a positive medical test does not mean what most people think it means.</p>
+      <div class="card-foot">
+        <span class="action">Open module →</span>
+      </div>
+    </div>
+
+    <div class="module-card" data-url="Module 8 - Binomial Distribution/index.html">
+      <div class="card-head">
+        <span class="module-num">Module 8</span>
+        <span class="status-badge badge-checking">Checking...</span>
+      </div>
+      <h3 class="module-title">Binomial Distribution</h3>
+      <p class="module-desc">Bernoulli trials, the binomial model, mean and variance. Counting successes when every outcome is either yes or no, and nothing in between.</p>
+      <div class="card-foot">
+        <span class="action">Open module →</span>
+      </div>
+    </div>
+
+    <div class="module-card" data-url="Module 9 - Negative Binomial Distribution/index.html">
+      <div class="card-head">
+        <span class="module-num">Module 9</span>
+        <span class="status-badge badge-checking">Checking...</span>
+      </div>
+      <h3 class="module-title">Negative Binomial Distribution</h3>
+      <p class="module-desc">Waiting for the r-th success. When the question shifts from "how many successes?" to "how long until we get enough?", the negative binomial takes over.</p>
+      <div class="card-foot">
+        <span class="action">Open module →</span>
+      </div>
+    </div>
+
+    <div class="module-card" data-url="Module 10 - Poisson Distribution/index.html">
+      <div class="card-head">
+        <span class="module-num">Module 10</span>
+        <span class="status-badge badge-checking">Checking...</span>
+      </div>
+      <h3 class="module-title">Poisson Distribution</h3>
+      <p class="module-desc">Modeling counts of rare events over time or space. Hospital arrivals, road accidents, and flood occurrences, when events happen randomly but at a predictable average rate.</p>
+      <div class="card-foot">
+        <span class="action">Open module →</span>
+      </div>
+    </div>
+
+    <div class="module-card" data-url="Module 11 - Normal Distribution/index.html">
+      <div class="card-head">
+        <span class="module-num">Module 11</span>
+        <span class="status-badge badge-checking">Checking...</span>
+      </div>
+      <h3 class="module-title">Normal Distribution</h3>
+      <p class="module-desc">The bell curve, the empirical rule, z-scores, and the standard normal table. Why this one shape appears in exam scores, heights, and measurement errors everywhere.</p>
+      <div class="card-foot">
+        <span class="action">Open module →</span>
+      </div>
+    </div>
+
+    <div class="module-card" data-url="Module 12 - Exponential Distribution/index.html">
+      <div class="card-head">
+        <span class="module-num">Module 12</span>
+        <span class="status-badge badge-checking">Checking...</span>
+      </div>
+      <h3 class="module-title">Exponential Distribution</h3>
+      <p class="module-desc">Time between events, the memoryless property, and the link back to Poisson. How long will you wait for the next bus if buses arrive randomly at a known average rate?</p>
+      <div class="card-foot">
+        <span class="action">Open module →</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BLOCK 4 -->
+  <h2 class="section-title" style="margin-top:36px;">Block 4 · Statistical Inference</h2>
+  <div class="module-grid">
+
+    <div class="module-card" data-url="Module 13 - Sampling Distributions and the Central Limit Theorem/index.html">
+      <div class="card-head">
+        <span class="module-num">Module 13</span>
+        <span class="status-badge badge-checking">Checking...</span>
+      </div>
+      <h3 class="module-title">Sampling Distributions and the Central Limit Theorem</h3>
+      <p class="module-desc">Why sample means vary, what standard error means, and the remarkable fact that averages become normal no matter what the original data looked like.</p>
+      <div class="card-foot">
+        <span class="action">Open module →</span>
+      </div>
+    </div>
+
+    <div class="module-card" data-url="Module 14 - Estimation and Confidence Intervals/index.html">
+      <div class="card-head">
+        <span class="module-num">Module 14</span>
+        <span class="status-badge badge-checking">Checking...</span>
+      </div>
+      <h3 class="module-title">Estimation and Confidence Intervals</h3>
+      <p class="module-desc">Point estimates, interval estimates, and the margin of error. What "54% support, plus or minus 3%" actually means, and what it does not mean.</p>
+      <div class="card-foot">
+        <span class="action">Open module →</span>
+      </div>
+    </div>
+
+    <div class="module-card" data-url="Module 15 - Hypothesis Testing/index.html">
+      <div class="card-head">
+        <span class="module-num">Module 15</span>
+        <span class="status-badge badge-checking">Checking...</span>
+      </div>
+      <h3 class="module-title">Hypothesis Testing</h3>
+      <p class="module-desc">Null and alternative hypotheses, test statistics, p-values, and Type I and Type II errors. How scientists decide whether a result is real or just noise.</p>
+      <div class="card-foot">
+        <span class="action">Open module →</span>
+      </div>
+    </div>
+
+    <div class="module-card" data-url="Module 16 - Analysis of Variance/index.html">
+      <div class="card-head">
+        <span class="module-num">Module 16</span>
+        <span class="status-badge badge-checking">Checking...</span>
+      </div>
+      <h3 class="module-title">Analysis of Variance</h3>
+      <p class="module-desc">Comparing means across three or more groups with the F-test. When a t-test is no longer enough and you need to ask which of these groups is actually different.</p>
+      <div class="card-foot">
+        <span class="action">Open module →</span>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <div><strong>Statistics for Non-Statisticians</strong></div>
+    <div class="footer-links">
+      <span>Instructor: K.M. Tanvir</span>
+      <span>·</span>
+      <a href="mailto:kmtanvir@isrt.ac.bd">kmtanvir@isrt.ac.bd</a>
+    </div>
+  </footer>
+
+</div>
+<script>
+async function fileExists(url) {
+  const bust = url + (url.includes('?') ? '&' : '?') + '_=' + Date.now();
+  try {
+    let res = await fetch(bust, { method: 'HEAD', cache: 'no-store' });
+    if (res.status === 405) res = await fetch(bust, { method: 'GET', cache: 'no-store' });
+    return res.ok;
+  } catch (e) { return false; }
+}
+function markAvailable(card, url) {
+  card.querySelector('.status-badge').className = 'status-badge badge-available';
+  card.querySelector('.status-badge').textContent = 'Available';
+  card.classList.remove('locked'); card.classList.add('available');
+  card.addEventListener('click', () => { window.location.href = url; });
+}
+function markLocked(card) {
+  card.querySelector('.status-badge').className = 'status-badge badge-locked';
+  card.querySelector('.status-badge').textContent = 'Coming soon';
+  card.classList.remove('available'); card.classList.add('locked');
+  const a = card.querySelector('.action'); if (a) a.textContent = 'Not yet released';
+}
+async function probeCard(card) {
+  if (card.getAttribute('data-force-locked') === 'true') { markLocked(card); return false; }
+  const url = card.getAttribute('data-url');
+  if (!url) return false;
+  const ok = await fileExists(url);
+  ok ? markAvailable(card, url) : markLocked(card);
+  return ok;
+}
+function updateCounters(available, total) {
+  document.getElementById('count-available').textContent = available;
+  document.getElementById('count-upcoming').textContent = Math.max(0, total - available);
+  document.getElementById('count-total').textContent = total;
+  const pct = total > 0 ? Math.round((available / total) * 100) : 0;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent =
+    available + ' of ' + total + ' modules released (' + pct + '%)';
+}
+async function init() {
+  const cards = document.querySelectorAll('.module-card');
+  const results = await Promise.all(Array.from(cards).map(probeCard));
+  updateCounters(results.filter(Boolean).length, cards.length);
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
