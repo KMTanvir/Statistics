@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 2: Organizing and Visualizing Data</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;
+  --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#dbeafe;
+  --accent:#4f46e5;--success:#059669;--success-light:#d1fae5;
+  --danger:#dc2626;--danger-light:#fee2e2;
+  --warning:#d97706;--warning-light:#fef3c7;
+  --border:#e2e8f0;
+  --shadow:0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.08),0 4px 10px rgba(0,0,0,.04);
+  --radius:12px;--radius-sm:8px;--transition:.2s cubic-bezier(.4,0,.2,1);
+}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;}
+.app{max-width:1100px;margin:0 auto;padding:24px 20px 80px;}
+header.mod-header{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%);color:#fff;padding:32px 28px;border-radius:var(--radius);margin-bottom:20px;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;}
+header.mod-header::before{content:"";position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:rgba(255,255,255,.08);border-radius:50%;}
+header.mod-header::after{content:"";position:absolute;bottom:-30px;right:80px;width:100px;height:100px;background:rgba(255,255,255,.05);border-radius:50%;}
+.mod-badge{display:inline-block;background:rgba(255,255,255,.2);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:.5px;position:relative;z-index:1;}
+header.mod-header h1{font-size:28px;margin:12px 0 8px;font-weight:700;position:relative;z-index:1;}
+header.mod-header p.mod-sub{font-size:14px;opacity:.88;max-width:640px;position:relative;z-index:1;}
+header.mod-header p.mod-instructor{font-size:13px;opacity:.8;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.2);position:relative;z-index:1;}
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;padding:14px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;}
+.stat{text-align:center;padding:6px;}
+.stat .stat-value{font-size:22px;font-weight:700;color:var(--primary);line-height:1.2;}
+.stat .stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:2px;}
+.tabs{display:flex;gap:4px;background:#fff;padding:6px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;flex-wrap:wrap;}
+.tab-btn{flex:1;min-width:110px;padding:11px 16px;background:transparent;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;transition:all var(--transition);font-family:inherit;}
+.tab-btn:hover{background:var(--bg);color:var(--text);}
+.tab-btn.active{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.28);}
+.tab-content{display:none;animation:fadeIn .28s ease-in-out;}
+.tab-content.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);margin-bottom:16px;}
+.progress-bar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:12px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:3px;transition:width .4s ease;}
+.slide-counter{text-align:center;color:var(--muted);font-size:13px;margin-bottom:14px;font-weight:500;}
+.slide{display:none;min-height:440px;padding:4px;animation:slideIn .3s ease;}
+.slide.active{display:block;}
+@keyframes slideIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+.slide h2{font-size:26px;margin-bottom:6px;color:var(--primary-dark);font-weight:700;line-height:1.25;}
+.slide h3{font-size:18px;margin:20px 0 8px;color:var(--text);font-weight:600;}
+.slide p{margin-bottom:12px;color:#334155;}
+.slide ul,.slide ol{margin:0 0 14px 22px;}
+.slide li{margin-bottom:7px;color:#334155;}
+.slide .slide-sub{color:var(--muted);font-size:15px;margin-bottom:18px;font-style:italic;}
+.obj-list{list-style:none;padding:0;margin:14px 0;}
+.obj-list li{padding:9px 0 9px 32px;position:relative;color:#334155;border-bottom:1px solid var(--border);}
+.obj-list li:last-child{border-bottom:none;}
+.obj-list li::before{content:"";position:absolute;left:0;top:13px;width:18px;height:18px;background:var(--success-light);border-radius:50%;}
+.obj-list li::after{content:"✓";position:absolute;left:3px;top:10px;color:var(--success);font-size:11px;font-weight:700;}
+.example-box{background:var(--primary-light);border-left:4px solid var(--primary);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.example-box strong{color:var(--primary-dark);}
+.tip-box{background:var(--success-light);border-left:4px solid var(--success);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.tip-box strong{color:var(--success);}
+.warn-box{background:var(--warning-light);border-left:4px solid var(--warning);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.warn-box strong{color:var(--warning);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:14px 0;}
+.def-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;}
+.def-card .def-term{font-weight:700;color:var(--primary-dark);font-size:15px;margin-bottom:6px;}
+.def-card .def-body{font-size:14px;color:#334155;}
+.freq-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;}
+.freq-table th{background:var(--primary);color:#fff;padding:9px 12px;text-align:left;font-weight:600;}
+.freq-table th:not(:first-child),.freq-table td:not(:first-child){text-align:right;}
+.freq-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:#334155;}
+.freq-table tr:nth-child(even) td{background:#f8fafc;}
+.freq-table tr.total-row td{font-weight:700;background:var(--primary-light);color:var(--primary-dark);border-top:2px solid var(--primary);}
+.freq-table th:first-child{border-radius:8px 0 0 0;}.freq-table th:last-child{border-radius:0 8px 0 0;}
+.chart-wrap{background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin:12px 0;}
+.chart-wrap canvas{max-height:260px;}
+.chart-title{font-size:12px;font-weight:600;color:var(--muted);text-align:center;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;}
+.chart-tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.chart-tab{padding:5px 12px;font-size:13px;font-family:inherit;cursor:pointer;border-radius:6px;border:1px solid var(--border);background:#fff;color:var(--muted);transition:all var(--transition);}
+.chart-tab.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.practice{background:#f1f5f9;border:2px dashed #cbd5e1;border-radius:var(--radius-sm);padding:18px;margin:20px 0;}
+.practice h4{color:var(--primary);margin-bottom:10px;font-size:15px;}
+.practice-q{margin-bottom:10px;color:var(--text);font-weight:500;}
+.practice-options{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+.practice-btn{padding:8px 14px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;font-size:14px;transition:all var(--transition);color:var(--text);}
+.practice-btn:hover{border-color:var(--primary);background:var(--primary-light);}
+.practice-btn.correct{background:var(--success-light);border-color:var(--success);color:var(--success);font-weight:600;}
+.practice-btn.wrong{background:var(--danger-light);border-color:var(--danger);color:var(--danger);}
+.practice-btn.disabled{pointer-events:none;opacity:.75;}
+.practice-feedback{margin-top:10px;padding:10px 14px;border-radius:6px;font-size:14px;display:none;}
+.practice-feedback.show{display:block;}
+.practice-feedback.right{background:var(--success-light);color:var(--success);border:1px solid var(--success);}
+.practice-feedback.wrong{background:var(--danger-light);color:var(--danger);border:1px solid var(--danger);}
+.slide-nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border);gap:10px;flex-wrap:wrap;}
+.btn{padding:10px 20px;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;transition:all var(--transition);font-family:inherit;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover:not(:disabled){background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,.28);}
+.btn-primary:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover:not(:disabled){background:var(--bg);color:var(--text);}
+.btn-ghost:disabled{opacity:.45;cursor:not-allowed;}
+.quiz-intro{background:#fff;padding:22px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;text-align:center;}
+.quiz-intro h2{color:var(--primary-dark);margin-bottom:8px;}
+.quiz-intro p{color:var(--muted);margin-bottom:14px;}
+.quiz-question{background:#fff;border-radius:var(--radius);padding:22px;margin-bottom:14px;box-shadow:var(--shadow);border:1px solid var(--border);}
+.quiz-question h4{font-size:16px;margin-bottom:14px;color:var(--text);font-weight:600;}
+.q-num{color:var(--primary);font-weight:700;margin-right:6px;}
+.quiz-options{display:grid;gap:8px;}
+.quiz-option{padding:11px 16px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:#fff;transition:all var(--transition);font-size:14px;color:var(--text);text-align:left;font-family:inherit;}
+.quiz-option:hover{border-color:var(--primary);background:var(--primary-light);transform:translateX(2px);}
+.quiz-option.correct{border-color:var(--success);background:var(--success-light);color:var(--success);font-weight:600;}
+.quiz-option.wrong{border-color:var(--danger);background:var(--danger-light);color:var(--danger);}
+.quiz-option.disabled{pointer-events:none;}
+.quiz-explain{display:none;margin-top:10px;padding:10px 14px;background:#f8fafc;border-left:3px solid var(--primary);border-radius:4px;font-size:13px;color:#334155;}
+.quiz-explain.show{display:block;}
+.quiz-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px 20px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);flex-wrap:wrap;}
+.quiz-progress-text{font-size:13px;color:var(--muted);}
+.quiz-result{display:none;padding:30px;background:linear-gradient(135deg,#f0fdf4 0%,#dbeafe 100%);border-radius:var(--radius);text-align:center;margin-top:16px;box-shadow:var(--shadow);}
+.quiz-result.show{display:block;}
+.quiz-result h3{font-size:24px;margin-bottom:10px;color:var(--primary-dark);}
+.quiz-result .score{font-size:48px;font-weight:700;color:var(--primary);margin:14px 0;line-height:1;}
+.quiz-result .score .total{font-size:26px;color:var(--muted);}
+.quiz-result p{color:#334155;margin-bottom:16px;font-size:15px;}
+.verdict{display:inline-block;padding:6px 14px;border-radius:16px;font-weight:600;font-size:14px;margin-bottom:8px;}
+.verdict.great{background:var(--success-light);color:var(--success);}
+.verdict.good{background:var(--primary-light);color:var(--primary-dark);}
+.verdict.ok{background:var(--warning-light);color:var(--warning);}
+.flashcards-header{background:#fff;padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;text-align:center;}
+.flashcards-header h2{color:var(--primary-dark);margin-bottom:6px;}
+.flashcards-header p{color:var(--muted);font-size:14px;}
+.flashcards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+.flashcard{perspective:1000px;height:170px;cursor:pointer;}
+.flashcard-inner{position:relative;width:100%;height:100%;transition:transform .55s;transform-style:preserve-3d;}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+.flashcard-front,.flashcard-back{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:var(--shadow);}
+.flashcard-front{background:linear-gradient(135deg,#fff 0%,#f8fafc 100%);border:2px solid var(--primary-light);color:var(--primary-dark);font-weight:600;font-size:16px;}
+.flashcard-front .fc-hint{font-size:11px;color:var(--muted);font-weight:400;margin-top:8px;font-style:italic;}
+.flashcard-back{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%);color:#fff;transform:rotateY(180deg);font-size:13px;line-height:1.55;}
+.cases-header{background:#fff;padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;}
+.cases-header h2{color:var(--primary-dark);margin-bottom:6px;}
+.cases-header p{color:var(--muted);font-size:14px;}
+.case-card{background:#fff;border-radius:var(--radius);padding:24px;margin-bottom:16px;box-shadow:var(--shadow);border-left:4px solid var(--primary);}
+.case-card h4{font-size:16px;color:var(--primary-dark);font-weight:700;margin-bottom:12px;}
+.case-prompt{color:#334155;font-size:15px;margin-bottom:14px;line-height:1.6;}
+.case-q{font-weight:600;color:var(--text);margin-bottom:12px;font-size:15px;}
+.case-textarea{width:100%;min-height:80px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;resize:vertical;background:#f8fafc;color:var(--text);transition:border-color var(--transition);}
+.case-textarea:focus{outline:none;border-color:var(--primary);background:#fff;}
+.reveal-btns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+.reveal-btn{padding:8px 16px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;transition:all var(--transition);}
+.reveal-btn.miss{color:var(--warning);border-color:var(--warning);}
+.reveal-btn.miss:hover{background:var(--warning-light);}
+.reveal-btn.right{color:var(--success);border-color:var(--success);}
+.reveal-btn.right:hover{background:var(--success-light);}
+.reveal-panel{display:none;margin-top:12px;padding:14px 16px;border-radius:var(--radius-sm);font-size:14px;line-height:1.6;}
+.reveal-panel.show{display:block;}
+.reveal-panel.miss-panel{background:var(--warning-light);border-left:3px solid var(--warning);color:#78350f;}
+.reveal-panel.right-panel{background:var(--success-light);border-left:3px solid var(--success);color:#064e3b;}
+.case-worked-btn{margin-top:10px;padding:6px 14px;background:var(--primary-light);color:var(--primary-dark);border:none;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;}
+.case-worked-btn.done{background:var(--success-light);color:var(--success);}
+.takeaway-list{list-style:none;padding:0;margin:16px 0;}
+.takeaway-list li{padding:12px 16px 12px 48px;position:relative;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:10px;font-size:15px;color:#1e293b;border:1px solid var(--border);}
+.takeaway-list li .t-num{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:24px;height:24px;background:var(--primary);color:#fff;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.reset-btn{position:fixed;bottom:18px;right:18px;background:#fff;border:1px solid var(--border);padding:8px 14px;border-radius:20px;font-size:13px;color:var(--muted);cursor:pointer;box-shadow:var(--shadow);font-family:inherit;transition:all var(--transition);z-index:100;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+/* dual-chart layout for slide 5 */
+.dual-chart{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;}
+.dual-chart .chart-wrap{margin:0;}
+@media(max-width:720px){
+  .app{padding:14px 12px 80px;}
+  header.mod-header{padding:22px 18px;}
+  header.mod-header h1{font-size:22px;}
+  .card{padding:20px 16px;}
+  .two-col,.dual-chart{grid-template-columns:1fr;}
+  .stats-bar{grid-template-columns:repeat(2,1fr);}
+  .slide h2{font-size:22px;}
+  .freq-table{font-size:12px;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="mod-header">
+  <span class="mod-badge">Module 2 of 16</span>
+  <h1>Organizing and Visualizing Data</h1>
+  <p class="mod-sub">Turning a column of numbers into a picture that reveals what is actually going on.</p>
+  <p class="mod-instructor"><strong>K.M. Tanvir</strong> &nbsp;·&nbsp; Statistics for Non-Statisticians</p>
+</header>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-value" id="stat-slides">0%</div><div class="stat-label">Slides Viewed</div></div>
+  <div class="stat"><div class="stat-value" id="stat-quiz">&#8212;</div><div class="stat-label">Quiz Score</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cards">0 / 16</div><div class="stat-label">Cards Flipped</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cases">0 / 4</div><div class="stat-label">Cases Worked</div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('slides',this)">&#128214; Slides</button>
+  <button class="tab-btn" onclick="switchTab('quiz',this)">&#128221; Quiz</button>
+  <button class="tab-btn" onclick="switchTab('flashcards',this)">&#127183; Flashcards</button>
+  <button class="tab-btn" onclick="switchTab('cases',this)">&#127919; Real Cases</button>
+</div>
+
+<!-- ========== SLIDES ========== -->
+<div id="tab-slides" class="tab-content active">
+<div class="card">
+  <div class="progress-bar"><div class="progress-fill" id="slide-progress"></div></div>
+  <div class="slide-counter" id="slide-counter">Slide 1 of 11</div>
+
+  <!-- S1: objectives -->
+  <div class="slide active" id="slide-1">
+    <h2>Organizing and Visualizing Data</h2>
+    <p class="slide-sub">Module 2 &nbsp;·&nbsp; By the end of this module, you will be able to:</p>
+    <ul class="obj-list">
+      <li>Construct and interpret a frequency distribution table including relative and cumulative frequencies</li>
+      <li>Select the appropriate chart type: bar, grouped bar, stacked bar, histogram, scatter plot, or box plot</li>
+      <li>Distinguish bar charts (categorical) from histograms (quantitative continuous) and explain why the difference matters</li>
+      <li>Read a scatter plot to assess direction, strength, and linearity of a bivariate relationship</li>
+      <li>Extract the five-number summary from a box plot and apply the 1.5 &times; IQR rule to identify potential outliers</li>
+      <li>Recognize chart design choices that distort or mislead readers</li>
+    </ul>
+    <div class="tip-box"><strong>Continuing from Module 1:</strong> The BMI research team has 2,000 measurements in a spreadsheet column. This module turns that raw list into structures and pictures that reveal the data's actual shape.</div>
+  </div>
+
+  <!-- S2: frequency distribution -->
+  <div class="slide" id="slide-2">
+    <h2>Frequency Distributions</h2>
+    <p>A frequency distribution organizes data into classes (bins) and counts how many observations fall into each. The table below is built from the 2,000-student BMI dataset established in Module 1.</p>
+    <table class="freq-table">
+      <thead><tr><th>BMI Class</th><th>Frequency (f)</th><th>Relative Freq.</th><th>Cumulative Rel. Freq.</th></tr></thead>
+      <tbody>
+        <tr><td>15.0 – 17.9</td><td>28</td><td>0.014</td><td>0.014</td></tr>
+        <tr><td>18.0 – 20.9</td><td>210</td><td>0.105</td><td>0.119</td></tr>
+        <tr><td>21.0 – 23.9</td><td>460</td><td>0.230</td><td>0.349</td></tr>
+        <tr><td>24.0 – 26.9</td><td>540</td><td>0.270</td><td>0.619</td></tr>
+        <tr><td>27.0 – 29.9</td><td>380</td><td>0.190</td><td>0.809</td></tr>
+        <tr><td>30.0 – 32.9</td><td>220</td><td>0.110</td><td>0.919</td></tr>
+        <tr><td>33.0 – 35.9</td><td>110</td><td>0.055</td><td>0.974</td></tr>
+        <tr><td>36.0 – 38.9</td><td>42</td><td>0.021</td><td>0.995</td></tr>
+        <tr><td>39.0 – 41.9</td><td>10</td><td>0.005</td><td>1.000</td></tr>
+        <tr class="total-row"><td>Total</td><td>2,000</td><td>1.000</td><td></td></tr>
+      </tbody>
+    </table>
+    <div class="example-box"><strong>Reading the table:</strong> The 24.0–26.9 class contains 27.0% of all students. Together, the three middle classes (21.0–29.9) account for 69.0% of students. This concentration is already visible before drawing a single chart.</div>
+    <div class="tip-box"><strong>Convention:</strong> Classes are left-closed, right-open: a BMI of exactly 18.0 belongs to [18.0, 21.0), not [15.0, 18.0), so each observation falls into exactly one class.</div>
+  </div>
+
+  <!-- S3: bar chart (simple, categorical) -->
+  <div class="slide" id="slide-3">
+    <h2>Bar Charts</h2>
+    <p>A bar chart is used for <strong>qualitative (categorical) variables</strong>. Each bar represents one category; bar length is proportional to frequency or relative frequency. The bars are separated by gaps to signal that the categories are discrete: there are no intermediate values between, say, "Engineering" and "Business."</p>
+    <div class="chart-wrap">
+      <div class="chart-title">Number of students by academic department (n = 2,000)</div>
+      <canvas id="barChart" height="210"></canvas>
+    </div>
+    <h3>Key rules for bar charts</h3>
+    <ul>
+      <li>The vertical axis must start at zero. Truncating it exaggerates differences between bars.</li>
+      <li>For nominal variables (no natural order), bars are often sorted from tallest to shortest to help the reader identify the most and least common categories at a glance.</li>
+      <li>Horizontal bar charts work better when category labels are long and would overlap on a vertical chart.</li>
+    </ul>
+    <div class="warn-box"><strong>Do not use a bar chart for quantitative continuous data.</strong> Drawing a separate bar for each numerical value (BMI = 22, 23, 24 ...) implies the values are discrete categories. For continuous data, use a histogram, which is the subject of the next slide.</div>
+  </div>
+
+  <!-- S4: histogram -->
+  <div class="slide" id="slide-4">
+    <h2>Histograms</h2>
+    <p>A histogram is the correct display for a <strong>quantitative continuous variable</strong>. Each bar covers one class interval, and the bars touch each other because there are no gaps in the underlying number line. The height of each bar represents the frequency (or relative frequency) of observations in that interval.</p>
+    <div class="chart-wrap">
+      <div class="chart-title">BMI distribution among 2,000 university students</div>
+      <div class="chart-tabs">
+        <button class="chart-tab active" onclick="switchHistType('freq',this)">Frequency</button>
+        <button class="chart-tab" onclick="switchHistType('rel',this)">Relative Frequency</button>
+      </div>
+      <canvas id="histChart" height="210"></canvas>
+    </div>
+    <p>The histogram immediately reveals what the table could only hint at: the data is concentrated between BMI 21 and 30, with a gentle rightward tail. This <strong>right-skewed</strong> shape means most students have moderate BMI values, but a minority with notably high values stretch the distribution toward the right.</p>
+    <div class="practice" id="prac-1">
+      <h4>&#9999; Quick Check</h4>
+      <p class="practice-q">What fraction of students have a BMI below 24.0? (Use the frequency table from Slide 2.)</p>
+      <div class="practice-options">
+        <button class="practice-btn" onclick="checkPrac('prac-1',this,false)">11.9%</button>
+        <button class="practice-btn" onclick="checkPrac('prac-1',this,false)">23.0%</button>
+        <button class="practice-btn" onclick="checkPrac('prac-1',this,true)">34.9%</button>
+        <button class="practice-btn" onclick="checkPrac('prac-1',this,false)">61.9%</button>
+      </div>
+      <div class="practice-feedback" id="prac-1-fb"></div>
+    </div>
+  </div>
+
+  <!-- S5: grouped + stacked bar (same data, two charts) -->
+  <div class="slide" id="slide-5">
+    <h2>Grouped and Stacked Bar Charts</h2>
+    <p>When a categorical variable interacts with a second categorical variable (a grouping factor), two variants of the bar chart become useful. Both charts below display <strong>exactly the same data</strong>: the number of students in each BMI category across four departments.</p>
+    <div class="dual-chart">
+      <div class="chart-wrap">
+        <div class="chart-title">Grouped (side-by-side) bar chart</div>
+        <canvas id="groupedBar" height="220"></canvas>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-title">Stacked bar chart</div>
+        <div class="chart-tabs" style="justify-content:center;">
+          <button class="chart-tab active" onclick="switchStackType('abs',this)">Count</button>
+          <button class="chart-tab" onclick="switchStackType('pct',this)">100%</button>
+        </div>
+        <canvas id="stackedBar" height="185"></canvas>
+      </div>
+    </div>
+    <div class="two-col" style="margin-top:14px;">
+      <div class="def-card">
+        <div class="def-term">Grouped bar chart</div>
+        <div class="def-body">Places bars for each subgroup side by side. Best for <strong>comparing individual subgroup values</strong> across categories. The eye can judge bar heights directly from a shared baseline.</div>
+      </div>
+      <div class="def-card">
+        <div class="def-term">Stacked bar chart</div>
+        <div class="def-body">Places subgroup bars on top of one another. Shows <strong>totals and compositional shares</strong>. The 100% variant scales all bars to the same height, emphasizing proportions rather than counts.</div>
+      </div>
+    </div>
+    <div class="tip-box"><strong>When to switch to 100% stacked:</strong> If department sizes differ substantially, the 100% view lets you compare <em>proportional composition</em> without the distraction of unequal group sizes dominating the visual.</div>
+  </div>
+
+  <!-- S6: scatter plot -->
+  <div class="slide" id="slide-6">
+    <h2>Scatter Plots</h2>
+    <p>A scatter plot displays the relationship between <strong>two quantitative variables</strong> simultaneously. Each observation becomes a single point: its horizontal position encodes one variable, its vertical position the other.</p>
+    <div class="chart-wrap">
+      <div class="chart-title">Hours of physical activity per week vs. BMI (sample of 120 students)</div>
+      <canvas id="scatterChart" height="240"></canvas>
+    </div>
+    <h3>What to look for</h3>
+    <ul>
+      <li><strong>Direction:</strong> Upward slope = positive association. Downward slope = negative association.</li>
+      <li><strong>Strength:</strong> Tight clustering around an imaginary line = strong. Diffuse spread = weak.</li>
+      <li><strong>Linearity:</strong> Is the trend approximately straight, or does it curve?</li>
+      <li><strong>Outliers:</strong> Points far from the main cluster may warrant investigation.</li>
+    </ul>
+    <div class="example-box"><strong>Reading this chart:</strong> Students who report more weekly physical activity tend to have lower BMI values (moderate negative association, broadly linear). This is an observational association, not proof of causation. Active students may differ from sedentary ones in diet, sleep, and many other unmeasured ways.</div>
+  </div>
+
+  <!-- S7: box plot (single) -->
+  <div class="slide" id="slide-7">
+    <h2>Box Plots</h2>
+    <p>A box plot (box-and-whisker plot) summarizes a distribution using five values: minimum, Q1, median, Q3, and maximum. It simultaneously reveals center, spread, skewness, and potential outliers.</p>
+    <svg viewBox="0 0 680 190" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:680px;margin:10px auto;display:block;">
+      <!-- axis -->
+      <line x1="60" y1="148" x2="650" y2="148" stroke="#e2e8f0" stroke-width="1.5"/>
+      <!-- ticks + labels: scale: 1 BMI unit = (650-60)/26 = 22.7px, origin BMI 14 at x=60 -->
+      <!-- toX(v) = 60 + (v-14)*22.7 -->
+      <!-- 15→83, 20→197, 25→311, 30→425, 35→538, 40→652 -->
+      <line x1="83"  y1="144" x2="83"  y2="152" stroke="#94a3b8" stroke-width="1.5"/><text x="83"  y="164" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="Inter,sans-serif">15</text>
+      <line x1="197" y1="144" x2="197" y2="152" stroke="#94a3b8" stroke-width="1.5"/><text x="197" y="164" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="Inter,sans-serif">20</text>
+      <line x1="311" y1="144" x2="311" y2="152" stroke="#94a3b8" stroke-width="1.5"/><text x="311" y="164" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="Inter,sans-serif">25</text>
+      <line x1="425" y1="144" x2="425" y2="152" stroke="#94a3b8" stroke-width="1.5"/><text x="425" y="164" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="Inter,sans-serif">30</text>
+      <line x1="538" y1="144" x2="538" y2="152" stroke="#94a3b8" stroke-width="1.5"/><text x="538" y="164" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="Inter,sans-serif">35</text>
+      <text x="355" y="180" text-anchor="middle" font-size="11" fill="#64748b" font-family="Inter,sans-serif">BMI</text>
+      <!-- toX: min=15.2→83+0.2*22.7=87.5≈88, Q1=21.5→60+7.5*22.7=230, Med=24.5→60+10.5*22.7=298, Q3=28.5→60+14.5*22.7=389, max(fence)=36→60+22*22.7=559, outlier=39.5→60+25.5*22.7=639 -->
+      <!-- Left whisker -->
+      <line x1="88" y1="90" x2="230" y2="90" stroke="#2563eb" stroke-width="2"/>
+      <line x1="88" y1="75" x2="88" y2="105" stroke="#2563eb" stroke-width="2"/>
+      <!-- Box -->
+      <rect x="230" y="66" width="159" height="48" rx="4" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+      <!-- Median -->
+      <line x1="298" y1="66" x2="298" y2="114" stroke="#1d4ed8" stroke-width="3"/>
+      <!-- Right whisker -->
+      <line x1="389" y1="90" x2="559" y2="90" stroke="#2563eb" stroke-width="2"/>
+      <line x1="559" y1="75" x2="559" y2="105" stroke="#2563eb" stroke-width="2"/>
+      <!-- Outlier -->
+      <circle cx="639" cy="90" r="6" fill="none" stroke="#dc2626" stroke-width="2"/>
+      <!-- Annotations above -->
+      <text x="88"  y="55" text-anchor="middle" font-size="10" font-weight="600" fill="#1e40af" font-family="Inter,sans-serif">Min</text>
+      <text x="88"  y="44" text-anchor="middle" font-size="10" fill="#1e40af" font-family="Inter,sans-serif">15.2</text>
+      <text x="230" y="55" text-anchor="middle" font-size="10" font-weight="600" fill="#1e40af" font-family="Inter,sans-serif">Q1</text>
+      <text x="230" y="44" text-anchor="middle" font-size="10" fill="#1e40af" font-family="Inter,sans-serif">21.5</text>
+      <text x="298" y="55" text-anchor="middle" font-size="10" font-weight="600" fill="#1d4ed8" font-family="Inter,sans-serif">Median</text>
+      <text x="298" y="44" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter,sans-serif">24.5</text>
+      <text x="389" y="55" text-anchor="middle" font-size="10" font-weight="600" fill="#1e40af" font-family="Inter,sans-serif">Q3</text>
+      <text x="389" y="44" text-anchor="middle" font-size="10" fill="#1e40af" font-family="Inter,sans-serif">28.5</text>
+      <text x="559" y="55" text-anchor="middle" font-size="10" font-weight="600" fill="#1e40af" font-family="Inter,sans-serif">Max*</text>
+      <text x="559" y="44" text-anchor="middle" font-size="10" fill="#1e40af" font-family="Inter,sans-serif">36.0</text>
+      <text x="639" y="55" text-anchor="middle" font-size="10" font-weight="600" fill="#dc2626" font-family="Inter,sans-serif">Outlier</text>
+      <text x="639" y="44" text-anchor="middle" font-size="10" fill="#dc2626" font-family="Inter,sans-serif">39.5</text>
+      <!-- IQR brace label -->
+      <text x="310" y="132" text-anchor="middle" font-size="11" fill="#4f46e5" font-family="Inter,sans-serif">IQR = Q3 − Q1 = 7.0  (middle 50% of data)</text>
+    </svg>
+    <div class="two-col">
+      <div class="def-card">
+        <div class="def-term">Interquartile Range (IQR)</div>
+        <div class="def-body">IQR = Q3 &minus; Q1 = 28.5 &minus; 21.5 = 7.0. Measures spread of the middle 50% of data. Resistant to outliers. The box width represents the IQR.</div>
+      </div>
+      <div class="def-card">
+        <div class="def-term">Outlier detection (1.5 &times; IQR rule)</div>
+        <div class="def-body">Upper fence = Q3 + 1.5 &times; 7.0 = 39.0. Lower fence = Q1 &minus; 1.5 &times; 7.0 = 11.0. The value 39.5 exceeds the upper fence, so it is flagged as an outlier (open circle beyond the whisker).</div>
+      </div>
+    </div>
+    <div class="practice" id="prac-2">
+      <h4>&#9999; Quick Check</h4>
+      <p class="practice-q">In the box plot above, what percentage of students have a BMI between Q1 (21.5) and Q3 (28.5)?</p>
+      <div class="practice-options">
+        <button class="practice-btn" onclick="checkPrac('prac-2',this,false)">25%</button>
+        <button class="practice-btn" onclick="checkPrac('prac-2',this,true)">50%</button>
+        <button class="practice-btn" onclick="checkPrac('prac-2',this,false)">75%</button>
+        <button class="practice-btn" onclick="checkPrac('prac-2',this,false)">It depends on the distribution</button>
+      </div>
+      <div class="practice-feedback" id="prac-2-fb"></div>
+    </div>
+  </div>
+
+  <!-- S8: comparing groups with box plots (SVG) -->
+  <div class="slide" id="slide-8">
+    <h2>Comparing Groups with Box Plots</h2>
+    <p>Side-by-side box plots placed on a common axis are one of the most efficient ways to compare the distribution of a variable across several groups. A single glance reveals differences in center, spread, and skewness that would take several tables to communicate.</p>
+    <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;margin:12px auto;display:block;">
+      <!-- axis ticks: BMI scale 14–42, plot x: 110 to 670, width=560 -->
+      <!-- toX(v) = 110 + (v-14)/28 * 560 -->
+      <!-- 14→110, 18→190, 22→270, 26→350, 30→430, 34→510, 38→590, 42→670 -->
+      <line x1="110" y1="260" x2="670" y2="260" stroke="#e2e8f0" stroke-width="1.5"/>
+      <line x1="190" y1="255" x2="190" y2="265" stroke="#94a3b8" stroke-width="1.5"/><text x="190" y="277" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="Inter,sans-serif">18</text>
+      <line x1="270" y1="255" x2="270" y2="265" stroke="#94a3b8" stroke-width="1.5"/><text x="270" y="277" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="Inter,sans-serif">22</text>
+      <line x1="350" y1="255" x2="350" y2="265" stroke="#94a3b8" stroke-width="1.5"/><text x="350" y="277" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="Inter,sans-serif">26</text>
+      <line x1="430" y1="255" x2="430" y2="265" stroke="#94a3b8" stroke-width="1.5"/><text x="430" y="277" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="Inter,sans-serif">30</text>
+      <line x1="510" y1="255" x2="510" y2="265" stroke="#94a3b8" stroke-width="1.5"/><text x="510" y="277" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="Inter,sans-serif">34</text>
+      <line x1="590" y1="255" x2="590" y2="265" stroke="#94a3b8" stroke-width="1.5"/><text x="590" y="277" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="Inter,sans-serif">38</text>
+      <text x="390" y="295" text-anchor="middle" font-size="11" fill="#64748b" font-family="Inter,sans-serif">BMI</text>
+      <!-- Grid verticals -->
+      <line x1="190" y1="10" x2="190" y2="260" stroke="#f1f5f9" stroke-width="1"/>
+      <line x1="270" y1="10" x2="270" y2="260" stroke="#f1f5f9" stroke-width="1"/>
+      <line x1="350" y1="10" x2="350" y2="260" stroke="#f1f5f9" stroke-width="1"/>
+      <line x1="430" y1="10" x2="430" y2="260" stroke="#f1f5f9" stroke-width="1"/>
+      <line x1="510" y1="10" x2="510" y2="260" stroke="#f1f5f9" stroke-width="1"/>
+      <line x1="590" y1="10" x2="590" y2="260" stroke="#f1f5f9" stroke-width="1"/>
+      <!-- Department labels (right-aligned at x=105) -->
+      <text x="105" y="49"  text-anchor="end" font-size="12" fill="#334155" font-family="Inter,sans-serif" font-weight="600">Engineering</text>
+      <text x="105" y="99"  text-anchor="end" font-size="12" fill="#334155" font-family="Inter,sans-serif" font-weight="600">Business</text>
+      <text x="105" y="149" text-anchor="end" font-size="12" fill="#334155" font-family="Inter,sans-serif" font-weight="600">Science</text>
+      <text x="105" y="199" text-anchor="end" font-size="12" fill="#334155" font-family="Inter,sans-serif" font-weight="600">Social Sci.</text>
+      <text x="105" y="249" text-anchor="end" font-size="12" fill="#334155" font-family="Inter,sans-serif" font-weight="600">Humanities</text>
+      <!-- 
+        Row cy values: 45, 95, 145, 195, 245  (each row 50px)
+        Box half-height: 14px
+        toX(v) = 110 + (v-14)/28*560
+        Eng:  min=15.5→141  q1=21.2→231  med=24.1→290  q3=28.0→350  max=35.5→471
+        Bus:  min=17.0→171  q1=22.5→251  med=25.8→313  q3=29.5→391  max=38.0→511
+        Sci:  min=16.0→151  q1=20.8→221  med=23.5→270  q3=27.2→331  max=34.0→451
+        Soc:  min=18.0→190  q1=23.0→261  med=26.5→330  q3=30.0→390  max=37.5→511
+        Hum:  min=16.5→161  q1=21.0→230  med=24.8→297  q3=28.8→371  max=36.0→491
+      -->
+      <!-- Engineering cy=45 -->
+      <line x1="141" y1="45" x2="231" y2="45" stroke="#2563eb" stroke-width="2"/>
+      <line x1="141" y1="31" x2="141" y2="59" stroke="#2563eb" stroke-width="2"/>
+      <rect x="231" y="31" width="119" height="28" rx="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+      <line x1="290" y1="31" x2="290" y2="59" stroke="#1d4ed8" stroke-width="2.5"/>
+      <line x1="350" y1="45" x2="471" y2="45" stroke="#2563eb" stroke-width="2"/>
+      <line x1="471" y1="31" x2="471" y2="59" stroke="#2563eb" stroke-width="2"/>
+      <!-- Business cy=95 -->
+      <line x1="171" y1="95" x2="251" y2="95" stroke="#2563eb" stroke-width="2"/>
+      <line x1="171" y1="81" x2="171" y2="109" stroke="#2563eb" stroke-width="2"/>
+      <rect x="251" y="81" width="140" height="28" rx="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+      <line x1="313" y1="81" x2="313" y2="109" stroke="#1d4ed8" stroke-width="2.5"/>
+      <line x1="391" y1="95" x2="511" y2="95" stroke="#2563eb" stroke-width="2"/>
+      <line x1="511" y1="81" x2="511" y2="109" stroke="#2563eb" stroke-width="2"/>
+      <!-- Science cy=145 -->
+      <line x1="151" y1="145" x2="221" y2="145" stroke="#2563eb" stroke-width="2"/>
+      <line x1="151" y1="131" x2="151" y2="159" stroke="#2563eb" stroke-width="2"/>
+      <rect x="221" y="131" width="110" height="28" rx="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+      <line x1="270" y1="131" x2="270" y2="159" stroke="#1d4ed8" stroke-width="2.5"/>
+      <line x1="331" y1="145" x2="451" y2="145" stroke="#2563eb" stroke-width="2"/>
+      <line x1="451" y1="131" x2="451" y2="159" stroke="#2563eb" stroke-width="2"/>
+      <!-- Social Sci cy=195 -->
+      <line x1="190" y1="195" x2="261" y2="195" stroke="#2563eb" stroke-width="2"/>
+      <line x1="190" y1="181" x2="190" y2="209" stroke="#2563eb" stroke-width="2"/>
+      <rect x="261" y="181" width="129" height="28" rx="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+      <line x1="330" y1="181" x2="330" y2="209" stroke="#1d4ed8" stroke-width="2.5"/>
+      <line x1="390" y1="195" x2="511" y2="195" stroke="#2563eb" stroke-width="2"/>
+      <line x1="511" y1="181" x2="511" y2="209" stroke="#2563eb" stroke-width="2"/>
+      <!-- Humanities cy=245 -->
+      <line x1="161" y1="245" x2="230" y2="245" stroke="#2563eb" stroke-width="2"/>
+      <line x1="161" y1="231" x2="161" y2="259" stroke="#2563eb" stroke-width="2"/>
+      <rect x="230" y="231" width="141" height="28" rx="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+      <line x1="297" y1="231" x2="297" y2="259" stroke="#1d4ed8" stroke-width="2.5"/>
+      <line x1="371" y1="245" x2="491" y2="245" stroke="#2563eb" stroke-width="2"/>
+      <line x1="491" y1="231" x2="491" y2="259" stroke="#2563eb" stroke-width="2"/>
+    </svg>
+    <div class="tip-box"><strong>Box plots vs. histograms for comparison:</strong> A histogram gives the richest picture of one group's shape. Side-by-side box plots sacrifice some shape detail but enable efficient comparison across many groups simultaneously, answering "which department has the widest spread?" or "which has the highest median?" in a single view.</div>
+  </div>
+
+  <!-- S9: chart selection guide -->
+  <div class="slide" id="slide-9">
+    <h2>Choosing the Right Chart</h2>
+    <p>Chart selection is not an aesthetic decision. Each chart type is designed to answer a specific kind of question. Using the wrong type produces displays that are at best uninformative and at worst misleading.</p>
+    <svg viewBox="0 0 700 290" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;margin:14px auto;display:block;">
+      <text x="10"  y="22" font-size="10" font-weight="700" fill="#94a3b8" font-family="Inter,sans-serif" letter-spacing="0.5">CHART TYPE</text>
+      <text x="210" y="22" font-size="10" font-weight="700" fill="#94a3b8" font-family="Inter,sans-serif" letter-spacing="0.5">VARIABLE TYPE</text>
+      <text x="390" y="22" font-size="10" font-weight="700" fill="#94a3b8" font-family="Inter,sans-serif" letter-spacing="0.5">PRIMARY QUESTION ANSWERED</text>
+      <line x1="0" y1="28" x2="700" y2="28" stroke="#e2e8f0" stroke-width="1"/>
+      <!-- rows alternating -->
+      <rect x="0" y="30"  width="700" height="40" rx="4" fill="#eff6ff"/>
+      <rect x="0" y="72"  width="700" height="40" rx="4" fill="#f5f3ff"/>
+      <rect x="0" y="114" width="700" height="40" rx="4" fill="#fef3c7"/>
+      <rect x="0" y="156" width="700" height="40" rx="4" fill="#eff6ff"/>
+      <rect x="0" y="198" width="700" height="40" rx="4" fill="#f0fdf4"/>
+      <rect x="0" y="240" width="700" height="40" rx="4" fill="#fdf2f8"/>
+      <!-- Bar -->
+      <text x="10" y="56"  font-size="13" font-weight="600" fill="#1e40af" font-family="Inter,sans-serif">Bar chart</text>
+      <text x="210" y="56" font-size="13" fill="#334155" font-family="Inter,sans-serif">Qualitative (one variable)</text>
+      <text x="390" y="56" font-size="13" fill="#334155" font-family="Inter,sans-serif">How many in each category?</text>
+      <!-- Grouped -->
+      <text x="10" y="98"  font-size="13" font-weight="600" fill="#5b21b6" font-family="Inter,sans-serif">Grouped bar chart</text>
+      <text x="210" y="98" font-size="13" fill="#334155" font-family="Inter,sans-serif">Qualitative (two variables)</text>
+      <text x="390" y="98" font-size="13" fill="#334155" font-family="Inter,sans-serif">Compare subgroups across categories</text>
+      <!-- Stacked -->
+      <text x="10" y="140"  font-size="13" font-weight="600" fill="#92400e" font-family="Inter,sans-serif">Stacked bar chart</text>
+      <text x="210" y="140" font-size="13" fill="#334155" font-family="Inter,sans-serif">Qualitative (two variables)</text>
+      <text x="390" y="140" font-size="13" fill="#334155" font-family="Inter,sans-serif">Part-to-whole composition per category</text>
+      <!-- Histogram -->
+      <text x="10" y="182"  font-size="13" font-weight="600" fill="#1e40af" font-family="Inter,sans-serif">Histogram</text>
+      <text x="210" y="182" font-size="13" fill="#334155" font-family="Inter,sans-serif">Quantitative continuous</text>
+      <text x="390" y="182" font-size="13" fill="#334155" font-family="Inter,sans-serif">Shape and concentration of one variable</text>
+      <!-- Scatter -->
+      <text x="10" y="224"  font-size="13" font-weight="600" fill="#065f46" font-family="Inter,sans-serif">Scatter plot</text>
+      <text x="210" y="224" font-size="13" fill="#334155" font-family="Inter,sans-serif">Two quantitative variables</text>
+      <text x="390" y="224" font-size="13" fill="#334155" font-family="Inter,sans-serif">Relationship between two variables</text>
+      <!-- Box plot -->
+      <text x="10" y="266"  font-size="13" font-weight="600" fill="#7e1d5d" font-family="Inter,sans-serif">Box plot</text>
+      <text x="210" y="266" font-size="13" fill="#334155" font-family="Inter,sans-serif">Quantitative (one or more groups)</text>
+      <text x="390" y="266" font-size="13" fill="#334155" font-family="Inter,sans-serif">Five-number summary; compare groups</text>
+    </svg>
+    <div class="warn-box"><strong>The most common error:</strong> Applying a bar chart to a quantitative continuous variable (drawing separate bars for BMI = 22, 23, 24 ...). The gaps between bars falsely imply that the values between them are impossible. A histogram with appropriate class intervals is the correct choice.</div>
+  </div>
+
+  <!-- S10: misleading charts -->
+  <div class="slide" id="slide-10">
+    <h2>When Charts Mislead</h2>
+    <p>A well-designed chart reveals truth; a poorly designed or deliberately manipulative one conceals it. Recognizing these techniques is an essential skill for any quantitatively literate reader.</p>
+    <h3>Truncated Y-Axis</h3>
+    <p>Starting the vertical axis at a non-zero value exaggerates differences between bars. A change from 44% to 46% appears to triple when the axis runs from 43% to 47% rather than 0% to 100%.</p>
+    <h3>Inconsistent Class Widths in Histograms</h3>
+    <p>If class widths are unequal, bar <em>height</em> must represent frequency density (frequency &divide; class width), not raw frequency. Using raw frequency with unequal widths makes wider classes appear artificially larger.</p>
+    <h3>Overloaded Grouped Bar Charts</h3>
+    <p>More than four subgroups per cluster produces bars too narrow to read and a legend too crowded to parse. The visual appears dense with information while transmitting very little.</p>
+    <h3>Scatter Plots without Scales</h3>
+    <p>A scatter plot whose axes lack a scale or begin at arbitrary points can make a weak relationship look strong, or a strong one look weak, purely through axis compression or expansion.</p>
+    <div class="warn-box"><strong>Practical check:</strong> Before accepting a chart's message, verify the axis origin and scale, confirm that the chart type suits the variable type, and ask whether the data range was selectively chosen to support a predetermined conclusion.</div>
+  </div>
+
+  <!-- S11: recap -->
+  <div class="slide" id="slide-11">
+    <h2>Module 2 Recap</h2>
+    <p class="slide-sub">Six principles to carry forward:</p>
+    <ul class="takeaway-list">
+      <li><span class="t-num">1</span>A frequency table compresses raw data into a structured summary. It is always the first step before drawing any chart.</li>
+      <li><span class="t-num">2</span>Bar charts (categorical, gaps between bars) and histograms (continuous, touching bars) look similar but belong to different data types. Confusing them is a substantive error, not merely cosmetic.</li>
+      <li><span class="t-num">3</span>Use a grouped bar chart to compare individual subgroup values; use a stacked bar chart (especially 100%) to compare proportional composition.</li>
+      <li><span class="t-num">4</span>A scatter plot is the first tool for investigating a relationship between two quantitative variables. Always assess direction, strength, linearity, and outliers before computing any summary number.</li>
+      <li><span class="t-num">5</span>A box plot condenses an entire distribution into five numbers, identifies outliers via the 1.5 &times; IQR rule, and enables efficient group comparison when placed side by side.</li>
+      <li><span class="t-num">6</span>Truncated axes, wrong chart types, and selective data ranges are routinely used to mislead. Verification of these three features should precede any chart interpretation.</li>
+    </ul>
+    <div class="tip-box"><strong>Next:</strong> Module 3 introduces numerical measures of center, the mean, median, and mode, anchoring the visual intuitions built here in precise arithmetic definitions.</div>
+  </div>
+
+  <div class="slide-nav">
+    <button class="btn btn-ghost" id="btn-prev" onclick="changeSlide(-1)" disabled>&#8592; Previous</button>
+    <span style="font-size:13px;color:var(--muted);">Use arrow keys or buttons</span>
+    <button class="btn btn-primary" id="btn-next" onclick="changeSlide(1)">Next &#8594;</button>
+  </div>
+</div>
+</div>
+
+<!-- ========== QUIZ ========== -->
+<div id="tab-quiz" class="tab-content">
+<div class="quiz-intro">
+  <h2>&#128221; Module Quiz</h2>
+  <p>10 questions on frequency distributions and data visualization.</p>
+  <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
+</div>
+<div id="quiz-questions" style="display:none;">
+  <div class="quiz-question" id="qq-1">
+    <h4><span class="q-num">1.</span>A researcher records the department of each of 500 students. The most appropriate chart is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(1,this,false)">A histogram</button>
+      <button class="quiz-option" onclick="answerQ(1,this,true)">A bar chart</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">A scatter plot</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">A box plot</button>
+    </div>
+    <div class="quiz-explain" id="qe-1">Department is a nominal qualitative variable. A bar chart is the correct choice. A histogram would falsely imply that continuous values exist between the named categories.</div>
+  </div>
+  <div class="quiz-question" id="qq-2">
+    <h4><span class="q-num">2.</span>Why do the bars in a histogram touch each other, unlike in a bar chart?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(2,this,false)">To make the chart more compact</button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">Because adjacent class frequencies are always equal</button>
+      <button class="quiz-option" onclick="answerQ(2,this,true)">Because the underlying variable is continuous with no gaps between adjacent class intervals</button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">Because the vertical axis always starts at zero</button>
+    </div>
+    <div class="quiz-explain" id="qe-2">Continuous variables can take any value within a range, so there are no forbidden values between classes. Touching bars reflect this continuity. Gaps in a bar chart signal that categories are discrete and separate.</div>
+  </div>
+  <div class="quiz-question" id="qq-3">
+    <h4><span class="q-num">3.</span>You want to compare average exam scores for male and female students across three departments. The best chart is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(3,this,false)">A stacked bar chart</button>
+      <button class="quiz-option" onclick="answerQ(3,this,true)">A grouped bar chart</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">A histogram</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">A box plot</button>
+    </div>
+    <div class="quiz-explain" id="qe-3">A grouped bar chart places bars for each gender side by side within each department, enabling direct height comparison within and across departments from a shared baseline. A stacked bar chart would make the non-baseline group hard to compare.</div>
+  </div>
+  <div class="quiz-question" id="qq-4">
+    <h4><span class="q-num">4.</span>A 100% stacked bar chart shows the proportion of students in each BMI category across four departments. What does switching to 100% stacked remove from the display?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(4,this,false)">Information about which categories are present</button>
+      <button class="quiz-option" onclick="answerQ(4,this,true)">Information about the total number of students per department</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">Information about proportional composition</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">Information about the number of BMI categories</button>
+    </div>
+    <div class="quiz-explain" id="qe-4">Scaling all bars to 100% height removes information about group size, since every department bar now looks equally tall regardless of how many students are in it. What remains is each department's proportional composition, which is exactly what the 100% stacked chart emphasizes.</div>
+  </div>
+  <div class="quiz-question" id="qq-5">
+    <h4><span class="q-num">5.</span>A scatter plot of study hours (x) vs. CGPA (y) shows points clustering tightly around an upward-sloping line. This indicates:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(5,this,false)">A strong negative association</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">A weak positive association</button>
+      <button class="quiz-option" onclick="answerQ(5,this,true)">A strong positive association</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">No association</button>
+    </div>
+    <div class="quiz-explain" id="qe-5">Upward slope = positive direction (as x increases, y tends to increase). Tight clustering = strong relationship. Together: strong positive association. This does not imply causation; students who study more may also differ in other relevant ways.</div>
+  </div>
+  <div class="quiz-question" id="qq-6">
+    <h4><span class="q-num">6.</span>In a box plot, the box spans from Q1 to Q3. What percentage of the data does the box represent?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(6,this,false)">25%</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">75%</button>
+      <button class="quiz-option" onclick="answerQ(6,this,true)">50%</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">It depends on the distribution shape</button>
+    </div>
+    <div class="quiz-explain" id="qe-6">Q1 is the 25th percentile and Q3 is the 75th percentile by definition. The interval between them therefore contains exactly the middle 50% of all observations in the dataset, regardless of the distribution's shape.</div>
+  </div>
+  <div class="quiz-question" id="qq-7">
+    <h4><span class="q-num">7.</span>For a dataset with Q1 = 40 and Q3 = 60, which value would be flagged as an outlier by the 1.5 × IQR rule?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(7,this,false)">25</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">35</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">85</button>
+      <button class="quiz-option" onclick="answerQ(7,this,true)">95</button>
+    </div>
+    <div class="quiz-explain" id="qe-7">IQR = 60 &minus; 40 = 20. Upper fence = 60 + 1.5 &times; 20 = 90. Lower fence = 40 &minus; 30 = 10. Only 95 exceeds the upper fence of 90, so it is the only outlier among the choices.</div>
+  </div>
+  <div class="quiz-question" id="qq-8">
+    <h4><span class="q-num">8.</span>A histogram of income has a long tail to the right. This shape is called:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(8,this,false)">Left-skewed</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">Symmetric</button>
+      <button class="quiz-option" onclick="answerQ(8,this,true)">Right-skewed</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">Bimodal</button>
+    </div>
+    <div class="quiz-explain" id="qe-8">Skewness is named after the direction of the tail. A right-skewed distribution has its bulk on the left and a long tail reaching toward higher values. Income is a classic example: most earners cluster at moderate levels, but a small number of high earners stretch the distribution far to the right.</div>
+  </div>
+  <div class="quiz-question" id="qq-9">
+    <h4><span class="q-num">9.</span>A bar chart's vertical axis runs from 98 to 106, making the bar for 100 look much shorter than the bar for 106. This is an example of:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(9,this,false)">An appropriate zoom to show detail</button>
+      <button class="quiz-option" onclick="answerQ(9,this,true)">A truncated axis that exaggerates visual differences</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">A grouped bar chart design error</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">An inconsistent class-width problem</button>
+    </div>
+    <div class="quiz-explain" id="qe-9">Starting the axis at 98 rather than 0 compresses the reference baseline so the visible variation fills the full chart height. A genuine 6-unit difference appears far larger than it is. This is among the most widely exploited techniques for making modest differences look dramatic.</div>
+  </div>
+  <div class="quiz-question" id="qq-10">
+    <h4><span class="q-num">10.</span>You want to investigate whether taller students tend to have higher BMI. The most appropriate chart is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(10,this,false)">A grouped bar chart</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">A histogram</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">A box plot</button>
+      <button class="quiz-option" onclick="answerQ(10,this,true)">A scatter plot</button>
+    </div>
+    <div class="quiz-explain" id="qe-10">Height and BMI are both quantitative continuous variables. A scatter plot is the correct tool for visualizing the relationship between two quantitative variables simultaneously. Each student becomes one point, and the pattern of points reveals the direction and strength of the association.</div>
+  </div>
+  <div class="quiz-footer">
+    <span class="quiz-progress-text" id="quiz-progress">0 of 10 answered</span>
+    <button class="btn btn-primary" onclick="submitQuiz()" id="btn-submit-quiz" disabled>Submit Quiz</button>
+  </div>
+  <div class="quiz-result" id="quiz-result">
+    <h3>Quiz Complete</h3>
+    <div class="score" id="quiz-score-display">0<span class="total"> / 10</span></div>
+    <div class="verdict" id="quiz-verdict"></div>
+    <p id="quiz-msg"></p>
+    <button class="btn btn-primary" onclick="retakeQuiz()">Retake Quiz</button>
+  </div>
+</div>
+</div>
+
+<!-- ========== FLASHCARDS ========== -->
+<div id="tab-flashcards" class="tab-content">
+<div class="flashcards-header">
+  <h2>&#127183; Flashcards</h2>
+  <p>16 key terms from Module 2. Click any card to reveal its definition.</p>
+</div>
+<div class="flashcards-grid" id="fc-grid"></div>
+</div>
+
+<!-- ========== REAL CASES ========== -->
+<div id="tab-cases" class="tab-content">
+<div class="cases-header">
+  <h2>&#127919; Real Cases</h2>
+  <p>Read each scenario, write your interpretation, then reveal what most people miss and what the careful reading looks like.</p>
+</div>
+
+<div class="case-card" id="case-1">
+  <h4>Case 1: The Dramatic Sales Chart</h4>
+  <p class="case-prompt">A company's annual report includes a bar chart titled "Unprecedented Revenue Growth." The vertical axis runs from 980 to 1,020 crore taka. The bars show 2021 = 990, 2022 = 998, 2023 = 1,005, 2024 = 1,012. The tallest bar appears to be roughly five times the height of the shortest.</p>
+  <p class="case-q">What does the data actually show, and why does the visual impression diverge so dramatically from the arithmetic?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-1','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-1','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-1" onclick="markCaseWorked(1)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-1">Most readers accept the visual impression of dramatic, accelerating growth. The title "Unprecedented" reinforces this, and the tall final bar seems to confirm it.</div>
+  <div class="reveal-panel right-panel" id="right-case-1">Revenue grew from 990 to 1,012 crore over four years: an increase of 22 crore on a base of 990, roughly 2.2% total growth (about 0.7% per year, barely above inflation). By starting the axis at 980 rather than 0, the tiny 22-crore variation is stretched across the full chart height. A bar representing 1,012 that should appear 1.022 times as tall as one for 990 instead appears roughly five times as tall. The word "unprecedented" is technically defensible (revenue did reach a new high) while the visual impression of dramatic growth is manufactured entirely by the axis choice.</div>
+</div>
+
+<div class="case-card" id="case-2">
+  <h4>Case 2: Scatter Plot and Causation</h4>
+  <p class="case-prompt">A health researcher publishes a scatter plot with "Hours of sleep per night" on the x-axis and "Reaction time (ms)" on the y-axis. The points show a moderate negative association. The caption reads: "More sleep causes faster reaction times."</p>
+  <p class="case-q">Is the caption a valid interpretation of the scatter plot? What does the chart actually demonstrate?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-2','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-2','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-2" onclick="markCaseWorked(2)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-2">Most readers accept the causal caption because the visual pattern is clear and the direction makes intuitive sense. If sleeping more is associated with faster reactions, it seems natural to say sleep "causes" the improvement.</div>
+  <div class="reveal-panel right-panel" id="right-case-2">A scatter plot demonstrates association, not causation. The chart tells us that in this dataset, individuals who reported more sleep tended to have faster reaction times. But participants were not randomly assigned to sleep conditions: people who sleep more may also exercise more, eat better, or experience lower stress. Any of those factors could independently improve reaction time. To establish that sleep itself causes faster reactions, a controlled experiment (randomizing participants into different sleep conditions) is required. The correct caption: "Sleep duration is negatively associated with reaction time in this sample."</div>
+</div>
+
+<div class="case-card" id="case-3">
+  <h4>Case 3: Comparing Departments with Box Plots</h4>
+  <p class="case-prompt">Side-by-side box plots of CGPA by department show: Engineering has a median of 3.20, a box spanning 3.00 to 3.45, and a long lower whisker reaching 2.10. Business has a median of 3.30, a box spanning 3.15 to 3.50, and short symmetric whiskers. A faculty member concludes: "Business students are academically stronger."</p>
+  <p class="case-q">Evaluate this conclusion using what the box plots actually show.</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-3','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-3','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-3" onclick="markCaseWorked(3)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-3">Many readers focus only on the median comparison and accept the conclusion. Business's median (3.30) exceeds Engineering's (3.20), which seems to settle the question.</div>
+  <div class="reveal-panel right-panel" id="right-case-3">The median comparison is only one part of the story. Engineering's long lower whisker (reaching 2.10) indicates a notable group of lower-performing students pulling the median down, while the upper half of Engineering's distribution may overlap substantially with Business. Engineering's wider box (IQR = 0.45 vs. 0.35) reveals greater variability in academic outcomes. Most importantly, CGPAs across departments are not directly comparable: grading norms, course difficulty, and assessment structures differ systematically. A 3.20 in Engineering may reflect different academic attainment than a 3.30 in Business. The box plots reveal distributional differences but cannot support a simple "stronger" verdict without accounting for structural differences in how grades are awarded across programs.</div>
+</div>
+
+<div class="case-card" id="case-4">
+  <h4>Case 4: Grouped vs. Stacked — Same Data, Different Insight</h4>
+  <p class="case-prompt">A university health report presents two charts of the same BMI category data (Underweight, Normal, Overweight, Obese) across four departments. Chart A is a grouped bar chart. Chart B is a 100% stacked bar chart. A student claims: "These charts show different data because they look completely different."</p>
+  <p class="case-q">Is the student correct? What does each chart uniquely reveal that the other cannot?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-4','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-4','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-4" onclick="markCaseWorked(4)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-4">Many students treat visual difference as a signal of data difference. If two charts look completely different, they assume they must contain different information.</div>
+  <div class="reveal-panel right-panel" id="right-case-4">The student is wrong: both charts encode the same underlying numbers. What differs is the question each is designed to answer. The grouped bar chart makes it easy to compare the absolute count of, say, Overweight students across departments side by side. This is the right tool when you want to know: "Which department has the most students in the Obese category?" The 100% stacked bar chart removes absolute count and instead shows each department's proportional breakdown. This is the right tool when you want to know: "In which department does the Overweight category represent the largest share of students?" If a department has three times as many students as another, the grouped chart will visually overemphasize it even if its composition is identical. The 100% stacked chart eliminates this size effect. Choosing between them is a matter of which question matters most to the reader, not which chart contains more data.</div>
+</div>
+
+</div>
+
+<button class="reset-btn" onclick="resetProgress()">&#8635; Reset Progress</button>
+
+<script>
+const STORAGE_KEY='stats101-module2-progress-v1';
+const TOTAL_SLIDES=11,TOTAL_CARDS=16,TOTAL_CASES=4,TOTAL_QUIZ=10;
+
+// ---- Consistent color palette (blues) ----
+const C_UNDER   = '#93c5fd';  // light blue
+const C_NORMAL  = '#3b82f6';  // medium blue
+const C_OVER    = '#1d4ed8';  // dark blue
+const C_OBESE   = '#1e3a8a';  // very dark blue
+const DEPT_COLORS = ['#bfdbfe','#60a5fa','#2563eb','#1d4ed8','#1e3a8a'];
+
+const flashcardData=[
+  {term:'Frequency distribution',def:'A table that organizes data into classes and records the count, relative frequency, and cumulative relative frequency for each class.'},
+  {term:'Class width',def:'The span of each interval in a frequency distribution: approximately Range / number of classes, rounded to a convenient value.'},
+  {term:'Relative frequency',def:'The proportion of all observations in a given class: f / n. All relative frequencies sum to 1.'},
+  {term:'Cumulative relative frequency',def:'The running total of relative frequencies from the first class up to and including a given class. Reaches 1.0 at the final class.'},
+  {term:'Bar chart',def:'A chart for qualitative (categorical) variables. Bars are separated by gaps to signal that the categories are discrete. Bar length encodes frequency or relative frequency.'},
+  {term:'Grouped bar chart',def:'Bars for multiple subgroups are placed side by side within each category. Best for comparing individual subgroup values directly across categories from a shared baseline.'},
+  {term:'Stacked bar chart',def:'Subgroup bars are stacked on top of one another. Shows totals and compositional shares. The 100% variant emphasizes proportions, removing information about group size.'},
+  {term:'Histogram',def:'A chart for quantitative continuous variables. Bars touch each other to reflect the continuity of the scale. Each bar represents one class interval.'},
+  {term:'Right-skewed distribution',def:'A histogram with a long tail extending to the right. Most values cluster on the left. The mean exceeds the median.'},
+  {term:'Left-skewed distribution',def:'A histogram with a long tail extending to the left. Most values cluster on the right. The mean is less than the median.'},
+  {term:'Scatter plot',def:'A chart that plots each observation as a point in 2D space, with one quantitative variable on each axis. Used to visualize the relationship between two quantitative variables.'},
+  {term:'Positive association',def:'In a scatter plot, as one variable increases the other tends to increase. Points cluster around an upward-sloping trend.'},
+  {term:'Negative association',def:'In a scatter plot, as one variable increases the other tends to decrease. Points cluster around a downward-sloping trend.'},
+  {term:'Box plot',def:'A display using the five-number summary (min, Q1, median, Q3, max). The box spans the IQR; the line inside is the median. Outliers appear as individual points beyond the whiskers.'},
+  {term:'Interquartile range (IQR)',def:'IQR = Q3 − Q1. The range of the middle 50% of the data. The width of the box in a box plot. Resistant to outliers because extreme values do not affect Q1 or Q3.'},
+  {term:'Outlier (1.5 × IQR rule)',def:'A value flagged as an outlier if it exceeds Q3 + 1.5 × IQR (upper fence) or falls below Q1 − 1.5 × IQR (lower fence). Shown as open circles on a box plot.'}
+];
+
+let state={slidesViewed:new Set(),quizScore:null,cardsFlipped:new Set(),casesWorked:new Set(),quizAnswers:{},quizSubmitted:false,currentSlide:1};
+
+function loadState(){
+  try{const s=localStorage.getItem(STORAGE_KEY);if(s){const p=JSON.parse(s);state.slidesViewed=new Set(p.slidesViewed||[]);state.quizScore=p.quizScore!==undefined?p.quizScore:null;state.cardsFlipped=new Set(p.cardsFlipped||[]);state.casesWorked=new Set(p.casesWorked||[]);state.quizAnswers=p.quizAnswers||{};state.quizSubmitted=p.quizSubmitted||false;state.currentSlide=p.currentSlide||1;}}catch(e){}
+}
+function saveState(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify({slidesViewed:[...state.slidesViewed],quizScore:state.quizScore,cardsFlipped:[...state.cardsFlipped],casesWorked:[...state.casesWorked],quizAnswers:state.quizAnswers,quizSubmitted:state.quizSubmitted,currentSlide:state.currentSlide}));}catch(e){}
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');btn.classList.add('active');
+  if(name==='slides') setTimeout(renderChartsForCurrentSlide,80);
+}
+
+let chartsRendered={};
+let barChartObj=null,histChartObj=null,groupedBarObj=null,stackedBarObj=null,scatterObj=null;
+let histType='freq',stackType='abs';
+
+// ---- data shared between grouped+stacked ----
+const depts4=['CSE','EEE','BBA','Civil'];
+const d_Under=[25,20,30,15];
+const d_Normal=[185,175,195,165];
+const d_Over=[110,120,130,145];
+const d_Obese=[40,45,55,65];
+function pctData(arr){
+  return depts4.map((_,i)=>{const t=d_Under[i]+d_Normal[i]+d_Over[i]+d_Obese[i];return parseFloat((arr[i]/t*100).toFixed(1));});
+}
+
+function showSlide(n){
+  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+  document.getElementById('slide-'+n).classList.add('active');
+  state.currentSlide=n;state.slidesViewed.add(n);saveState();updateSlideUI();updateStats();
+  setTimeout(renderChartsForCurrentSlide,80);
+}
+function updateSlideUI(){
+  const n=state.currentSlide;
+  document.getElementById('slide-counter').textContent='Slide '+n+' of '+TOTAL_SLIDES;
+  document.getElementById('slide-progress').style.width=(n/TOTAL_SLIDES*100)+'%';
+  document.getElementById('btn-prev').disabled=n===1;
+  document.getElementById('btn-next').disabled=n===TOTAL_SLIDES;
+}
+function changeSlide(dir){const n=state.currentSlide+dir;if(n>=1&&n<=TOTAL_SLIDES)showSlide(n);}
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('tab-slides').classList.contains('active'))return;
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')changeSlide(1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')changeSlide(-1);
+});
+
+const scatterData=(()=>{const pts=[];for(let i=0;i<120;i++){const a=Math.random()*14;const b=28-a*0.6+(Math.random()*8-4);pts.push({x:parseFloat(a.toFixed(1)),y:parseFloat(b.toFixed(1))});}return pts;})();
+const bmiClasses=['15-18','18-21','21-24','24-27','27-30','30-33','33-36','36-39','39-42'];
+const bmiFreq=[28,210,460,540,380,220,110,42,10];
+const bmiRel=[0.014,0.105,0.230,0.270,0.190,0.110,0.055,0.021,0.005];
+const deptNames=['Engineering','Business','Science','Social Sci.','Humanities'];
+const deptCounts=[480,420,350,290,220];
+
+function renderChartsForCurrentSlide(){
+  const n=state.currentSlide;
+  if(n===3&&!chartsRendered['bar']){
+    chartsRendered['bar']=true;
+    const ctx=document.getElementById('barChart');if(!ctx)return;
+    barChartObj=new Chart(ctx,{type:'bar',data:{labels:deptNames,datasets:[{label:'Students',data:deptCounts,backgroundColor:DEPT_COLORS,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:12}}},y:{beginAtZero:true,title:{display:true,text:'Number of students',font:{size:12}}}}}});
+  }
+  if(n===4&&!chartsRendered['hist']){
+    chartsRendered['hist']=true;
+    const ctx=document.getElementById('histChart');if(!ctx)return;
+    histChartObj=new Chart(ctx,{type:'bar',data:{labels:bmiClasses,datasets:[{label:'Frequency',data:bmiFreq,backgroundColor:'#3b82f6',borderColor:'#1d4ed8',borderWidth:1,categoryPercentage:1.0,barPercentage:1.0,borderRadius:0,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},title:{display:true,text:'BMI Class',font:{size:12}}},y:{beginAtZero:true,title:{display:true,text:'Frequency',font:{size:12}}}}}});
+  }
+  if(n===5&&!chartsRendered['grouped']){
+    chartsRendered['grouped']=true;
+    const ctx1=document.getElementById('groupedBar');
+    const ctx2=document.getElementById('stackedBar');
+    if(ctx1){
+      groupedBarObj=new Chart(ctx1,{type:'bar',data:{labels:depts4,datasets:[
+        {label:'Underweight',data:d_Under,backgroundColor:C_UNDER,borderRadius:3},
+        {label:'Normal',data:d_Normal,backgroundColor:C_NORMAL,borderRadius:3},
+        {label:'Overweight',data:d_Over,backgroundColor:C_OVER,borderRadius:3},
+        {label:'Obese',data:d_Obese,backgroundColor:C_OBESE,borderRadius:3}
+      ]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12}}},scales:{x:{grid:{display:false}},y:{beginAtZero:true,title:{display:true,text:'Count',font:{size:11}}}}}});
+    }
+    if(ctx2){
+      stackedBarObj=new Chart(ctx2,{type:'bar',data:{labels:depts4,datasets:[
+        {label:'Underweight',data:[...d_Under],backgroundColor:C_UNDER,stack:'s',borderRadius:0},
+        {label:'Normal',data:[...d_Normal],backgroundColor:C_NORMAL,stack:'s',borderRadius:0},
+        {label:'Overweight',data:[...d_Over],backgroundColor:C_OVER,stack:'s',borderRadius:0},
+        {label:'Obese',data:[...d_Obese],backgroundColor:C_OBESE,stack:'s',borderRadius:0}
+      ]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},stacked:true},y:{stacked:true,beginAtZero:true,title:{display:true,text:'Count',font:{size:11}}}}}});
+    }
+  }
+  if(n===6&&!chartsRendered['scatter']){
+    chartsRendered['scatter']=true;
+    const ctx=document.getElementById('scatterChart');if(!ctx)return;
+    scatterObj=new Chart(ctx,{type:'scatter',data:{datasets:[{label:'Student',data:scatterData,backgroundColor:'rgba(37,99,235,0.45)',pointRadius:4,pointHoverRadius:6}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Hours of physical activity per week',font:{size:12}},min:0,max:14},y:{title:{display:true,text:'BMI',font:{size:12}},min:12,max:42}}}});
+  }
+}
+
+function switchHistType(type,btn){
+  histType=type;
+  document.querySelectorAll('#slide-4 .chart-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  if(histChartObj){histChartObj.data.datasets[0].data=type==='freq'?bmiFreq:bmiRel;histChartObj.options.scales.y.title.text=type==='freq'?'Frequency':'Relative Frequency';histChartObj.update();}
+}
+function switchStackType(type,btn){
+  stackType=type;
+  document.querySelectorAll('#slide-5 .chart-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  if(!stackedBarObj)return;
+  if(type==='abs'){
+    stackedBarObj.data.datasets[0].data=[...d_Under];
+    stackedBarObj.data.datasets[1].data=[...d_Normal];
+    stackedBarObj.data.datasets[2].data=[...d_Over];
+    stackedBarObj.data.datasets[3].data=[...d_Obese];
+    stackedBarObj.options.scales.y.title.text='Count';
+  } else {
+    stackedBarObj.data.datasets[0].data=pctData(d_Under);
+    stackedBarObj.data.datasets[1].data=pctData(d_Normal);
+    stackedBarObj.data.datasets[2].data=pctData(d_Over);
+    stackedBarObj.data.datasets[3].data=pctData(d_Obese);
+    stackedBarObj.options.scales.y.title.text='Percentage (%)';
+  }
+  stackedBarObj.update();
+}
+
+function checkPrac(id,btn,correct){
+  document.querySelectorAll('#'+id+' .practice-btn').forEach(b=>b.classList.add('disabled'));
+  const fb=document.getElementById(id+'-fb');
+  if(correct){btn.classList.add('correct');fb.textContent=id==='prac-1'?'Correct. Sum the relative frequencies for classes below 24.0: 0.014 + 0.105 + 0.230 = 0.349, so 34.9%.':'Correct. Q1 is the 25th percentile and Q3 is the 75th percentile, so exactly 50% of the data falls between them by definition.';fb.className='practice-feedback show right';}
+  else{btn.classList.add('wrong');fb.textContent=id==='prac-1'?'Not quite. Add relative frequencies for all classes with upper boundary below 24.0: 0.014 + 0.105 + 0.230 = 0.349.':'Not quite. Q1 marks the 25th percentile and Q3 the 75th. The interval from Q1 to Q3 always spans exactly 50% of the data.';fb.className='practice-feedback show wrong';}
+}
+
+let quizAnswered=0,quizCorrect=0;
+function startQuiz(){document.querySelector('.quiz-intro').style.display='none';document.getElementById('quiz-questions').style.display='block';if(state.quizSubmitted)restoreQuizState();}
+function answerQ(qNum,btn,correct){
+  const qq=document.getElementById('qq-'+qNum);if(qq.classList.contains('answered'))return;
+  qq.classList.add('answered');qq.querySelectorAll('.quiz-option').forEach(o=>o.classList.add('disabled'));
+  btn.classList.add(correct?'correct':'wrong');if(correct)quizCorrect++;
+  document.getElementById('qe-'+qNum).classList.add('show');
+  state.quizAnswers[qNum]=correct;quizAnswered++;
+  document.getElementById('quiz-progress').textContent=quizAnswered+' of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=quizAnswered<TOTAL_QUIZ;saveState();
+}
+function submitQuiz(){
+  state.quizScore=quizCorrect;state.quizSubmitted=true;saveState();
+  document.getElementById('quiz-score-display').innerHTML=quizCorrect+'<span class="total"> / '+TOTAL_QUIZ+'</span>';
+  const v=document.getElementById('quiz-verdict'),m=document.getElementById('quiz-msg');
+  if(quizCorrect>=9){v.textContent='Excellent';v.className='verdict great';m.textContent='Strong command of visualization concepts.';}
+  else if(quizCorrect>=7){v.textContent='Good';v.className='verdict good';m.textContent='Solid. Review the explanations on questions you missed.';}
+  else{v.textContent='Keep going';v.className='verdict ok';m.textContent='Revisit the slides on chart types, box plots, and scatter plots before retaking.';}
+  document.getElementById('quiz-result').classList.add('show');updateStats();
+}
+function retakeQuiz(){
+  state.quizScore=null;state.quizSubmitted=false;state.quizAnswers={};quizCorrect=0;quizAnswered=0;saveState();
+  document.getElementById('quiz-result').classList.remove('show');
+  document.querySelectorAll('.quiz-question').forEach(q=>{q.classList.remove('answered');q.querySelectorAll('.quiz-option').forEach(o=>o.classList.remove('correct','wrong','disabled'));q.querySelectorAll('.quiz-explain').forEach(e=>e.classList.remove('show'));});
+  document.getElementById('quiz-progress').textContent='0 of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=true;updateStats();
+}
+function restoreQuizState(){
+  Object.entries(state.quizAnswers).forEach(([qNum,correct])=>{
+    const qq=document.getElementById('qq-'+qNum);if(!qq)return;
+    qq.classList.add('answered');qq.querySelectorAll('.quiz-option').forEach(o=>o.classList.add('disabled'));
+    document.getElementById('qe-'+qNum).classList.add('show');quizAnswered++;if(correct)quizCorrect++;
+  });
+  document.getElementById('quiz-progress').textContent=quizAnswered+' of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=quizAnswered<TOTAL_QUIZ;
+  if(state.quizSubmitted)submitQuiz();
+}
+
+function buildFlashcards(){
+  const grid=document.getElementById('fc-grid');
+  flashcardData.forEach((fc,i)=>{
+    const div=document.createElement('div');div.className='flashcard'+(state.cardsFlipped.has(i)?' flipped':'');
+    div.innerHTML='<div class="flashcard-inner"><div class="flashcard-front">'+fc.term+'<span class="fc-hint">Click to reveal definition</span></div><div class="flashcard-back">'+fc.def+'</div></div>';
+    div.addEventListener('click',()=>{div.classList.toggle('flipped');state.cardsFlipped.add(i);saveState();updateStats();});
+    grid.appendChild(div);
+  });
+}
+
+function revealCase(id,type){document.getElementById(type+'-'+id).classList.add('show');}
+function markCaseWorked(n){
+  state.casesWorked.add(n);saveState();
+  const btn=document.getElementById('worked-case-'+n);btn.textContent='Worked';btn.classList.add('done');updateStats();
+}
+
+function updateStats(){
+  document.getElementById('stat-slides').textContent=Math.round(state.slidesViewed.size/TOTAL_SLIDES*100)+'%';
+  document.getElementById('stat-quiz').textContent=state.quizScore!==null?state.quizScore+' / '+TOTAL_QUIZ:'—';
+  document.getElementById('stat-cards').textContent=state.cardsFlipped.size+' / '+TOTAL_CARDS;
+  document.getElementById('stat-cases').textContent=state.casesWorked.size+' / '+TOTAL_CASES;
+}
+function resetProgress(){if(!confirm('Reset all progress for this module?'))return;localStorage.removeItem(STORAGE_KEY);location.reload();}
+
+loadState();buildFlashcards();showSlide(state.currentSlide);updateStats();
+if(state.quizSubmitted){document.querySelector('.quiz-intro').style.display='none';document.getElementById('quiz-questions').style.display='block';restoreQuizState();}
+state.casesWorked.forEach(n=>{const btn=document.getElementById('worked-case-'+n);if(btn){btn.textContent='Worked';btn.classList.add('done');}});
+</script>
+</div>
+</body>
+</html>
