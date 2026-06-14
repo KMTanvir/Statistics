@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 1: Introduction to Statistics</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --muted: #64748b;
+  --primary: #2563eb; --primary-dark: #1d4ed8; --primary-light: #dbeafe;
+  --accent: #4f46e5; --success: #059669; --success-light: #d1fae5;
+  --danger: #dc2626; --danger-light: #fee2e2;
+  --warning: #d97706; --warning-light: #fef3c7;
+  --border: #e2e8f0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.04);
+  --radius: 12px; --radius-sm: 8px;
+  --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+body { font-family: 'Inter','Segoe UI',system-ui,-apple-system,sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+.app { max-width: 1100px; margin: 0 auto; padding: 24px 20px 80px; }
+
+/* HEADER */
+header.mod-header {
+  background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+  color: white; padding: 32px 28px; border-radius: var(--radius);
+  margin-bottom: 20px; box-shadow: var(--shadow-lg);
+  position: relative; overflow: hidden;
+}
+header.mod-header::before { content:""; position:absolute; top:-40px; right:-40px; width:180px; height:180px; background:rgba(255,255,255,0.08); border-radius:50%; }
+header.mod-header::after  { content:""; position:absolute; bottom:-30px; right:80px; width:100px; height:100px; background:rgba(255,255,255,0.05); border-radius:50%; }
+.mod-badge { display:inline-block; background:rgba(255,255,255,0.2); padding:4px 12px; border-radius:20px; font-size:12px; font-weight:500; letter-spacing:0.5px; position:relative; z-index:1; }
+header.mod-header h1 { font-size:28px; margin:12px 0 8px; font-weight:700; position:relative; z-index:1; }
+header.mod-header p.mod-sub { font-size:14px; opacity:0.88; max-width:640px; position:relative; z-index:1; }
+header.mod-header p.mod-instructor { font-size:13px; opacity:0.8; margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.2); position:relative; z-index:1; }
+
+/* STATS BAR */
+.stats-bar { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; padding:14px; background:white; border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:16px; }
+.stat { text-align:center; padding:6px; }
+.stat .stat-value { font-size:22px; font-weight:700; color:var(--primary); line-height:1.2; }
+.stat .stat-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.6px; margin-top:2px; }
+
+/* TABS */
+.tabs { display:flex; gap:4px; background:white; padding:6px; border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:18px; flex-wrap:wrap; }
+.tab-btn { flex:1; min-width:110px; padding:11px 16px; background:transparent; border:none; border-radius:var(--radius-sm); font-size:14px; font-weight:500; color:var(--muted); cursor:pointer; transition:all var(--transition); font-family:inherit; }
+.tab-btn:hover { background:var(--bg); color:var(--text); }
+.tab-btn.active { background:var(--primary); color:white; box-shadow:0 2px 8px rgba(37,99,235,0.28); }
+.tab-content { display:none; animation:fadeIn 0.28s ease-in-out; }
+.tab-content.active { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* CARD */
+.card { background:var(--card); border-radius:var(--radius); padding:28px; box-shadow:var(--shadow); margin-bottom:16px; }
+
+/* SLIDES */
+.progress-bar { width:100%; height:6px; background:var(--border); border-radius:3px; overflow:hidden; margin-bottom:12px; }
+.progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--accent)); border-radius:3px; transition:width 0.4s ease; width:0%; }
+.slide-counter { text-align:center; color:var(--muted); font-size:13px; margin-bottom:14px; font-weight:500; }
+.slide { display:none; min-height:440px; padding:4px; animation:slideIn 0.3s ease; }
+.slide.active { display:block; }
+@keyframes slideIn { from{opacity:0;transform:translateX(12px)} to{opacity:1;transform:translateX(0)} }
+.slide h2 { font-size:26px; margin-bottom:6px; color:var(--primary-dark); font-weight:700; line-height:1.25; }
+.slide h3 { font-size:18px; margin:20px 0 8px; color:var(--text); font-weight:600; }
+.slide p { margin-bottom:12px; color:#334155; }
+.slide ul, .slide ol { margin:0 0 14px 22px; }
+.slide li { margin-bottom:7px; color:#334155; }
+.slide .slide-sub { color:var(--muted); font-size:15px; margin-bottom:18px; font-style:italic; }
+.slide .obj-list { list-style:none; padding:0; margin:14px 0; }
+.slide .obj-list li { padding:9px 0 9px 32px; position:relative; color:#334155; border-bottom:1px solid var(--border); }
+.slide .obj-list li:last-child { border-bottom:none; }
+.slide .obj-list li::before { content:""; position:absolute; left:0; top:13px; width:18px; height:18px; background:var(--success-light); border-radius:50%; }
+.slide .obj-list li::after { content:"✓"; position:absolute; left:3px; top:10px; color:var(--success); font-size:11px; font-weight:700; }
+
+.example-box { background:var(--primary-light); border-left:4px solid var(--primary); padding:16px 20px; border-radius:var(--radius-sm); margin:16px 0; }
+.example-box strong { color:var(--primary-dark); }
+.tip-box { background:var(--success-light); border-left:4px solid var(--success); padding:16px 20px; border-radius:var(--radius-sm); margin:16px 0; }
+.tip-box strong { color:var(--success); }
+.warn-box { background:var(--warning-light); border-left:4px solid var(--warning); padding:16px 20px; border-radius:var(--radius-sm); margin:16px 0; }
+.warn-box strong { color:var(--warning); }
+
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:14px 0; }
+.def-card { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px 18px; }
+.def-card .def-term { font-weight:700; color:var(--primary-dark); font-size:15px; margin-bottom:6px; }
+.def-card .def-body { font-size:14px; color:#334155; }
+
+.slide-nav { display:flex; justify-content:space-between; align-items:center; margin-top:24px; padding-top:16px; border-top:1px solid var(--border); gap:10px; flex-wrap:wrap; }
+.btn { padding:10px 20px; border:none; border-radius:var(--radius-sm); font-size:14px; font-weight:500; cursor:pointer; transition:all var(--transition); font-family:inherit; display:inline-flex; align-items:center; gap:6px; }
+.btn-primary { background:var(--primary); color:white; }
+.btn-primary:hover:not(:disabled) { background:var(--primary-dark); transform:translateY(-1px); box-shadow:0 4px 12px rgba(37,99,235,0.28); }
+.btn-primary:disabled { background:var(--border); color:var(--muted); cursor:not-allowed; }
+.btn-ghost { background:transparent; color:var(--muted); border:1px solid var(--border); }
+.btn-ghost:hover:not(:disabled) { background:var(--bg); color:var(--text); }
+.btn-ghost:disabled { opacity:0.45; cursor:not-allowed; }
+
+/* PRACTICE */
+.practice { background:#f1f5f9; border:2px dashed #cbd5e1; border-radius:var(--radius-sm); padding:18px; margin:20px 0; }
+.practice h4 { color:var(--primary); margin-bottom:10px; font-size:15px; }
+.practice-q { margin-bottom:10px; color:var(--text); font-weight:500; }
+.practice-options { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
+.practice-btn { padding:8px 14px; border:1px solid var(--border); background:white; border-radius:6px; cursor:pointer; font-family:inherit; font-size:14px; transition:all var(--transition); color:var(--text); }
+.practice-btn:hover { border-color:var(--primary); background:var(--primary-light); }
+.practice-btn.correct { background:var(--success-light); border-color:var(--success); color:var(--success); font-weight:600; }
+.practice-btn.wrong { background:var(--danger-light); border-color:var(--danger); color:var(--danger); }
+.practice-btn.disabled { pointer-events:none; opacity:0.75; }
+.practice-feedback { margin-top:10px; padding:10px 14px; border-radius:6px; font-size:14px; display:none; animation:fadeIn 0.2s; }
+.practice-feedback.show { display:block; }
+.practice-feedback.right { background:var(--success-light); color:var(--success); border:1px solid var(--success); }
+.practice-feedback.wrong { background:var(--danger-light); color:var(--danger); border:1px solid var(--danger); }
+
+/* QUIZ */
+.quiz-intro { background:white; padding:22px; border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:16px; text-align:center; }
+.quiz-intro h2 { color:var(--primary-dark); margin-bottom:8px; }
+.quiz-intro p { color:var(--muted); margin-bottom:14px; }
+.quiz-question { background:white; border-radius:var(--radius); padding:22px; margin-bottom:14px; box-shadow:var(--shadow); border:1px solid var(--border); }
+.quiz-question h4 { font-size:16px; margin-bottom:14px; color:var(--text); font-weight:600; }
+.q-num { color:var(--primary); font-weight:700; margin-right:6px; }
+.quiz-options { display:grid; gap:8px; }
+.quiz-option { padding:11px 16px; border:1px solid var(--border); border-radius:8px; cursor:pointer; background:white; transition:all var(--transition); font-size:14px; color:var(--text); text-align:left; font-family:inherit; }
+.quiz-option:hover { border-color:var(--primary); background:var(--primary-light); transform:translateX(2px); }
+.quiz-option.selected { border-color:var(--primary); background:var(--primary-light); font-weight:500; }
+.quiz-option.correct { border-color:var(--success); background:var(--success-light); color:var(--success); font-weight:600; }
+.quiz-option.wrong { border-color:var(--danger); background:var(--danger-light); color:var(--danger); }
+.quiz-option.disabled { pointer-events:none; }
+.quiz-explain { display:none; margin-top:10px; padding:10px 14px; background:#f8fafc; border-left:3px solid var(--primary); border-radius:4px; font-size:13px; color:#334155; }
+.quiz-explain.show { display:block; }
+.quiz-footer { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:16px 20px; background:white; border-radius:var(--radius); box-shadow:var(--shadow); flex-wrap:wrap; }
+.quiz-progress-text { font-size:13px; color:var(--muted); }
+.quiz-result { display:none; padding:30px; background:linear-gradient(135deg,#f0fdf4 0%,#dbeafe 100%); border-radius:var(--radius); text-align:center; margin-top:16px; box-shadow:var(--shadow); animation:fadeIn 0.4s ease; }
+.quiz-result.show { display:block; }
+.quiz-result h3 { font-size:24px; margin-bottom:10px; color:var(--primary-dark); }
+.quiz-result .score { font-size:48px; font-weight:700; color:var(--primary); margin:14px 0; line-height:1; }
+.quiz-result .score .total { font-size:26px; color:var(--muted); }
+.quiz-result p { color:#334155; margin-bottom:16px; font-size:15px; }
+.verdict { display:inline-block; padding:6px 14px; border-radius:16px; font-weight:600; font-size:14px; margin-bottom:8px; }
+.verdict.great { background:var(--success-light); color:var(--success); }
+.verdict.good { background:var(--primary-light); color:var(--primary-dark); }
+.verdict.ok { background:var(--warning-light); color:var(--warning); }
+
+/* FLASHCARDS */
+.flashcards-header { background:white; padding:20px; border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:16px; text-align:center; }
+.flashcards-header h2 { color:var(--primary-dark); margin-bottom:6px; }
+.flashcards-header p { color:var(--muted); font-size:14px; }
+.flashcards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px; }
+.flashcard { perspective:1000px; height:170px; cursor:pointer; }
+.flashcard-inner { position:relative; width:100%; height:100%; transition:transform 0.55s; transform-style:preserve-3d; }
+.flashcard.flipped .flashcard-inner { transform:rotateY(180deg); }
+.flashcard-front, .flashcard-back { position:absolute; inset:0; -webkit-backface-visibility:hidden; backface-visibility:hidden; border-radius:var(--radius); padding:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; box-shadow:var(--shadow); }
+.flashcard-front { background:linear-gradient(135deg,#fff 0%,#f8fafc 100%); border:2px solid var(--primary-light); color:var(--primary-dark); font-weight:600; font-size:16px; }
+.flashcard-front .fc-hint { font-size:11px; color:var(--muted); font-weight:400; margin-top:8px; font-style:italic; }
+.flashcard-back { background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%); color:white; transform:rotateY(180deg); font-size:13px; line-height:1.55; }
+
+/* REAL CASES */
+.cases-header { background:white; padding:20px; border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:16px; }
+.cases-header h2 { color:var(--primary-dark); margin-bottom:6px; }
+.cases-header p { color:var(--muted); font-size:14px; }
+.case-card { background:white; border-radius:var(--radius); padding:24px; margin-bottom:16px; box-shadow:var(--shadow); border-left:4px solid var(--primary); }
+.case-card h4 { font-size:16px; color:var(--primary-dark); font-weight:700; margin-bottom:12px; }
+.case-prompt { color:#334155; font-size:15px; margin-bottom:14px; line-height:1.6; }
+.case-q { font-weight:600; color:var(--text); margin-bottom:12px; font-size:15px; }
+.case-textarea { width:100%; min-height:80px; padding:12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-family:inherit; font-size:14px; resize:vertical; background:#f8fafc; color:var(--text); transition:border-color var(--transition); }
+.case-textarea:focus { outline:none; border-color:var(--primary); background:white; }
+.reveal-btns { display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+.reveal-btn { padding:8px 16px; border:1px solid var(--border); background:white; border-radius:6px; cursor:pointer; font-family:inherit; font-size:13px; font-weight:600; transition:all var(--transition); }
+.reveal-btn.miss { color:var(--warning); border-color:var(--warning); }
+.reveal-btn.miss:hover { background:var(--warning-light); }
+.reveal-btn.right { color:var(--success); border-color:var(--success); }
+.reveal-btn.right:hover { background:var(--success-light); }
+.reveal-panel { display:none; margin-top:12px; padding:14px 16px; border-radius:var(--radius-sm); font-size:14px; line-height:1.6; animation:fadeIn 0.25s; }
+.reveal-panel.show { display:block; }
+.reveal-panel.miss-panel { background:var(--warning-light); border-left:3px solid var(--warning); color:#78350f; }
+.reveal-panel.right-panel { background:var(--success-light); border-left:3px solid var(--success); color:#064e3b; }
+.case-worked-btn { margin-top:10px; padding:6px 14px; background:var(--primary-light); color:var(--primary-dark); border:none; border-radius:6px; cursor:pointer; font-family:inherit; font-size:13px; font-weight:600; }
+.case-worked-btn.done { background:var(--success-light); color:var(--success); }
+
+/* RESET */
+.reset-btn { position:fixed; bottom:18px; right:18px; background:white; border:1px solid var(--border); padding:8px 14px; border-radius:20px; font-size:13px; color:var(--muted); cursor:pointer; box-shadow:var(--shadow); font-family:inherit; transition:all var(--transition); z-index:100; }
+.reset-btn:hover { color:var(--danger); border-color:var(--danger); }
+
+/* TAKEAWAYS */
+.takeaway-list { list-style:none; padding:0; margin:16px 0; }
+.takeaway-list li { padding:12px 16px 12px 48px; position:relative; background:var(--bg); border-radius:var(--radius-sm); margin-bottom:10px; font-size:15px; color:#1e293b; border:1px solid var(--border); }
+.takeaway-list li .t-num { position:absolute; left:12px; top:50%; transform:translateY(-50%); width:24px; height:24px; background:var(--primary); color:white; border-radius:50%; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+
+@media(max-width:720px){
+  .app{padding:14px 12px 80px;}
+  header.mod-header{padding:22px 18px;}
+  header.mod-header h1{font-size:22px;}
+  .card{padding:20px 16px;}
+  .two-col{grid-template-columns:1fr;}
+  .stats-bar{grid-template-columns:repeat(2,1fr);}
+  .slide h2{font-size:22px;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HEADER -->
+<header class="mod-header">
+  <span class="mod-badge">Module 1 of 16</span>
+  <h1>Introduction to Statistics</h1>
+  <p class="mod-sub">A framework for drawing reliable conclusions from incomplete information.</p>
+  <p class="mod-instructor"><strong>K.M. Tanvir</strong> &nbsp;·&nbsp; Statistics for Non-Statisticians</p>
+</header>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat"><div class="stat-value" id="stat-slides">0%</div><div class="stat-label">Slides Viewed</div></div>
+  <div class="stat"><div class="stat-value" id="stat-quiz">&#8212;</div><div class="stat-label">Quiz Score</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cards">0 / 16</div><div class="stat-label">Cards Flipped</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cases">0 / 4</div><div class="stat-label">Cases Worked</div></div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('slides',this)">&#128214; Slides</button>
+  <button class="tab-btn" onclick="switchTab('quiz',this)">&#128221; Quiz</button>
+  <button class="tab-btn" onclick="switchTab('flashcards',this)">&#127183; Flashcards</button>
+  <button class="tab-btn" onclick="switchTab('cases',this)">&#127919; Real Cases</button>
+</div>
+
+<!-- ===================== SLIDES ===================== -->
+<div id="tab-slides" class="tab-content active">
+<div class="card">
+  <div class="progress-bar"><div class="progress-fill" id="slide-progress"></div></div>
+  <div class="slide-counter" id="slide-counter">Slide 1 of 11</div>
+
+  <!-- SLIDE 1 -->
+  <div class="slide active" id="slide-1">
+    <h2>Introduction to Statistics</h2>
+    <p class="slide-sub">Module 1 &nbsp;·&nbsp; By the end of this module, you will be able to:</p>
+    <ul class="obj-list">
+      <li>Distinguish between a population and a sample, and articulate why sampling is often the only practical approach to data collection</li>
+      <li>Classify variables by type and explain why classification determines which analytical tools are appropriate</li>
+      <li>Differentiate a parameter from a statistic, and describe the inferential relationship between them</li>
+      <li>Evaluate the strengths and weaknesses of common sampling designs</li>
+      <li>Identify sources of sampling bias in real-world studies and news reports</li>
+    </ul>
+    <div class="tip-box"><strong>Note:</strong> This module lays the conceptual foundation for everything that follows. The vocabulary introduced here, population, sample, parameter, statistic, and variable, will appear in every subsequent module.</div>
+  </div>
+
+  <!-- SLIDE 2 -->
+  <div class="slide" id="slide-2">
+    <h2>What Is Statistics?</h2>
+    <p>Every day, consequential decisions are made on the basis of incomplete information. A physician cannot test every drug on every patient before prescribing. A government cannot survey every citizen before drafting policy. A company cannot interview every customer before designing a product.</p>
+    <p>Statistics is the discipline that makes incomplete information <em>rigorous</em>. It provides a principled framework for collecting data, quantifying uncertainty, and drawing defensible conclusions from what we can observe about what we cannot fully observe.</p>
+    <svg viewBox="0 0 680 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:680px;margin:20px auto;display:block;">
+      <rect x="10" y="25" width="130" height="50" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="75" y="53" text-anchor="middle" font-size="13" fill="#1e40af" font-weight="600" font-family="Inter,sans-serif">Collect Data</text>
+      <polygon points="145,50 158,44 158,56" fill="#2563eb"/>
+      <line x1="140" y1="50" x2="158" y2="50" stroke="#2563eb" stroke-width="2"/>
+      <rect x="162" y="25" width="130" height="50" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="227" y="53" text-anchor="middle" font-size="13" fill="#1e40af" font-weight="600" font-family="Inter,sans-serif">Organize</text>
+      <polygon points="297,50 310,44 310,56" fill="#2563eb"/>
+      <line x1="292" y1="50" x2="310" y2="50" stroke="#2563eb" stroke-width="2"/>
+      <rect x="314" y="25" width="130" height="50" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="379" y="53" text-anchor="middle" font-size="13" fill="#1e40af" font-weight="600" font-family="Inter,sans-serif">Analyze</text>
+      <polygon points="449,50 462,44 462,56" fill="#2563eb"/>
+      <line x1="444" y1="50" x2="462" y2="50" stroke="#2563eb" stroke-width="2"/>
+      <rect x="466" y="25" width="130" height="50" rx="8" fill="#ede9fe" stroke="#4f46e5" stroke-width="1.5"/>
+      <text x="531" y="46" text-anchor="middle" font-size="13" fill="#3730a3" font-weight="600" font-family="Inter,sans-serif">Draw</text>
+      <text x="531" y="61" text-anchor="middle" font-size="13" fill="#3730a3" font-weight="600" font-family="Inter,sans-serif">Conclusions</text>
+    </svg>
+    <p>Statistics operates at two levels. <strong>Descriptive statistics</strong> summarizes and displays what the data show. <strong>Inferential statistics</strong> uses sample data to draw conclusions about a larger population, always with an honest acknowledgment of uncertainty.</p>
+    <div class="example-box"><strong>Example:</strong> Bangladesh's Directorate General of Health Services cannot measure the blood pressure of every adult in the country. Instead, it draws a carefully designed sample of several thousand adults and uses those measurements to estimate the national prevalence of hypertension, complete with a margin of error.</div>
+  </div>
+
+  <!-- SLIDE 3 -->
+  <div class="slide" id="slide-3">
+    <h2>A Researcher's Problem</h2>
+    <p>A public health researcher at a Bangladeshi university wants to estimate the average Body Mass Index (BMI) of university students nationwide. There are approximately four million enrolled students across more than 150 universities.</p>
+    <p>Measuring all four million is financially impossible, logistically impractical, and unnecessary, provided the sampling is done correctly. The researcher instead collects precise measurements from 2,000 carefully selected students. If the selection method is sound, those 2,000 observations can reliably represent the full four million.</p>
+    <svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:580px;margin:18px auto;display:block;">
+      <!-- Population background -->
+      <rect x="10" y="10" width="370" height="180" rx="12" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5" stroke-dasharray="6,3"/>
+      <text x="26" y="32" font-size="12" fill="#1d4ed8" font-weight="700" font-family="Inter,sans-serif">Population: ~4 million students</text>
+      <!-- Many small dots (population) -->
+      <circle cx="45" cy="60" r="4" fill="#bfdbfe"/><circle cx="70" cy="55" r="4" fill="#bfdbfe"/>
+      <circle cx="95" cy="65" r="4" fill="#bfdbfe"/><circle cx="55" cy="85" r="4" fill="#bfdbfe"/>
+      <circle cx="80" cy="80" r="4" fill="#bfdbfe"/><circle cx="105" cy="75" r="4" fill="#bfdbfe"/>
+      <circle cx="130" cy="60" r="4" fill="#bfdbfe"/><circle cx="155" cy="70" r="4" fill="#bfdbfe"/>
+      <circle cx="140" cy="90" r="4" fill="#bfdbfe"/><circle cx="165" cy="55" r="4" fill="#bfdbfe"/>
+      <circle cx="190" cy="65" r="4" fill="#bfdbfe"/><circle cx="215" cy="80" r="4" fill="#bfdbfe"/>
+      <circle cx="200" cy="55" r="4" fill="#bfdbfe"/><circle cx="230" cy="90" r="4" fill="#bfdbfe"/>
+      <circle cx="255" cy="60" r="4" fill="#bfdbfe"/><circle cx="280" cy="75" r="4" fill="#bfdbfe"/>
+      <circle cx="265" cy="90" r="4" fill="#bfdbfe"/><circle cx="305" cy="65" r="4" fill="#bfdbfe"/>
+      <circle cx="330" cy="55" r="4" fill="#bfdbfe"/><circle cx="345" cy="85" r="4" fill="#bfdbfe"/>
+      <circle cx="50" cy="115" r="4" fill="#bfdbfe"/><circle cx="75" cy="125" r="4" fill="#bfdbfe"/>
+      <circle cx="100" cy="110" r="4" fill="#bfdbfe"/><circle cx="125" cy="130" r="4" fill="#bfdbfe"/>
+      <circle cx="150" cy="120" r="4" fill="#bfdbfe"/><circle cx="175" cy="115" r="4" fill="#bfdbfe"/>
+      <circle cx="200" cy="130" r="4" fill="#bfdbfe"/><circle cx="225" cy="110" r="4" fill="#bfdbfe"/>
+      <circle cx="250" cy="125" r="4" fill="#bfdbfe"/><circle cx="275" cy="115" r="4" fill="#bfdbfe"/>
+      <circle cx="300" cy="130" r="4" fill="#bfdbfe"/><circle cx="325" cy="120" r="4" fill="#bfdbfe"/>
+      <circle cx="350" cy="110" r="4" fill="#bfdbfe"/><circle cx="55" cy="155" r="4" fill="#bfdbfe"/>
+      <circle cx="80" cy="165" r="4" fill="#bfdbfe"/><circle cx="105" cy="150" r="4" fill="#bfdbfe"/>
+      <circle cx="130" cy="160" r="4" fill="#bfdbfe"/><circle cx="155" cy="170" r="4" fill="#bfdbfe"/>
+      <circle cx="180" cy="155" r="4" fill="#bfdbfe"/><circle cx="205" cy="165" r="4" fill="#bfdbfe"/>
+      <!-- Sample region -->
+      <rect x="250" y="100" width="130" height="85" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+      <text x="315" y="118" text-anchor="middle" font-size="11" fill="#92400e" font-weight="700" font-family="Inter,sans-serif">Sample</text>
+      <text x="315" y="131" text-anchor="middle" font-size="11" fill="#92400e" font-family="Inter,sans-serif">2,000 students</text>
+      <circle cx="270" cy="148" r="5" fill="#f59e0b"/><circle cx="290" cy="155" r="5" fill="#f59e0b"/>
+      <circle cx="310" cy="145" r="5" fill="#f59e0b"/><circle cx="330" cy="158" r="5" fill="#f59e0b"/>
+      <circle cx="350" cy="148" r="5" fill="#f59e0b"/><circle cx="275" cy="168" r="5" fill="#f59e0b"/>
+      <circle cx="300" cy="172" r="5" fill="#f59e0b"/><circle cx="325" cy="168" r="5" fill="#f59e0b"/>
+      <!-- Arrow from sample to population -->
+      <path d="M 415 142 Q 500 100 540 142" stroke="#4f46e5" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+      <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#4f46e5"/></marker></defs>
+      <text x="490" y="90" text-anchor="middle" font-size="11" fill="#4f46e5" font-weight="600" font-family="Inter,sans-serif">Inference</text>
+      <!-- Labels -->
+      <rect x="415" y="125" width="160" height="40" rx="6" fill="#ede9fe" stroke="#4f46e5" stroke-width="1.5"/>
+      <text x="495" y="143" text-anchor="middle" font-size="11" fill="#3730a3" font-weight="600" font-family="Inter,sans-serif">Study the sample.</text>
+      <text x="495" y="157" text-anchor="middle" font-size="11" fill="#3730a3" font-family="Inter,sans-serif">Conclude about the population.</text>
+    </svg>
+    <div class="tip-box"><strong>Central promise of statistics:</strong> A well-chosen sample of manageable size can yield reliable conclusions about a population that is far too large to observe directly. The critical word is <em>well-chosen</em>.</div>
+  </div>
+
+  <!-- SLIDE 4 -->
+  <div class="slide" id="slide-4">
+    <h2>Population and Sample</h2>
+    <div class="two-col">
+      <div class="def-card">
+        <div class="def-term">Population</div>
+        <div class="def-body">The complete collection of all units relevant to a study. A population can be finite (all registered voters in Dhaka) or conceptually infinite (all possible readings from a measuring instrument). What defines the population is determined by the research question, not by convenience.</div>
+      </div>
+      <div class="def-card">
+        <div class="def-term">Sample</div>
+        <div class="def-body">A subset of the population selected for actual observation or measurement. The quality of any statistical conclusion depends critically on whether the sample was chosen in a principled way that avoids systematic bias.</div>
+      </div>
+    </div>
+    <div class="example-box"><strong>Back to the BMI study:</strong> The population is all approximately four million university students currently enrolled in Bangladesh. The sample is the 2,000 students whose BMI is actually measured. The researcher will use the sample to make statements about the population.</div>
+    <div class="practice" id="prac-1">
+      <h4>&#9999; Quick Check</h4>
+      <p class="practice-q">A nutritionist wants to study dietary habits among all adults in Dhaka. She recruits 400 adults from three neighborhoods. These 400 adults constitute the:</p>
+      <div class="practice-options">
+        <button class="practice-btn" onclick="checkPrac('prac-1',this,false)">Population</button>
+        <button class="practice-btn" onclick="checkPrac('prac-1',this,false)">Parameter</button>
+        <button class="practice-btn" onclick="checkPrac('prac-1',this,true)">Sample</button>
+        <button class="practice-btn" onclick="checkPrac('prac-1',this,false)">Statistic</button>
+      </div>
+      <div class="practice-feedback" id="prac-1-fb"></div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5 -->
+  <div class="slide" id="slide-5">
+    <h2>Why Sampling Works</h2>
+    <p>The idea of inferring population characteristics from a subset can seem presumptuous. In practice, it rests on a straightforward principle: a representative sample shares the essential distributional properties of the population it was drawn from.</p>
+    <div class="example-box"><strong>Analogy:</strong> When a physician orders a blood test, she draws a few millilitres from a vein. She does not drain the patient's entire blood supply. Those few millilitres, drawn correctly from the circulatory system, are chemically representative of what is circulating throughout the body. The key is that blood is well-mixed, so any small portion reflects the whole. Statistics requires us to create the equivalent of a "well-mixed" condition artificially, through careful sampling design.</div>
+    <h3>The Critical Requirement: Representativeness</h3>
+    <p>A sample is useful only if it accurately reflects the composition and variation of the full population. This is not guaranteed by having a large sample. A biased sample of 100,000 observations can yield worse conclusions than an unbiased sample of 1,000.</p>
+    <div class="warn-box"><strong>Common misconception:</strong> "The larger the sample, the more reliable the result." Sample size reduces random error, but it cannot correct for systematic bias introduced by a flawed selection process. A poll conducted exclusively among smartphone users will misrepresent a population where smartphone ownership is unequal across age or income groups, regardless of how many smartphone users respond.</div>
+  </div>
+
+  <!-- SLIDE 6 -->
+  <div class="slide" id="slide-6">
+    <h2>Types of Variables</h2>
+    <p>A variable is any characteristic that can take on different values across observations. Identifying a variable's type is not a formality. It determines which summary measures are meaningful and which statistical methods are valid.</p>
+    <svg viewBox="0 0 660 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:660px;margin:16px auto;display:block;">
+      <!-- Root -->
+      <rect x="240" y="8" width="160" height="44" rx="8" fill="#2563eb"/>
+      <text x="320" y="26" text-anchor="middle" font-size="13" fill="white" font-weight="700" font-family="Inter,sans-serif">Variable</text>
+      <text x="320" y="42" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.85)" font-family="Inter,sans-serif">Any measurable characteristic</text>
+      <!-- Branch lines from root -->
+      <line x1="240" y1="30" x2="140" y2="88" stroke="#94a3b8" stroke-width="1.5"/>
+      <line x1="400" y1="30" x2="500" y2="88" stroke="#94a3b8" stroke-width="1.5"/>
+      <!-- Quantitative -->
+      <rect x="50" y="88" width="170" height="44" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="135" y="106" text-anchor="middle" font-size="13" fill="#1e40af" font-weight="700" font-family="Inter,sans-serif">Quantitative</text>
+      <text x="135" y="122" text-anchor="middle" font-size="11" fill="#1e40af" font-family="Inter,sans-serif">Numerical measurements</text>
+      <!-- Qualitative -->
+      <rect x="420" y="88" width="170" height="44" rx="8" fill="#ede9fe" stroke="#4f46e5" stroke-width="1.5"/>
+      <text x="505" y="106" text-anchor="middle" font-size="13" fill="#3730a3" font-weight="700" font-family="Inter,sans-serif">Qualitative</text>
+      <text x="505" y="122" text-anchor="middle" font-size="11" fill="#3730a3" font-family="Inter,sans-serif">Categories or labels</text>
+      <!-- Quantitative branches -->
+      <line x1="100" y1="132" x2="60" y2="178" stroke="#94a3b8" stroke-width="1.5"/>
+      <line x1="170" y1="132" x2="210" y2="178" stroke="#94a3b8" stroke-width="1.5"/>
+      <rect x="10" y="178" width="120" height="56" rx="8" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+      <text x="70" y="196" text-anchor="middle" font-size="12" fill="#1d4ed8" font-weight="700" font-family="Inter,sans-serif">Discrete</text>
+      <text x="70" y="210" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter,sans-serif">Countable values</text>
+      <text x="70" y="226" text-anchor="middle" font-size="10" fill="#64748b" font-family="Inter,sans-serif">e.g. No. of courses</text>
+      <rect x="155" y="178" width="120" height="56" rx="8" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+      <text x="215" y="196" text-anchor="middle" font-size="12" fill="#1d4ed8" font-weight="700" font-family="Inter,sans-serif">Continuous</text>
+      <text x="215" y="210" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter,sans-serif">Measurable on a scale</text>
+      <text x="215" y="226" text-anchor="middle" font-size="10" fill="#64748b" font-family="Inter,sans-serif">e.g. BMI, height</text>
+      <!-- Qualitative branches -->
+      <line x1="470" y1="132" x2="430" y2="178" stroke="#94a3b8" stroke-width="1.5"/>
+      <line x1="540" y1="132" x2="580" y2="178" stroke="#94a3b8" stroke-width="1.5"/>
+      <rect x="370" y="178" width="120" height="56" rx="8" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
+      <text x="430" y="196" text-anchor="middle" font-size="12" fill="#5b21b6" font-weight="700" font-family="Inter,sans-serif">Nominal</text>
+      <text x="430" y="210" text-anchor="middle" font-size="10" fill="#5b21b6" font-family="Inter,sans-serif">No natural order</text>
+      <text x="430" y="226" text-anchor="middle" font-size="10" fill="#64748b" font-family="Inter,sans-serif">e.g. Gender, dept.</text>
+      <rect x="515" y="178" width="120" height="56" rx="8" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
+      <text x="575" y="196" text-anchor="middle" font-size="12" fill="#5b21b6" font-weight="700" font-family="Inter,sans-serif">Ordinal</text>
+      <text x="575" y="210" text-anchor="middle" font-size="10" fill="#5b21b6" font-family="Inter,sans-serif">Ordered categories</text>
+      <text x="575" y="226" text-anchor="middle" font-size="10" fill="#64748b" font-family="Inter,sans-serif">e.g. Year of study</text>
+    </svg>
+    <div class="example-box"><strong>In the BMI study:</strong> BMI (kg/m&#178;) is <em>continuous quantitative</em>. Number of meals per day is <em>discrete quantitative</em>. A student's department is <em>nominal qualitative</em>. Year of study (Year 1, 2, 3, 4) is <em>ordinal qualitative</em>.</div>
+  </div>
+
+  <!-- SLIDE 7 -->
+  <div class="slide" id="slide-7">
+    <h2>Parameters and Statistics</h2>
+    <p>This distinction is fundamental to statistical inference and is worth understanding precisely.</p>
+    <div class="two-col">
+      <div class="def-card">
+        <div class="def-term">Parameter</div>
+        <div class="def-body">A numerical characteristic of the <strong>population</strong>. It is a fixed value, but it is typically unknown because we cannot observe the entire population. Denoted by Greek letters: the population mean is \(\mu\), the standard deviation is \(\sigma\).</div>
+      </div>
+      <div class="def-card">
+        <div class="def-term">Statistic</div>
+        <div class="def-body">A numerical characteristic of the <strong>sample</strong>. It is calculated from observed data and used to estimate the corresponding parameter. Denoted by Roman letters: the sample mean is \(\bar{x}\), the sample standard deviation is \(s\).</div>
+      </div>
+    </div>
+    <svg viewBox="0 0 580 110" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:580px;margin:16px auto;display:block;">
+      <rect x="10" y="20" width="200" height="70" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="110" y="45" text-anchor="middle" font-size="13" fill="#1e40af" font-weight="700" font-family="Inter,sans-serif">Population</text>
+      <text x="110" y="63" text-anchor="middle" font-size="12" fill="#1e40af" font-family="Inter,sans-serif">Parameter: &#956;, &#963;</text>
+      <text x="110" y="80" text-anchor="middle" font-size="11" fill="#64748b" font-family="Inter,sans-serif">(unknown, fixed)</text>
+      <rect x="370" y="20" width="200" height="70" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+      <text x="470" y="45" text-anchor="middle" font-size="13" fill="#92400e" font-weight="700" font-family="Inter,sans-serif">Sample</text>
+      <text x="470" y="63" text-anchor="middle" font-size="12" fill="#92400e" font-family="Inter,sans-serif">Statistic: x&#772;, s</text>
+      <text x="470" y="80" text-anchor="middle" font-size="11" fill="#64748b" font-family="Inter,sans-serif">(calculated, observed)</text>
+      <line x1="370" y1="55" x2="215" y2="55" stroke="#4f46e5" stroke-width="2" marker-end="url(#arrP)"/>
+      <defs><marker id="arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#4f46e5"/></marker></defs>
+      <text x="290" y="46" text-anchor="middle" font-size="11" fill="#4f46e5" font-weight="600" font-family="Inter,sans-serif">estimates</text>
+    </svg>
+    <div class="example-box"><strong>In the BMI study:</strong> The true average BMI of all four million students is a parameter, \(\mu\). We will never know its exact value. The average BMI computed from the 2,000-student sample is a statistic, \(\bar{x}\). We use \(\bar{x}\) as our best available estimate of \(\mu\), and we will learn in later modules how to quantify the uncertainty in that estimate.</div>
+  </div>
+
+  <!-- SLIDE 8 -->
+  <div class="slide" id="slide-8">
+    <h2>Methods of Data Collection</h2>
+    <p>The choice of data collection method determines what kinds of conclusions are defensible. Three broad approaches are used in practice.</p>
+    <h3>Sample Survey</h3>
+    <p>A structured instrument, questionnaire or interview, is administered to a selected sample. Well-suited for measuring attitudes, self-reported behaviors, and demographic characteristics. Conclusions are limited by the honesty and recall accuracy of respondents.</p>
+    <h3>Observational Study</h3>
+    <p>The researcher observes and records outcomes without intervening or manipulating any variable. Useful when experimentation is infeasible or unethical, but limited in its ability to establish cause and effect because measured and unmeasured variables may be confounded.</p>
+    <h3>Controlled Experiment</h3>
+    <p>The researcher deliberately assigns treatments to subjects (ideally at random) and measures the resulting effect. Randomized controlled experiments are the only design capable of establishing a causal relationship between a treatment and an outcome.</p>
+    <div class="warn-box"><strong>Key distinction:</strong> Observational studies can identify associations; only controlled experiments can establish causation. This difference is not a technicality. It is why the observation that "people who carry lighters get more lung cancer" does not mean lighters cause cancer.</div>
+    <div class="example-box"><strong>In the BMI study:</strong> A survey could ask students to self-report their weight and height. An observational study could examine university health records. A controlled experiment could randomize students into different meal-plan conditions and measure BMI change over a semester. Each approach yields a different type of conclusion.</div>
+  </div>
+
+  <!-- SLIDE 9 -->
+  <div class="slide" id="slide-9">
+    <h2>Sampling Techniques</h2>
+    <p>Probability sampling methods assign known, non-zero probabilities of selection to every unit in the population. This is what makes inference from a sample to a population mathematically justifiable.</p>
+    <svg viewBox="0 0 660 230" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:660px;margin:14px auto;display:block;">
+      <!-- Simple Random -->
+      <rect x="10" y="10" width="145" height="100" rx="8" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+      <text x="82" y="30" text-anchor="middle" font-size="11" fill="#1d4ed8" font-weight="700" font-family="Inter,sans-serif">Simple Random</text>
+      <circle cx="35" cy="60" r="5" fill="#bfdbfe"/><circle cx="55" cy="50" r="5" fill="#bfdbfe"/>
+      <circle cx="75" cy="65" r="5" fill="#bfdbfe"/><circle cx="95" cy="50" r="5" fill="#2563eb"/>
+      <circle cx="115" cy="65" r="5" fill="#bfdbfe"/><circle cx="40" cy="80" r="5" fill="#2563eb"/>
+      <circle cx="65" cy="82" r="5" fill="#bfdbfe"/><circle cx="88" cy="80" r="5" fill="#2563eb"/>
+      <circle cx="112" cy="80" r="5" fill="#bfdbfe"/><circle cx="130" cy="55" r="5" fill="#2563eb"/>
+      <text x="82" y="102" text-anchor="middle" font-size="10" fill="#64748b" font-family="Inter,sans-serif">Each unit equally likely</text>
+      <!-- Stratified -->
+      <rect x="170" y="10" width="145" height="100" rx="8" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
+      <text x="242" y="30" text-anchor="middle" font-size="11" fill="#5b21b6" font-weight="700" font-family="Inter,sans-serif">Stratified</text>
+      <rect x="180" y="38" width="55" height="60" rx="4" fill="#ddd6fe" stroke="#7c3aed" stroke-width="1"/>
+      <rect x="248" y="38" width="55" height="60" rx="4" fill="#ede9fe" stroke="#7c3aed" stroke-width="1"/>
+      <circle cx="200" cy="55" r="5" fill="#7c3aed"/><circle cx="218" cy="67" r="5" fill="#c4b5fd"/>
+      <circle cx="200" cy="80" r="5" fill="#c4b5fd"/>
+      <circle cx="268" cy="55" r="5" fill="#c4b5fd"/><circle cx="285" cy="67" r="5" fill="#7c3aed"/>
+      <circle cx="268" cy="80" r="5" fill="#c4b5fd"/>
+      <text x="242" y="108" text-anchor="middle" font-size="10" fill="#64748b" font-family="Inter,sans-serif">Sample from each stratum</text>
+      <!-- Cluster -->
+      <rect x="330" y="10" width="145" height="100" rx="8" fill="#f0fdf4" stroke="#6ee7b7" stroke-width="1.5"/>
+      <text x="402" y="30" text-anchor="middle" font-size="11" fill="#065f46" font-weight="700" font-family="Inter,sans-serif">Cluster</text>
+      <ellipse cx="365" cy="65" rx="22" ry="22" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+      <circle cx="358" cy="60" r="4" fill="#059669"/><circle cx="372" cy="60" r="4" fill="#059669"/><circle cx="365" cy="74" r="4" fill="#059669"/>
+      <ellipse cx="420" cy="65" rx="22" ry="22" fill="#e5e7eb" stroke="#9ca3af" stroke-width="1"/>
+      <circle cx="413" cy="60" r="4" fill="#9ca3af"/><circle cx="427" cy="60" r="4" fill="#9ca3af"/><circle cx="420" cy="74" r="4" fill="#9ca3af"/>
+      <ellipse cx="460" cy="55" rx="16" ry="16" fill="#e5e7eb" stroke="#9ca3af" stroke-width="1"/>
+      <circle cx="455" cy="52" r="4" fill="#9ca3af"/><circle cx="466" cy="60" r="4" fill="#9ca3af"/>
+      <text x="402" y="102" text-anchor="middle" font-size="10" fill="#64748b" font-family="Inter,sans-serif">Whole clusters selected</text>
+      <!-- Systematic -->
+      <rect x="490" y="10" width="155" height="100" rx="8" fill="#fefce8" stroke="#fde68a" stroke-width="1.5"/>
+      <text x="568" y="30" text-anchor="middle" font-size="11" fill="#92400e" font-weight="700" font-family="Inter,sans-serif">Systematic</text>
+      <circle cx="508" cy="58" r="5" fill="#fbbf24"/><circle cx="526" cy="58" r="5" fill="#fde68a"/>
+      <circle cx="544" cy="58" r="5" fill="#fde68a"/><circle cx="562" cy="58" r="5" fill="#fbbf24"/>
+      <circle cx="580" cy="58" r="5" fill="#fde68a"/><circle cx="598" cy="58" r="5" fill="#fde68a"/>
+      <circle cx="616" cy="58" r="5" fill="#fbbf24"/><circle cx="634" cy="58" r="5" fill="#fde68a"/>
+      <circle cx="508" cy="78" r="5" fill="#fde68a"/><circle cx="526" cy="78" r="5" fill="#fde68a"/>
+      <circle cx="544" cy="78" r="5" fill="#fbbf24"/><circle cx="562" cy="78" r="5" fill="#fde68a"/>
+      <circle cx="580" cy="78" r="5" fill="#fde68a"/><circle cx="598" cy="78" r="5" fill="#fbbf24"/>
+      <circle cx="616" cy="78" r="5" fill="#fde68a"/><circle cx="634" cy="78" r="5" fill="#fde68a"/>
+      <text x="568" y="102" text-anchor="middle" font-size="10" fill="#64748b" font-family="Inter,sans-serif">Every k-th unit selected</text>
+      <!-- Legend -->
+      <circle cx="230" cy="145" r="5" fill="#2563eb"/><text x="242" y="149" font-size="11" fill="#334155" font-family="Inter,sans-serif">Selected unit</text>
+      <circle cx="330" cy="145" r="5" fill="#bfdbfe"/><text x="342" y="149" font-size="11" fill="#334155" font-family="Inter,sans-serif">Not selected</text>
+    </svg>
+    <div class="practice" id="prac-2">
+      <h4>&#9999; Quick Check</h4>
+      <p class="practice-q">A researcher lists all 6,000 students at a university and selects every 60th student, starting from a randomly chosen position. This method is:</p>
+      <div class="practice-options">
+        <button class="practice-btn" onclick="checkPrac('prac-2',this,false)">Simple random sampling</button>
+        <button class="practice-btn" onclick="checkPrac('prac-2',this,false)">Stratified sampling</button>
+        <button class="practice-btn" onclick="checkPrac('prac-2',this,false)">Cluster sampling</button>
+        <button class="practice-btn" onclick="checkPrac('prac-2',this,true)">Systematic sampling</button>
+      </div>
+      <div class="practice-feedback" id="prac-2-fb"></div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10 -->
+  <div class="slide" id="slide-10">
+    <h2>When Sampling Goes Wrong</h2>
+    <p>Bias in sampling is not merely an academic concern. It has led to consequential errors in public health research, political polling, and market surveys. Recognizing these failure modes is essential for any informed reader of quantitative evidence.</p>
+    <h3>Convenience Sampling</h3>
+    <p>Selecting whoever is easiest to reach. A study on mobile phone usage conducted in a university computer lab selects a sample that systematically overrepresents digitally engaged students. The results cannot be generalized to all students.</p>
+    <h3>Self-Selection Bias</h3>
+    <p>When participation is voluntary, those who opt in typically differ from those who do not. Online polls and call-in surveys are structurally self-selected. The people motivated to respond hold stronger opinions than the silent majority, skewing results in a predictable direction.</p>
+    <h3>Non-Response Bias</h3>
+    <p>When a significant fraction of a selected sample does not respond, and non-respondents differ systematically from respondents. A survey mailed to alumni will be disproportionately completed by those who feel positively about their institution.</p>
+    <div class="warn-box"><strong>A cautionary case:</strong> In the 1936 U.S. presidential election, <em>Literary Digest</em> mailed ten million ballots to people drawn from telephone directories and automobile registrations, and predicted that Alf Landon would defeat Franklin Roosevelt by a wide margin. Roosevelt won in a landslide. The sampling frame excluded low-income voters who were less likely to own telephones or cars and who voted heavily for Roosevelt. Large sample size did not compensate for a biased frame.</div>
+  </div>
+
+  <!-- SLIDE 11 -->
+  <div class="slide" id="slide-11">
+    <h2>Module 1 Recap</h2>
+    <p class="slide-sub">Five principles to carry forward from this module:</p>
+    <ul class="takeaway-list">
+      <li><span class="t-num">1</span>Statistics provides a principled framework for drawing reliable conclusions from incomplete information. The goal is not certainty, but defensible inference.</li>
+      <li><span class="t-num">2</span>The population is what you care about; the sample is what you observe. Always clarify both before interpreting a result.</li>
+      <li><span class="t-num">3</span>A parameter describes the population (usually unknown). A statistic describes the sample (what you calculate). The entire enterprise of inference is about using the latter to estimate the former.</li>
+      <li><span class="t-num">4</span>Variable type is not administrative bookkeeping. It determines which summary measures are meaningful and which statistical methods are valid.</li>
+      <li><span class="t-num">5</span>Before trusting any quantitative claim, ask: Who was in the sample? How were they selected? Could non-participation or self-selection have distorted the result?</li>
+    </ul>
+    <div class="tip-box"><strong>Next:</strong> Module 2 turns to the question of how to organize and display data effectively, translating raw numbers into charts and tables that reveal structure.</div>
+  </div>
+
+  <!-- NAV -->
+  <div class="slide-nav">
+    <button class="btn btn-ghost" id="btn-prev" onclick="changeSlide(-1)" disabled>&#8592; Previous</button>
+    <span style="font-size:13px;color:var(--muted);">Use arrow keys or buttons</span>
+    <button class="btn btn-primary" id="btn-next" onclick="changeSlide(1)">Next &#8594;</button>
+  </div>
+</div>
+</div>
+
+<!-- ===================== QUIZ ===================== -->
+<div id="tab-quiz" class="tab-content">
+<div class="quiz-intro">
+  <h2>&#128221; Module Quiz</h2>
+  <p>10 questions testing conceptual understanding. Read each question carefully before selecting an answer.</p>
+  <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
+</div>
+<div id="quiz-questions" style="display:none;">
+
+  <div class="quiz-question" id="qq-1">
+    <h4><span class="q-num">1.</span>A hospital wants to estimate the average recovery time for all patients who underwent a particular surgery last year. The hospital's records show 3,400 such patients, but the research team analyzes a random selection of 200 records. The 3,400 patients represent the:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(1,this,true)">Population</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">Sample</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">Parameter</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">Statistic</button>
+    </div>
+    <div class="quiz-explain" id="qe-1">The population is the complete set of all units relevant to the research question: all 3,400 patients who had the surgery. The 200 records examined form the sample, which is the subset actually studied.</div>
+  </div>
+
+  <div class="quiz-question" id="qq-2">
+    <h4><span class="q-num">2.</span>The true average height of all first-year students at a university is best described as:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(2,this,false)">A statistic, because it describes a group</button>
+      <button class="quiz-option" onclick="answerQ(2,this,true)">A parameter, because it describes the entire population of interest</button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">A sample, because not all students were measured</button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">A variable, because height differs across individuals</button>
+    </div>
+    <div class="quiz-explain" id="qe-2">A parameter is a numerical characteristic of the population. The true average height of all first-year students (the full population of interest) is a parameter, typically denoted \(\mu\). It is unknown unless every student is measured.</div>
+  </div>
+
+  <div class="quiz-question" id="qq-3">
+    <h4><span class="q-num">3.</span>Which of the following is a continuous quantitative variable?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(3,this,false)">Number of siblings a student has</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">Academic department (CSE, EEE, Civil)</button>
+      <button class="quiz-option" onclick="answerQ(3,this,true)">Body weight measured in kilograms</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">Year of study (Year 1, 2, 3, 4)</button>
+    </div>
+    <div class="quiz-explain" id="qe-3">Body weight is continuous because it can take any value on a numerical scale within a range, including fractional values. Number of siblings is discrete (countable). Department is nominal qualitative. Year of study is ordinal qualitative.</div>
+  </div>
+
+  <div class="quiz-question" id="qq-4">
+    <h4><span class="q-num">4.</span>A researcher divides all university students into four groups by region (Dhaka, Chittagong, Rajshahi, Khulna) and then randomly selects students from within each regional group. This is best described as:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(4,this,false)">Simple random sampling</button>
+      <button class="quiz-option" onclick="answerQ(4,this,true)">Stratified sampling</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">Cluster sampling</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">Systematic sampling</button>
+    </div>
+    <div class="quiz-explain" id="qe-4">Stratified sampling divides the population into homogeneous subgroups (strata) and draws random samples from each. Here, the four regions are the strata. This ensures all regions are represented, which simple random sampling might not guarantee.</div>
+  </div>
+
+  <div class="quiz-question" id="qq-5">
+    <h4><span class="q-num">5.</span>A television channel invites viewers to text in their vote on whether a new policy should be implemented. 45,000 responses are received. Which of the following is the most serious concern about this data?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(5,this,false)">The sample size is too small to be reliable</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">The question is ambiguous</button>
+      <button class="quiz-option" onclick="answerQ(5,this,true)">Self-selection bias means respondents are not representative of the broader population</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">The results should have been collected in person</button>
+    </div>
+    <div class="quiz-explain" id="qe-5">When participation is entirely voluntary, people with strong opinions are far more likely to respond than those who are indifferent. The 45,000 respondents are self-selected and do not represent the population. The large number makes this bias more misleading, not less.</div>
+  </div>
+
+  <div class="quiz-question" id="qq-6">
+    <h4><span class="q-num">6.</span>A student's letter grade in a course (A, B, C, D, F) is best classified as:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(6,this,false)">Continuous quantitative</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">Discrete quantitative</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">Nominal qualitative</button>
+      <button class="quiz-option" onclick="answerQ(6,this,true)">Ordinal qualitative</button>
+    </div>
+    <div class="quiz-explain" id="qe-6">Letter grades are qualitative because they are categories, not measurements. They are ordinal because the categories have a meaningful order (A is better than B, which is better than C). However, the differences between categories are not necessarily equal in magnitude, so they are not quantitative.</div>
+  </div>
+
+  <div class="quiz-question" id="qq-7">
+    <h4><span class="q-num">7.</span>An average BMI of 22.4 calculated from the 2,000-student sample is an example of:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(7,this,false)">A population parameter</button>
+      <button class="quiz-option" onclick="answerQ(7,this,true)">A sample statistic</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">A continuous variable</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">A sampling frame</button>
+    </div>
+    <div class="quiz-explain" id="qe-7">Any numerical summary computed from a sample is a statistic. The value 22.4 was calculated from the 2,000 observed measurements, not from the full population of four million students. It serves as an estimate of the unknown population parameter \(\mu\).</div>
+  </div>
+
+  <div class="quiz-question" id="qq-8">
+    <h4><span class="q-num">8.</span>A researcher wants to study the health outcomes of a new drug. She randomly assigns 500 patients to receive the drug and 500 to receive a placebo, then measures outcomes after six months. This is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(8,this,false)">An observational study</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">A sample survey</button>
+      <button class="quiz-option" onclick="answerQ(8,this,true)">A controlled experiment</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">A cluster sample</button>
+    </div>
+    <div class="quiz-explain" id="qe-8">The defining feature of a controlled experiment is that the researcher deliberately assigns treatments (drug vs. placebo) to participants, ideally at random. This is the only design that can establish a causal relationship between the treatment and the measured outcome.</div>
+  </div>
+
+  <div class="quiz-question" id="qq-9">
+    <h4><span class="q-num">9.</span>A study on employee satisfaction is conducted by emailing a questionnaire to 800 randomly selected employees. Only 210 respond. The researchers publish results based on these 210 responses. The primary concern is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(9,this,false)">The sample was too large</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">Simple random sampling was used incorrectly</button>
+      <button class="quiz-option" onclick="answerQ(9,this,true)">Non-response bias, because those who responded may differ systematically from those who did not</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">The population was not well defined</button>
+    </div>
+    <div class="quiz-explain" id="qe-9">Non-response bias arises when those who do not participate in a study differ in relevant ways from those who do. Employees who are dissatisfied may be more or less likely to respond than satisfied employees, making the 210 responses an unrepresentative subset of the 800 selected.</div>
+  </div>
+
+  <div class="quiz-question" id="qq-10">
+    <h4><span class="q-num">10.</span>Which of the following statements about sample size is most accurate?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(10,this,false)">A larger sample always produces more accurate results</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">Sample size matters more than sampling method</button>
+      <button class="quiz-option" onclick="answerQ(10,this,true)">A large biased sample can produce worse results than a small well-designed sample</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">Sample size is the only factor that determines reliability</button>
+    </div>
+    <div class="quiz-explain" id="qe-10">This is perhaps the most important practical lesson in sampling. Increasing sample size reduces random (chance) variation but does nothing to correct systematic bias. The Literary Digest poll of 1936 had over two million responses and still produced a badly wrong prediction, because the sampling frame was systematically biased.</div>
+  </div>
+
+  <div class="quiz-footer">
+    <span class="quiz-progress-text" id="quiz-progress">0 of 10 answered</span>
+    <button class="btn btn-primary" onclick="submitQuiz()" id="btn-submit-quiz" disabled>Submit Quiz</button>
+  </div>
+  <div class="quiz-result" id="quiz-result">
+    <h3>Quiz Complete</h3>
+    <div class="score" id="quiz-score-display">0<span class="total"> / 10</span></div>
+    <div class="verdict" id="quiz-verdict"></div>
+    <p id="quiz-msg"></p>
+    <button class="btn btn-primary" onclick="retakeQuiz()">Retake Quiz</button>
+  </div>
+</div>
+</div>
+
+<!-- ===================== FLASHCARDS ===================== -->
+<div id="tab-flashcards" class="tab-content">
+<div class="flashcards-header">
+  <h2>&#127183; Flashcards</h2>
+  <p>16 key terms from Module 1. Click any card to reveal its definition.</p>
+</div>
+<div class="flashcards-grid" id="fc-grid">
+  <!-- cards injected by JS -->
+</div>
+</div>
+
+<!-- ===================== REAL CASES ===================== -->
+<div id="tab-cases" class="tab-content">
+<div class="cases-header">
+  <h2>&#127919; Real Cases</h2>
+  <p>Read each scenario, write your interpretation, then reveal what most people miss and what the careful reading looks like.</p>
+</div>
+
+<!-- CASE 1 -->
+<div class="case-card" id="case-1">
+  <h4>Case 1: The Online Poll</h4>
+  <p class="case-prompt">A major Bangladeshi news portal runs an online poll for 24 hours asking: "Do you support the government's proposal to increase university tuition fees?" By the end of the day, 18,600 responses have been collected. The portal headlines its story: "Survey shows 81% of Bangladeshis oppose tuition fee hike."</p>
+  <p class="case-q">What would you conclude from this poll? How much confidence should a policymaker place in this figure?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-1','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-1','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-1" onclick="markCaseWorked(1)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-1">Most readers are impressed by the large sample size (18,600 responses) and take the 81% figure as broadly representative. They treat it as meaningful evidence of public opinion.</div>
+  <div class="reveal-panel right-panel" id="right-case-1">This is a self-selected, opt-in sample with no probability mechanism. The people who visited this particular news portal, saw the poll, and felt strongly enough to click a button are systematically different from the general population. People with strong opinions (in this case, those opposed to fee increases) are far more likely to participate than those who are indifferent or support the proposal. The 18,600 responses do not represent 18,600 independent, randomly selected opinions. A policymaker who treats this as evidence of national sentiment is making a category error: confusing a large self-selected response with a representative sample.</div>
+</div>
+
+<!-- CASE 2 -->
+<div class="case-card" id="case-2">
+  <h4>Case 2: Nine Out of Ten</h4>
+  <p class="case-prompt">An advertisement for a dietary supplement states: "9 out of 10 nutritionists recommend NutriBoost for daily energy support." No further information about the study is provided. The product is priced at 1,200 taka per month.</p>
+  <p class="case-q">How much evidential weight should you give this claim? What information would you need before treating it as meaningful?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-2','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-2','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-2" onclick="markCaseWorked(2)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-2">Many consumers interpret "9 out of 10 nutritionists" as evidence that a large, independent, representative survey of the professional community was conducted, and that the overwhelming majority endorsed the product.</div>
+  <div class="reveal-panel right-panel" id="right-case-2">Without knowing the sample size, sampling method, and who conducted the study, this statistic carries no evidential weight. "9 out of 10" could mean 9 out of 10 nutritionists employed by the company, or 9 out of 10 consultants paid to review the product, or literally 10 people at a focus group. The claim also says "recommend for daily energy support," not that the product is effective. A statistic without a disclosed methodology is not evidence; it is marketing. The questions to ask: How many nutritionists? How were they selected? Who funded the study? What exactly were they asked?</div>
+</div>
+
+<!-- CASE 3 -->
+<div class="case-card" id="case-3">
+  <h4>Case 3: The University Average</h4>
+  <p class="case-prompt">A university publishes its annual report with the headline: "Average graduate CGPA: 3.51." A faculty member cites this figure in a grant application, arguing that the university produces academically high-performing graduates. A rival faculty member dismisses it as "meaningless."</p>
+  <p class="case-q">Who is more right? What would a statistically careful interpretation of this figure require?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-3','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-3','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-3" onclick="markCaseWorked(3)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-3">Most readers accept the average as a straightforward, unambiguous summary of graduate performance, and use it directly to compare the university against others or against a benchmark.</div>
+  <div class="reveal-panel right-panel" id="right-case-3">Several questions must be answered before this figure can be meaningfully interpreted. First, is 3.51 the mean or the median? If a small number of students have very high CGPAs, the mean could be pulled upward, making it unrepresentative of the typical student. Second, does it cover all graduates or only those with complete records? Students who dropped out or whose records are incomplete may be excluded, introducing survivorship bias. Third, CGPA reflects the grading standards of that particular institution and its departments. A 3.51 at one university may represent different academic attainment than a 3.51 at another, making cross-institutional comparison invalid without context. The figure is not meaningless, but it requires several layers of contextual interpretation before it can support the claim made in the grant application.</div>
+</div>
+
+<!-- CASE 4 -->
+<div class="case-card" id="case-4">
+  <h4>Case 4: The Volunteer Health Study</h4>
+  <p class="case-prompt">A research team publishes a 5-year study: "Regular physical exercise reduces the risk of Type 2 diabetes by 38%." The study enrolled 4,000 volunteers recruited through advertisements placed at gyms, fitness centers, and university health clinics. All participants were between 20 and 40 years old.</p>
+  <p class="case-q">Can this conclusion be generalized to the broader adult population? What limitations should be stated alongside this finding?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-4','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-4','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-4" onclick="markCaseWorked(4)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-4">The 5-year duration, the large sample size, and the precise-sounding percentage (38%) create an impression of rigor. Most readers generalize the finding to all adults.</div>
+  <div class="reveal-panel right-panel" id="right-case-4">The sample was recruited from gyms and health clinics, meaning participants were almost certainly more health-conscious, more physically active at baseline, and more attentive to nutrition than the general adult population. This is a well-documented problem called "healthy volunteer bias." The finding may be entirely valid within this subpopulation, but it cannot be straightforwardly applied to sedentary adults, older populations, or those with pre-existing conditions, because those groups were systematically excluded by the recruitment method. Additionally, this appears to be an observational study (volunteers chose to exercise; they were not randomly assigned to do so), which means confounding factors, such as diet, socioeconomic status, and access to healthcare, may partly explain the association. The 38% figure describes an association, not a guaranteed causal effect applicable to all adults.</div>
+</div>
+
+</div><!-- end cases tab -->
+
+<button class="reset-btn" onclick="resetProgress()">&#8635; Reset Progress</button>
+
+<script>
+// ===== DATA =====
+const STORAGE_KEY = 'stats101-module1-progress-v1';
+const TOTAL_SLIDES = 11;
+const TOTAL_CARDS = 16;
+const TOTAL_CASES = 4;
+const TOTAL_QUIZ = 10;
+
+const flashcardData = [
+  {term:'Statistics', def:'The science of collecting, organizing, analyzing, and interpreting data to draw reliable conclusions in the presence of variability and uncertainty.'},
+  {term:'Population', def:'The complete collection of all units of interest in a study. It may be finite or conceptually infinite, and is defined by the research question.'},
+  {term:'Sample', def:'A subset of the population selected for actual observation or measurement. The basis of all inferential conclusions.'},
+  {term:'Parameter', def:'A numerical characteristic of a population. Usually unknown and fixed. Denoted by Greek letters such as μ (mean) and σ (standard deviation).'},
+  {term:'Statistic', def:'A numerical characteristic computed from a sample. Used to estimate the corresponding population parameter. Denoted by Roman letters such as x̄ and s.'},
+  {term:'Variable', def:'Any characteristic that can take on different values across units of observation. Classification by type determines which analytical methods apply.'},
+  {term:'Quantitative variable', def:'A variable measured on a numerical scale. Meaningful arithmetic operations (addition, subtraction) can be applied to its values.'},
+  {term:'Qualitative variable', def:'A variable that describes a category or attribute rather than a numerical quantity. Also called a categorical variable.'},
+  {term:'Discrete variable', def:'A quantitative variable that can only take countable values (often integers). There are gaps between possible values. Example: number of students in a class.'},
+  {term:'Continuous variable', def:'A quantitative variable that can take any value within an interval on the real number line. Example: height, weight, temperature.'},
+  {term:'Nominal variable', def:'A qualitative variable whose categories have no natural order or ranking. Example: department, blood type, city of birth.'},
+  {term:'Ordinal variable', def:'A qualitative variable whose categories have a meaningful rank or order, but differences between ranks are not necessarily equal. Example: year of study, satisfaction rating.'},
+  {term:'Simple random sampling', def:'A probability sampling method in which every unit in the population has an equal and independent chance of being selected.'},
+  {term:'Stratified sampling', def:'The population is divided into homogeneous subgroups (strata), and random samples are drawn independently from each stratum. Ensures representation of key subgroups.'},
+  {term:'Cluster sampling', def:'The population is divided into groups (clusters), and entire clusters are selected at random. Cost-effective for geographically dispersed populations.'},
+  {term:'Systematic sampling', def:'Units are selected from an ordered list at a fixed interval (every k-th unit), starting from a randomly chosen point.'}
+];
+
+// ===== STATE =====
+let state = {
+  slidesViewed: new Set(),
+  quizScore: null,
+  cardsFlipped: new Set(),
+  casesWorked: new Set(),
+  quizAnswers: {},
+  quizSubmitted: false,
+  currentSlide: 1
+};
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const p = JSON.parse(saved);
+      state.slidesViewed = new Set(p.slidesViewed || []);
+      state.quizScore = p.quizScore !== undefined ? p.quizScore : null;
+      state.cardsFlipped = new Set(p.cardsFlipped || []);
+      state.casesWorked = new Set(p.casesWorked || []);
+      state.quizAnswers = p.quizAnswers || {};
+      state.quizSubmitted = p.quizSubmitted || false;
+      state.currentSlide = p.currentSlide || 1;
+    }
+  } catch(e){}
+}
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      slidesViewed: [...state.slidesViewed],
+      quizScore: state.quizScore,
+      cardsFlipped: [...state.cardsFlipped],
+      casesWorked: [...state.casesWorked],
+      quizAnswers: state.quizAnswers,
+      quizSubmitted: state.quizSubmitted,
+      currentSlide: state.currentSlide
+    }));
+  } catch(e){}
+}
+
+// ===== TABS =====
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ===== SLIDES =====
+function showSlide(n) {
+  document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+  document.getElementById('slide-' + n).classList.add('active');
+  state.currentSlide = n;
+  state.slidesViewed.add(n);
+  saveState();
+  updateSlideUI();
+  updateStats();
+}
+function updateSlideUI() {
+  const n = state.currentSlide;
+  document.getElementById('slide-counter').textContent = 'Slide ' + n + ' of ' + TOTAL_SLIDES;
+  document.getElementById('slide-progress').style.width = (n / TOTAL_SLIDES * 100) + '%';
+  document.getElementById('btn-prev').disabled = n === 1;
+  document.getElementById('btn-next').disabled = n === TOTAL_SLIDES;
+}
+function changeSlide(dir) {
+  const next = state.currentSlide + dir;
+  if (next >= 1 && next <= TOTAL_SLIDES) showSlide(next);
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeSlide(1);
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') changeSlide(-1);
+});
+
+// ===== PRACTICE =====
+function checkPrac(id, btn, correct) {
+  const btns = document.querySelectorAll('#' + id + ' .practice-btn');
+  btns.forEach(b => b.classList.add('disabled'));
+  const fb = document.getElementById(id + '-fb');
+  if (correct) {
+    btn.classList.add('correct');
+    fb.textContent = 'Correct. ' + (id === 'prac-1' ? 'The 400 adults selected for observation form the sample. The population is all adults in Dhaka.' : 'Systematic sampling selects every k-th unit from an ordered list, starting at a random point.');
+    fb.className = 'practice-feedback show right';
+  } else {
+    btn.classList.add('wrong');
+    fb.textContent = 'Not quite. ' + (id === 'prac-1' ? 'The 400 adults who were recruited form the sample, the subset actually studied. The population is all adults in Dhaka.' : 'Systematic sampling selects every k-th unit from an ordered list. Look for the "every 60th student" clue.');
+    fb.className = 'practice-feedback show wrong';
+  }
+}
+
+// ===== QUIZ =====
+let quizAnswered = 0;
+let quizCorrect = 0;
+const correctAnswers = {1:0,2:1,3:2,4:1,5:2,6:3,7:1,8:2,9:2,10:2};
+
+function startQuiz() {
+  document.querySelector('.quiz-intro').style.display = 'none';
+  document.getElementById('quiz-questions').style.display = 'block';
+  if (state.quizSubmitted) restoreQuizState();
+}
+function answerQ(qNum, btn, correct) {
+  const qq = document.getElementById('qq-' + qNum);
+  if (qq.classList.contains('answered')) return;
+  qq.classList.add('answered');
+  const opts = qq.querySelectorAll('.quiz-option');
+  opts.forEach(o => { o.classList.add('disabled'); });
+  btn.classList.add(correct ? 'correct' : 'wrong');
+  if (correct) quizCorrect++;
+  document.getElementById('qe-' + qNum).classList.add('show');
+  state.quizAnswers[qNum] = correct;
+  quizAnswered++;
+  document.getElementById('quiz-progress').textContent = quizAnswered + ' of ' + TOTAL_QUIZ + ' answered';
+  document.getElementById('btn-submit-quiz').disabled = quizAnswered < TOTAL_QUIZ;
+  saveState();
+}
+function submitQuiz() {
+  state.quizScore = quizCorrect;
+  state.quizSubmitted = true;
+  saveState();
+  const el = document.getElementById('quiz-result');
+  document.getElementById('quiz-score-display').innerHTML = quizCorrect + '<span class="total"> / ' + TOTAL_QUIZ + '</span>';
+  const v = document.getElementById('quiz-verdict');
+  const m = document.getElementById('quiz-msg');
+  if (quizCorrect >= 9) { v.textContent = 'Excellent'; v.className = 'verdict great'; m.textContent = 'You have a strong command of the foundational concepts in this module.'; }
+  else if (quizCorrect >= 7) { v.textContent = 'Good'; v.className = 'verdict good'; m.textContent = 'Solid understanding. Review the explanations on the questions you missed.'; }
+  else { v.textContent = 'Keep going'; v.className = 'verdict ok'; m.textContent = 'Revisit the slides on the topics that gave you difficulty, then retake.'; }
+  el.classList.add('show');
+  updateStats();
+}
+function retakeQuiz() {
+  state.quizScore = null; state.quizSubmitted = false; state.quizAnswers = {};
+  quizCorrect = 0; quizAnswered = 0;
+  saveState();
+  document.getElementById('quiz-result').classList.remove('show');
+  document.querySelectorAll('.quiz-question').forEach(q => {
+    q.classList.remove('answered');
+    q.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('correct','wrong','disabled','selected'));
+    q.querySelectorAll('.quiz-explain').forEach(e => e.classList.remove('show'));
+  });
+  document.getElementById('quiz-progress').textContent = '0 of ' + TOTAL_QUIZ + ' answered';
+  document.getElementById('btn-submit-quiz').disabled = true;
+  updateStats();
+}
+function restoreQuizState() {
+  Object.entries(state.quizAnswers).forEach(([qNum, correct]) => {
+    const qq = document.getElementById('qq-' + qNum);
+    if (!qq) return;
+    qq.classList.add('answered');
+    qq.querySelectorAll('.quiz-option').forEach(o => o.classList.add('disabled'));
+    document.getElementById('qe-' + qNum).classList.add('show');
+    quizAnswered++;
+    if (correct) { quizCorrect++; }
+  });
+  document.getElementById('quiz-progress').textContent = quizAnswered + ' of ' + TOTAL_QUIZ + ' answered';
+  document.getElementById('btn-submit-quiz').disabled = quizAnswered < TOTAL_QUIZ;
+  if (state.quizSubmitted) submitQuiz();
+}
+
+// ===== FLASHCARDS =====
+function buildFlashcards() {
+  const grid = document.getElementById('fc-grid');
+  flashcardData.forEach((fc, i) => {
+    const div = document.createElement('div');
+    div.className = 'flashcard' + (state.cardsFlipped.has(i) ? ' flipped' : '');
+    div.innerHTML = '<div class="flashcard-inner"><div class="flashcard-front">' + fc.term + '<span class="fc-hint">Click to reveal definition</span></div><div class="flashcard-back">' + fc.def + '</div></div>';
+    div.addEventListener('click', () => {
+      div.classList.toggle('flipped');
+      state.cardsFlipped.add(i);
+      saveState();
+      updateStats();
+    });
+    grid.appendChild(div);
+  });
+}
+
+// ===== REAL CASES =====
+function revealCase(id, type) {
+  document.getElementById(type + '-' + id).classList.add('show');
+}
+function markCaseWorked(n) {
+  state.casesWorked.add(n);
+  saveState();
+  const btn = document.getElementById('worked-case-' + n);
+  btn.textContent = 'Worked';
+  btn.classList.add('done');
+  updateStats();
+}
+
+// ===== STATS BAR =====
+function updateStats() {
+  const pct = Math.round(state.slidesViewed.size / TOTAL_SLIDES * 100);
+  document.getElementById('stat-slides').textContent = pct + '%';
+  document.getElementById('stat-quiz').textContent = state.quizScore !== null ? state.quizScore + ' / ' + TOTAL_QUIZ : '—';
+  document.getElementById('stat-cards').textContent = state.cardsFlipped.size + ' / ' + TOTAL_CARDS;
+  document.getElementById('stat-cases').textContent = state.casesWorked.size + ' / ' + TOTAL_CASES;
+}
+
+// ===== RESET =====
+function resetProgress() {
+  if (!confirm('Reset all progress for this module?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+}
+
+// ===== INIT =====
+loadState();
+buildFlashcards();
+showSlide(state.currentSlide);
+updateStats();
+if (state.quizSubmitted) {
+  document.querySelector('.quiz-intro').style.display = 'none';
+  document.getElementById('quiz-questions').style.display = 'block';
+  restoreQuizState();
+}
+// restore worked cases
+state.casesWorked.forEach(n => {
+  const btn = document.getElementById('worked-case-' + n);
+  if (btn) { btn.textContent = 'Worked'; btn.classList.add('done'); }
+});
+</script>
+</div>
+</body>
+</html>
