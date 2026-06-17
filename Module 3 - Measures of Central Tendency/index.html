@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 3: Measures of Central Tendency</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;
+  --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#dbeafe;
+  --accent:#4f46e5;--success:#059669;--success-light:#d1fae5;
+  --danger:#dc2626;--danger-light:#fee2e2;
+  --warning:#d97706;--warning-light:#fef3c7;
+  --border:#e2e8f0;
+  --shadow:0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.08),0 4px 10px rgba(0,0,0,.04);
+  --radius:12px;--radius-sm:8px;--transition:.2s cubic-bezier(.4,0,.2,1);
+}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;}
+.app{max-width:1100px;margin:0 auto;padding:24px 20px 80px;}
+header.mod-header{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%);color:#fff;padding:32px 28px;border-radius:var(--radius);margin-bottom:20px;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;}
+header.mod-header::before{content:"";position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:rgba(255,255,255,.08);border-radius:50%;}
+header.mod-header::after{content:"";position:absolute;bottom:-30px;right:80px;width:100px;height:100px;background:rgba(255,255,255,.05);border-radius:50%;}
+.mod-badge{display:inline-block;background:rgba(255,255,255,.2);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:.5px;position:relative;z-index:1;}
+header.mod-header h1{font-size:28px;margin:12px 0 8px;font-weight:700;position:relative;z-index:1;}
+header.mod-header p.mod-sub{font-size:14px;opacity:.88;max-width:640px;position:relative;z-index:1;}
+header.mod-header p.mod-instructor{font-size:13px;opacity:.8;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.2);position:relative;z-index:1;}
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;padding:14px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;}
+.stat{text-align:center;padding:6px;}
+.stat .stat-value{font-size:22px;font-weight:700;color:var(--primary);line-height:1.2;}
+.stat .stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:2px;}
+.tabs{display:flex;gap:4px;background:#fff;padding:6px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;flex-wrap:wrap;}
+.tab-btn{flex:1;min-width:110px;padding:11px 16px;background:transparent;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;transition:all var(--transition);font-family:inherit;}
+.tab-btn:hover{background:var(--bg);color:var(--text);}
+.tab-btn.active{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.28);}
+.tab-content{display:none;animation:fadeIn .28s ease-in-out;}
+.tab-content.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);margin-bottom:16px;}
+.progress-bar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:12px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:3px;transition:width .4s ease;}
+.slide-counter{text-align:center;color:var(--muted);font-size:13px;margin-bottom:14px;font-weight:500;}
+.slide{display:none;min-height:440px;padding:4px;animation:slideIn .3s ease;}
+.slide.active{display:block;}
+@keyframes slideIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+.slide h2{font-size:26px;margin-bottom:6px;color:var(--primary-dark);font-weight:700;line-height:1.25;}
+.slide h3{font-size:18px;margin:20px 0 8px;color:var(--text);font-weight:600;}
+.slide p{margin-bottom:12px;color:#334155;}
+.slide ul,.slide ol{margin:0 0 14px 22px;}
+.slide li{margin-bottom:7px;color:#334155;}
+.slide .slide-sub{color:var(--muted);font-size:15px;margin-bottom:18px;font-style:italic;}
+.obj-list{list-style:none;padding:0;margin:14px 0;}
+.obj-list li{padding:9px 0 9px 32px;position:relative;color:#334155;border-bottom:1px solid var(--border);}
+.obj-list li:last-child{border-bottom:none;}
+.obj-list li::before{content:"";position:absolute;left:0;top:13px;width:18px;height:18px;background:var(--success-light);border-radius:50%;}
+.obj-list li::after{content:"✓";position:absolute;left:3px;top:10px;color:var(--success);font-size:11px;font-weight:700;}
+.example-box{background:var(--primary-light);border-left:4px solid var(--primary);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.example-box strong{color:var(--primary-dark);}
+.tip-box{background:var(--success-light);border-left:4px solid var(--success);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.tip-box strong{color:var(--success);}
+.warn-box{background:var(--warning-light);border-left:4px solid var(--warning);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.warn-box strong{color:var(--warning);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:14px 0;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:14px 0;}
+.def-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;}
+.def-card .def-term{font-weight:700;color:var(--primary-dark);font-size:15px;margin-bottom:6px;}
+.def-card .def-body{font-size:14px;color:#334155;}
+.formula-box{background:#0f172a;color:#e2e8f0;padding:18px 22px;border-radius:var(--radius-sm);margin:14px 0;text-align:center;font-size:16px;overflow-x:auto;}
+.freq-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;}
+.freq-table th{background:var(--primary);color:#fff;padding:9px 12px;text-align:left;font-weight:600;}
+.freq-table th:not(:first-child),.freq-table td:not(:first-child){text-align:right;}
+.freq-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:#334155;}
+.freq-table tr:nth-child(even) td{background:#f8fafc;}
+.freq-table tr.total-row td{font-weight:700;background:var(--primary-light);color:var(--primary-dark);border-top:2px solid var(--primary);}
+.freq-table tr.highlight-row td{background:#fef3c7;}
+.freq-table th:first-child{border-radius:8px 0 0 0;}.freq-table th:last-child{border-radius:0 8px 0 0;}
+.practice{background:#f1f5f9;border:2px dashed #cbd5e1;border-radius:var(--radius-sm);padding:18px;margin:20px 0;}
+.practice h4{color:var(--primary);margin-bottom:10px;font-size:15px;}
+.practice-q{margin-bottom:10px;color:var(--text);font-weight:500;}
+.practice-options{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+.practice-btn{padding:8px 14px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;font-size:14px;transition:all var(--transition);color:var(--text);}
+.practice-btn:hover{border-color:var(--primary);background:var(--primary-light);}
+.practice-btn.correct{background:var(--success-light);border-color:var(--success);color:var(--success);font-weight:600;}
+.practice-btn.wrong{background:var(--danger-light);border-color:var(--danger);color:var(--danger);}
+.practice-btn.disabled{pointer-events:none;opacity:.75;}
+.practice-feedback{margin-top:10px;padding:10px 14px;border-radius:6px;font-size:14px;display:none;}
+.practice-feedback.show{display:block;}
+.practice-feedback.right{background:var(--success-light);color:var(--success);border:1px solid var(--success);}
+.practice-feedback.wrong{background:var(--danger-light);color:var(--danger);border:1px solid var(--danger);}
+.slide-nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border);gap:10px;flex-wrap:wrap;}
+.key-hint{font-size:12px;color:var(--muted);}
+.kbd{display:inline-block;background:#f1f5f9;border:1px solid var(--border);border-bottom-width:2px;border-radius:4px;padding:1px 6px;font-family:monospace;font-size:11px;color:var(--text);}
+.btn{padding:10px 20px;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;transition:all var(--transition);font-family:inherit;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover:not(:disabled){background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,.28);}
+.btn-primary:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover:not(:disabled){background:var(--bg);color:var(--text);}
+.btn-ghost:disabled{opacity:.45;cursor:not-allowed;}
+.quiz-intro{background:#fff;padding:22px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;text-align:center;}
+.quiz-intro h2{color:var(--primary-dark);margin-bottom:8px;}
+.quiz-intro p{color:var(--muted);margin-bottom:14px;}
+.quiz-question{background:#fff;border-radius:var(--radius);padding:22px;margin-bottom:14px;box-shadow:var(--shadow);border:1px solid var(--border);}
+.quiz-question h4{font-size:16px;margin-bottom:14px;color:var(--text);font-weight:600;}
+.q-num{color:var(--primary);font-weight:700;margin-right:6px;}
+.quiz-options{display:grid;gap:8px;}
+.quiz-option{padding:11px 16px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:#fff;transition:all var(--transition);font-size:14px;color:var(--text);text-align:left;font-family:inherit;}
+.quiz-option:hover{border-color:var(--primary);background:var(--primary-light);transform:translateX(2px);}
+.quiz-option.correct{border-color:var(--success);background:var(--success-light);color:var(--success);font-weight:600;}
+.quiz-option.wrong{border-color:var(--danger);background:var(--danger-light);color:var(--danger);}
+.quiz-option.disabled{pointer-events:none;}
+.quiz-explain{display:none;margin-top:10px;padding:10px 14px;background:#f8fafc;border-left:3px solid var(--primary);border-radius:4px;font-size:13px;color:#334155;}
+.quiz-explain.show{display:block;}
+.quiz-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px 20px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);flex-wrap:wrap;}
+.quiz-progress-text{font-size:13px;color:var(--muted);}
+.quiz-result{display:none;padding:30px;background:linear-gradient(135deg,#f0fdf4 0%,#dbeafe 100%);border-radius:var(--radius);text-align:center;margin-top:16px;box-shadow:var(--shadow);}
+.quiz-result.show{display:block;}
+.quiz-result h3{font-size:24px;margin-bottom:10px;color:var(--primary-dark);}
+.quiz-result .score{font-size:48px;font-weight:700;color:var(--primary);margin:14px 0;line-height:1;}
+.quiz-result .score .total{font-size:26px;color:var(--muted);}
+.quiz-result p{color:#334155;margin-bottom:16px;font-size:15px;}
+.verdict{display:inline-block;padding:6px 14px;border-radius:16px;font-weight:600;font-size:14px;margin-bottom:8px;}
+.verdict.great{background:var(--success-light);color:var(--success);}
+.verdict.good{background:var(--primary-light);color:var(--primary-dark);}
+.verdict.ok{background:var(--warning-light);color:var(--warning);}
+.flashcards-header{background:#fff;padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;text-align:center;}
+.flashcards-header h2{color:var(--primary-dark);margin-bottom:6px;}
+.flashcards-header p{color:var(--muted);font-size:14px;}
+.flashcards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+.flashcard{perspective:1000px;height:170px;cursor:pointer;}
+.flashcard-inner{position:relative;width:100%;height:100%;transition:transform .55s;transform-style:preserve-3d;}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+.flashcard-front,.flashcard-back{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:var(--shadow);}
+.flashcard-front{background:linear-gradient(135deg,#fff 0%,#f8fafc 100%);border:2px solid var(--primary-light);color:var(--primary-dark);font-weight:600;font-size:16px;}
+.flashcard-front .fc-hint{font-size:11px;color:var(--muted);font-weight:400;margin-top:8px;font-style:italic;}
+.flashcard-back{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%);color:#fff;transform:rotateY(180deg);font-size:13px;line-height:1.55;}
+.cases-header{background:#fff;padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;}
+.cases-header h2{color:var(--primary-dark);margin-bottom:6px;}
+.cases-header p{color:var(--muted);font-size:14px;}
+.case-card{background:#fff;border-radius:var(--radius);padding:24px;margin-bottom:16px;box-shadow:var(--shadow);border-left:4px solid var(--primary);}
+.case-card h4{font-size:16px;color:var(--primary-dark);font-weight:700;margin-bottom:12px;}
+.case-prompt{color:#334155;font-size:15px;margin-bottom:14px;line-height:1.6;}
+.case-q{font-weight:600;color:var(--text);margin-bottom:12px;font-size:15px;}
+.case-textarea{width:100%;min-height:80px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;resize:vertical;background:#f8fafc;color:var(--text);transition:border-color var(--transition);}
+.case-textarea:focus{outline:none;border-color:var(--primary);background:#fff;}
+.reveal-btns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+.reveal-btn{padding:8px 16px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;transition:all var(--transition);}
+.reveal-btn.miss{color:var(--warning);border-color:var(--warning);}
+.reveal-btn.miss:hover{background:var(--warning-light);}
+.reveal-btn.right{color:var(--success);border-color:var(--success);}
+.reveal-btn.right:hover{background:var(--success-light);}
+.reveal-panel{display:none;margin-top:12px;padding:14px 16px;border-radius:var(--radius-sm);font-size:14px;line-height:1.6;}
+.reveal-panel.show{display:block;}
+.reveal-panel.miss-panel{background:var(--warning-light);border-left:3px solid var(--warning);color:#78350f;}
+.reveal-panel.right-panel{background:var(--success-light);border-left:3px solid var(--success);color:#064e3b;}
+.case-worked-btn{margin-top:10px;padding:6px 14px;background:var(--primary-light);color:var(--primary-dark);border:none;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;}
+.case-worked-btn.done{background:var(--success-light);color:var(--success);}
+.takeaway-list{list-style:none;padding:0;margin:16px 0;}
+.takeaway-list li{padding:12px 16px 12px 48px;position:relative;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:10px;font-size:15px;color:#1e293b;border:1px solid var(--border);}
+.takeaway-list li .t-num{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:24px;height:24px;background:var(--primary);color:#fff;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.reset-btn{position:fixed;bottom:18px;right:18px;background:#fff;border:1px solid var(--border);padding:8px 14px;border-radius:20px;font-size:13px;color:var(--muted);cursor:pointer;box-shadow:var(--shadow);font-family:inherit;transition:all var(--transition);z-index:100;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+@media(max-width:720px){
+  .app{padding:14px 12px 80px;}
+  header.mod-header{padding:22px 18px;}
+  header.mod-header h1{font-size:22px;}
+  .card{padding:20px 16px;}
+  .two-col,.three-col{grid-template-columns:1fr;}
+  .stats-bar{grid-template-columns:repeat(2,1fr);}
+  .slide h2{font-size:22px;}
+  .freq-table{font-size:12px;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="mod-header">
+  <span class="mod-badge">Module 3 of 16</span>
+  <h1>Measures of Central Tendency</h1>
+  <p class="mod-sub">Mean, median, and mode: three different answers to "what is typical," and why picking the wrong one can mislead an entire room.</p>
+  <p class="mod-instructor"><strong>K.M. Tanvir</strong> &nbsp;·&nbsp; Statistics for Non-Statisticians</p>
+</header>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-value" id="stat-slides">0%</div><div class="stat-label">Slides Viewed</div></div>
+  <div class="stat"><div class="stat-value" id="stat-quiz">&#8212;</div><div class="stat-label">Quiz Score</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cards">0 / 16</div><div class="stat-label">Cards Flipped</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cases">0 / 4</div><div class="stat-label">Cases Worked</div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('slides',this)">&#128214; Slides</button>
+  <button class="tab-btn" onclick="switchTab('quiz',this)">&#128221; Quiz</button>
+  <button class="tab-btn" onclick="switchTab('flashcards',this)">&#127183; Flashcards</button>
+  <button class="tab-btn" onclick="switchTab('cases',this)">&#127919; Real Cases</button>
+</div>
+
+<!-- ========== SLIDES ========== -->
+<div id="tab-slides" class="tab-content active">
+<div class="card">
+  <div class="progress-bar"><div class="progress-fill" id="slide-progress"></div></div>
+  <div class="slide-counter" id="slide-counter">Slide 1 of 11</div>
+
+  <!-- S1: objectives -->
+  <div class="slide active" id="slide-1">
+    <h2>Measures of Central Tendency</h2>
+    <p class="slide-sub">Module 3 &nbsp;·&nbsp; By the end of this module, you will be able to:</p>
+    <ul class="obj-list">
+      <li>Calculate the mean, median, and mode for raw (ungrouped) data</li>
+      <li>Calculate the mean, median, and mode for grouped data presented as a frequency distribution</li>
+      <li>Explain why the mean is sensitive to outliers and skewness while the median is resistant</li>
+      <li>Choose the most appropriate measure of center given the variable type and distribution shape</li>
+      <li>Compute a weighted mean and explain why simple averaging is sometimes incorrect</li>
+      <li>Recognize situations where a reported "average" misrepresents what is typical</li>
+    </ul>
+    <div class="tip-box"><strong>Continuing from Module 2:</strong> You already organized the 2,000-student BMI dataset into a frequency table and several charts. This module asks the next natural question: if you could report just one number to describe this distribution, which number, and why?</div>
+  </div>
+
+  <!-- S2: mean -->
+  <div class="slide" id="slide-2">
+    <h2>The Mean</h2>
+    <p>The arithmetic mean (commonly called the "average") is the sum of all values divided by the number of values. It is the balancing point of the data: the point where the data would balance if each value were a weight placed on a number line.</p>
+    <div class="formula-box">\[ \bar{x} = \frac{\sum x_i}{n} \quad \text{(sample)} \qquad \mu = \frac{\sum x_i}{N} \quad \text{(population)} \]</div>
+    <div class="example-box"><strong>Worked example:</strong> Nine students' midterm scores: 65, 68, 72, 72, 72, 75, 78, 90, 95.
+    <br>Sum = 65+68+72+72+72+75+78+90+95 = 687.
+    <br>Mean = 687 &divide; 9 = 76.33.</div>
+    <h3>Properties of the mean</h3>
+    <ul>
+      <li>Uses every value in the dataset, so it incorporates all available information.</li>
+      <li>Is the algebraic balancing point: the sum of deviations from the mean always equals zero.</li>
+      <li>Is sensitive to extreme values. A single very large or very small observation can pull the mean noticeably in its direction.</li>
+      <li>Applies only to quantitative data, since it requires arithmetic operations on the values.</li>
+    </ul>
+  </div>
+
+  <!-- S3: median -->
+  <div class="slide" id="slide-3">
+    <h2>The Median</h2>
+    <p>The median is the middle value of an ordered dataset: the point that splits the data into two equal halves, with 50% of observations below it and 50% above.</p>
+    <div class="two-col">
+      <div class="def-card">
+        <div class="def-term">Odd number of observations</div>
+        <div class="def-body">Median is the single middle value after sorting. Position = (n+1)/2.<br><br>Scores: 65, 68, 72, 72, 72, 75, 78, 90, 95 (n = 9)<br>Position = (9+1)/2 = 5th value &rarr; <strong>Median = 72</strong></div>
+      </div>
+      <div class="def-card">
+        <div class="def-term">Even number of observations</div>
+        <div class="def-body">Median is the average of the two middle values.<br><br>Add a 10th score of 60: 60, 65, 68, 72, 72, 72, 75, 78, 90, 95<br>Middle two are 72 and 72 &rarr; <strong>Median = (72+72)/2 = 72</strong></div>
+      </div>
+    </div>
+    <h3>Properties of the median</h3>
+    <ul>
+      <li>Depends only on the rank (position) of values, not their exact magnitude.</li>
+      <li>Resistant to outliers: changing the highest score from 95 to 9,500 would not change the median at all.</li>
+      <li>Appropriate for ordinal data as well as quantitative data, since it requires only that values can be ranked.</li>
+    </ul>
+    <div class="practice" id="prac-1">
+      <h4>&#9999; Quick Check</h4>
+      <p class="practice-q">A dataset has 12 observations sorted in order. Which positions hold the two values averaged to find the median?</p>
+      <div class="practice-options">
+        <button class="practice-btn" onclick="checkPrac('prac-1',this,false)">5th and 6th</button>
+        <button class="practice-btn" onclick="checkPrac('prac-1',this,true)">6th and 7th</button>
+        <button class="practice-btn" onclick="checkPrac('prac-1',this,false)">6th and 8th</button>
+        <button class="practice-btn" onclick="checkPrac('prac-1',this,false)">12th and 1st</button>
+      </div>
+      <div class="practice-feedback" id="prac-1-fb"></div>
+    </div>
+  </div>
+
+  <!-- S4: mode -->
+  <div class="slide" id="slide-4">
+    <h2>The Mode</h2>
+    <p>The mode is the value (or category) that occurs most frequently in the dataset. It is the only measure of central tendency that can be applied to nominal (qualitative) data, since it requires only counting, not ordering or arithmetic.</p>
+    <div class="example-box"><strong>From the scores example:</strong> 65, 68, 72, 72, 72, 75, 78, 90, 95. The value 72 appears three times, more than any other value. <strong>Mode = 72.</strong></div>
+    <div class="three-col">
+      <div class="def-card">
+        <div class="def-term">Unimodal</div>
+        <div class="def-body">Exactly one value occurs most frequently. Most real-world quantitative distributions are unimodal.</div>
+      </div>
+      <div class="def-card">
+        <div class="def-term">Bimodal</div>
+        <div class="def-body">Two values tie for the highest frequency, or the distribution has two distinct peaks, often signaling two underlying subgroups.</div>
+      </div>
+      <div class="def-card">
+        <div class="def-term">Multimodal</div>
+        <div class="def-body">More than two peaks. Often a sign that the data combines several distinct populations that should be examined separately.</div>
+      </div>
+    </div>
+    <div class="warn-box"><strong>A bimodal exam score distribution is a warning sign.</strong> If a class's scores cluster around 90 and 50 with few scores in between, it usually means two distinct groups exist within the class: students who understood the material and students who did not. Reporting a single mean (perhaps 70) would describe neither group accurately.</div>
+  </div>
+
+  <!-- S5: comparing mean median mode under skew -->
+  <div class="slide" id="slide-5">
+    <h2>Mean, Median, and Mode Under Skewness</h2>
+    <p>When a distribution is symmetric, the mean, median, and mode coincide at the same point. When a distribution is skewed, they separate, and the direction of separation reveals the direction of the skew.</p>
+    <svg viewBox="0 0 700 230" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;margin:10px auto;display:block;">
+      <!-- Symmetric -->
+      <text x="115" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#1e40af" font-family="Inter,sans-serif">Symmetric</text>
+      <path d="M 20,90 Q 70,15 115,15 Q 160,15 210,90" fill="none" stroke="#2563eb" stroke-width="2.5"/>
+      <line x1="115" y1="15" x2="115" y2="95" stroke="#1d4ed8" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <text x="115" y="108" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter,sans-serif">Mean = Median = Mode</text>
+      <!-- Right-skewed -->
+      <text x="375" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#92400e" font-family="Inter,sans-serif">Right-Skewed (Positive)</text>
+      <path d="M 260,95 Q 300,18 335,18 Q 400,18 480,90" fill="none" stroke="#d97706" stroke-width="2.5"/>
+      <line x1="335" y1="18" x2="335" y2="95" stroke="#92400e" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <line x1="358" y1="35" x2="358" y2="95" stroke="#92400e" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <line x1="390" y1="55" x2="390" y2="95" stroke="#92400e" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <text x="335" y="108" text-anchor="middle" font-size="9.5" fill="#92400e" font-family="Inter,sans-serif">Mode</text>
+      <text x="358" y="120" text-anchor="middle" font-size="9.5" fill="#92400e" font-family="Inter,sans-serif">Median</text>
+      <text x="390" y="132" text-anchor="middle" font-size="9.5" fill="#92400e" font-family="Inter,sans-serif">Mean</text>
+      <text x="362" y="148" text-anchor="middle" font-size="10" font-weight="600" fill="#78350f" font-family="Inter,sans-serif">Mode &lt; Median &lt; Mean</text>
+      <!-- Left-skewed -->
+      <text x="600" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#5b21b6" font-family="Inter,sans-serif">Left-Skewed (Negative)</text>
+      <path d="M 520,90 Q 600,18 665,18 Q 700,18 700,95" fill="none" stroke="#7c3aed" stroke-width="2.5"/>
+      <line x1="665" y1="18" x2="665" y2="95" stroke="#5b21b6" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <line x1="630" y1="40" x2="630" y2="95" stroke="#5b21b6" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <line x1="595" y1="60" x2="595" y2="95" stroke="#5b21b6" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <text x="665" y="108" text-anchor="middle" font-size="9.5" fill="#5b21b6" font-family="Inter,sans-serif">Mode</text>
+      <text x="630" y="120" text-anchor="middle" font-size="9.5" fill="#5b21b6" font-family="Inter,sans-serif">Median</text>
+      <text x="595" y="132" text-anchor="middle" font-size="9.5" fill="#5b21b6" font-family="Inter,sans-serif">Mean</text>
+      <text x="628" y="148" text-anchor="middle" font-size="10" font-weight="600" fill="#4c1d95" font-family="Inter,sans-serif">Mean &lt; Median &lt; Mode</text>
+    </svg>
+    <p>The mean is always pulled in the direction of the longer tail because it accounts for the magnitude of every value, including extreme ones. The median, depending only on rank, stays closer to the bulk of the data.</p>
+    <div class="example-box"><strong>From the Module 1–2 BMI data:</strong> The histogram was right-skewed. As you will verify on Slide 8, Mean (26.06) &gt; Median (25.68) &gt; Mode (25.0), exactly the pattern shown above.</div>
+  </div>
+
+  <!-- S6: choosing the right measure -->
+  <div class="slide" id="slide-6">
+    <h2>Choosing the Right Measure of Center</h2>
+    <p>The "correct" measure of central tendency is not a matter of preference. It depends on the variable's measurement level and the shape of its distribution.</p>
+    <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;margin:10px auto;display:block;">
+      <text x="10" y="22" font-size="10" font-weight="700" fill="#94a3b8" font-family="Inter,sans-serif" letter-spacing="0.5">SITUATION</text>
+      <text x="430" y="22" font-size="10" font-weight="700" fill="#94a3b8" font-family="Inter,sans-serif" letter-spacing="0.5">RECOMMENDED MEASURE</text>
+      <line x1="0" y1="28" x2="700" y2="28" stroke="#e2e8f0" stroke-width="1"/>
+      <rect x="0" y="30"  width="700" height="36" rx="4" fill="#eff6ff"/>
+      <rect x="0" y="68"  width="700" height="36" rx="4" fill="#f5f3ff"/>
+      <rect x="0" y="106" width="700" height="36" rx="4" fill="#fef3c7"/>
+      <rect x="0" y="144" width="700" height="36" rx="4" fill="#f0fdf4"/>
+      <rect x="0" y="182" width="700" height="36" rx="4" fill="#fdf2f8"/>
+      <text x="10" y="53"  font-size="13" fill="#1e40af" font-family="Inter,sans-serif">Nominal data (categories with no order, e.g. department)</text>
+      <text x="430" y="53" font-size="13" font-weight="700" fill="#1e40af" font-family="Inter,sans-serif">Mode</text>
+      <text x="10" y="91"  font-size="13" fill="#5b21b6" font-family="Inter,sans-serif">Ordinal data (ranked categories, e.g. satisfaction rating)</text>
+      <text x="430" y="91" font-size="13" font-weight="700" fill="#5b21b6" font-family="Inter,sans-serif">Median</text>
+      <text x="10" y="129"  font-size="13" fill="#92400e" font-family="Inter,sans-serif">Quantitative, symmetric, no major outliers</text>
+      <text x="430" y="129" font-size="13" font-weight="700" fill="#92400e" font-family="Inter,sans-serif">Mean</text>
+      <text x="10" y="167"  font-size="13" fill="#065f46" font-family="Inter,sans-serif">Quantitative, skewed or containing outliers (e.g. income)</text>
+      <text x="430" y="167" font-size="13" font-weight="700" fill="#065f46" font-family="Inter,sans-serif">Median</text>
+      <text x="10" y="205"  font-size="13" fill="#7e1d5d" font-family="Inter,sans-serif">Identifying the single most common value or category</text>
+      <text x="430" y="205" font-size="13" font-weight="700" fill="#7e1d5d" font-family="Inter,sans-serif">Mode</text>
+    </svg>
+    <div class="tip-box"><strong>A practical habit:</strong> Whenever you encounter a reported "average," ask two questions: what kind of variable is this, and is the distribution likely to be skewed? Income, wealth, house prices, and city population are routinely skewed; for these, the median is almost always the more honest summary.</div>
+  </div>
+
+  <!-- S7: mean for grouped data -->
+  <div class="slide" id="slide-7">
+    <h2>The Mean for Grouped Data</h2>
+    <p>When data has already been organized into a frequency distribution (as in Module 2), individual values are no longer available, only class intervals and frequencies. The mean is then estimated using the midpoint of each class as a stand-in for every value inside it.</p>
+    <div class="formula-box">\[ \bar{x} = \frac{\sum f_i m_i}{n} \quad \text{where } m_i \text{ is the midpoint of class } i \]</div>
+    <table class="freq-table">
+      <thead><tr><th>BMI Class</th><th>Frequency (f)</th><th>Midpoint (m)</th><th>f &times; m</th></tr></thead>
+      <tbody>
+        <tr><td>15.0 – 17.9</td><td>28</td><td>16.45</td><td>460.6</td></tr>
+        <tr><td>18.0 – 20.9</td><td>210</td><td>19.45</td><td>4,084.5</td></tr>
+        <tr><td>21.0 – 23.9</td><td>460</td><td>22.45</td><td>10,327.0</td></tr>
+        <tr><td>24.0 – 26.9</td><td>540</td><td>25.45</td><td>13,743.0</td></tr>
+        <tr><td>27.0 – 29.9</td><td>380</td><td>28.45</td><td>10,811.0</td></tr>
+        <tr><td>30.0 – 32.9</td><td>220</td><td>31.45</td><td>6,919.0</td></tr>
+        <tr><td>33.0 – 35.9</td><td>110</td><td>34.45</td><td>3,789.5</td></tr>
+        <tr><td>36.0 – 38.9</td><td>42</td><td>37.45</td><td>1,572.9</td></tr>
+        <tr><td>39.0 – 41.9</td><td>10</td><td>40.45</td><td>404.5</td></tr>
+        <tr class="total-row"><td>Total</td><td>2,000</td><td></td><td>52,112.0</td></tr>
+      </tbody>
+    </table>
+    <div class="example-box"><strong>Mean</strong> = 52,112.0 &divide; 2,000 = <strong>26.06</strong>. This estimate is very close to what would be obtained from the original 2,000 raw values, because the midpoint approximation averages out across many classes.</div>
+    <div class="warn-box"><strong>Why only an estimate:</strong> Using the midpoint assumes values are evenly spread within each class. This is a reasonable approximation for most real datasets, but it is not exact, since the true distribution of values inside a class is unknown once the data has been grouped.</div>
+  </div>
+
+  <!-- S8: median and mode for grouped data -->
+  <div class="slide" id="slide-8">
+    <h2>The Median and Mode for Grouped Data</h2>
+    <p>Both the median and the mode can be estimated for grouped data using interpolation formulas that locate the value within the relevant class.</p>
+    <h3>Median for grouped data</h3>
+    <div class="formula-box">\[ \text{Median} = L + \left( \frac{\frac{n}{2} - CF}{f} \right) h \]</div>
+    <p>where \(L\) is the lower boundary of the median class, \(CF\) is the cumulative frequency before the median class, \(f\) is the frequency of the median class, and \(h\) is the class width.</p>
+    <div class="example-box"><strong>Locating the median class:</strong> n/2 = 1,000. The cumulative frequency reaches 698 by the end of class 21.0–23.9 and 1,238 by the end of class 24.0–26.9, so the median class is <strong>24.0–26.9</strong> (L = 24.0, CF = 698, f = 540, h = 3).
+    <br><br>Median = 24.0 + [(1,000 &minus; 698) / 540] &times; 3 = 24.0 + 1.68 = <strong>25.68</strong></div>
+    <h3>Mode for grouped data</h3>
+    <div class="formula-box">\[ \text{Mode} = L + \left( \frac{f_1 - f_0}{2f_1 - f_0 - f_2} \right) h \]</div>
+    <p>where \(f_1\) is the frequency of the modal class (the class with the highest frequency), \(f_0\) is the frequency of the class before it, and \(f_2\) is the frequency of the class after it.</p>
+    <div class="example-box"><strong>Modal class</strong> is 24.0–26.9 (highest frequency, 540). L = 24.0, \(f_0\) = 460, \(f_1\) = 540, \(f_2\) = 380, h = 3.
+    <br><br>Mode = 24.0 + [(540 &minus; 460) / (2(540) &minus; 460 &minus; 380)] &times; 3 = 24.0 + 1.0 = <strong>25.0</strong></div>
+    <div class="tip-box"><strong>Putting it together:</strong> Mean = 26.06, Median = 25.68, Mode = 25.0. Since Mean &gt; Median &gt; Mode, this confirms the right-skewed shape already visible in the Module 2 histogram.</div>
+  </div>
+
+  <!-- S9: weighted mean -->
+  <div class="slide" id="slide-9">
+    <h2>The Weighted Mean</h2>
+    <p>A simple mean treats every value as equally important. A weighted mean assigns different weights to different values, appropriate whenever some observations should count more than others.</p>
+    <div class="formula-box">\[ \bar{x}_w = \frac{\sum w_i x_i}{\sum w_i} \]</div>
+    <div class="example-box"><strong>Worked example: Semester GPA</strong></div>
+    <table class="freq-table">
+      <thead><tr><th>Course</th><th>Credit Hours (w)</th><th>Grade Point (x)</th><th>w &times; x</th></tr></thead>
+      <tbody>
+        <tr><td>Statistics</td><td>3</td><td>3.75</td><td>11.25</td></tr>
+        <tr><td>Calculus</td><td>3</td><td>3.50</td><td>10.50</td></tr>
+        <tr><td>English</td><td>2</td><td>4.00</td><td>8.00</td></tr>
+        <tr><td>Programming</td><td>4</td><td>3.25</td><td>13.00</td></tr>
+        <tr class="total-row"><td>Total</td><td>12</td><td></td><td>42.75</td></tr>
+      </tbody>
+    </table>
+    <p>Weighted mean (true GPA) = 42.75 &divide; 12 = <strong>3.56</strong></p>
+    <p>Simple (unweighted) mean of the four grade points = (3.75+3.50+4.00+3.25) &divide; 4 = 14.50 &divide; 4 = <strong>3.63</strong></p>
+    <div class="warn-box"><strong>The two answers differ.</strong> The unweighted mean incorrectly treats a 2-credit course the same as a 4-credit course. Since Programming carries the most credit hours and the lowest grade point, ignoring credit weight overstates the GPA. Whenever observations represent different amounts (credit hours, population sizes, transaction volumes), the weighted mean is the correct calculation.</div>
+  </div>
+
+  <!-- S10: when average misleads -->
+  <div class="slide" id="slide-10">
+    <h2>When "Average" Misleads</h2>
+    <p>A reported average is a single number standing in for an entire distribution. When the underlying distribution is highly skewed, that single number can create a badly distorted impression of what is typical.</p>
+    <div class="example-box"><strong>A small garment factory reports an "average monthly salary" of 20,762 taka across its 21 employees.</strong> Nineteen sewing-machine operators earn 12,000 taka each, one line supervisor earns 28,000 taka, and the factory manager earns 1,80,000 taka.</div>
+    <table class="freq-table">
+      <thead><tr><th>Role</th><th>Count</th><th>Monthly Salary (BDT)</th><th>Subtotal</th></tr></thead>
+      <tbody>
+        <tr><td>Sewing-machine operator</td><td>19</td><td>12,000</td><td>228,000</td></tr>
+        <tr><td>Line supervisor</td><td>1</td><td>28,000</td><td>28,000</td></tr>
+        <tr><td>Factory manager</td><td>1</td><td>180,000</td><td>180,000</td></tr>
+        <tr class="total-row"><td>Total</td><td>21</td><td></td><td>436,000</td></tr>
+      </tbody>
+    </table>
+    <p>Mean salary = 436,000 &divide; 21 = <strong>20,762 taka</strong>. Median salary (the 11th value among 21 sorted salaries, which falls among the 19 operators) = <strong>12,000 taka</strong>.</p>
+    <div class="warn-box"><strong>The mean is technically correct and deeply unrepresentative.</strong> No employee earns close to 20,762 taka: 19 of the 21 employees (90% of staff) earn exactly 12,000. The mean is dragged upward by a single very high salary. The median of 12,000 is a far more honest description of what a typical employee at this factory actually earns.</div>
+    <div class="tip-box"><strong>This pattern recurs constantly:</strong> national income statistics, house prices, company salaries, and city-level wealth figures are all commonly skewed by a small number of very high values. Whenever you read "the average is X," it is worth asking whether the median would tell a different story.</div>
+  </div>
+
+  <!-- S11: recap -->
+  <div class="slide" id="slide-11">
+    <h2>Module 3 Recap</h2>
+    <p class="slide-sub">Six principles to carry forward:</p>
+    <ul class="takeaway-list">
+      <li><span class="t-num">1</span>The mean uses every value and is the algebraic balancing point of the data, but it is sensitive to outliers and skewness.</li>
+      <li><span class="t-num">2</span>The median depends only on rank, splits the data exactly in half, and is resistant to extreme values.</li>
+      <li><span class="t-num">3</span>The mode is the only measure usable for nominal data and identifies the single most common value or category.</li>
+      <li><span class="t-num">4</span>In a right-skewed distribution, Mean &gt; Median &gt; Mode. In a left-skewed distribution, the order reverses. In a symmetric distribution, all three coincide.</li>
+      <li><span class="t-num">5</span>For grouped data, the mean uses class midpoints, while the median and mode use interpolation formulas that locate a value within the relevant class.</li>
+      <li><span class="t-num">6</span>A weighted mean is required whenever observations carry different importance. Skewed real-world quantities like income are best summarized by the median, not the mean.</li>
+    </ul>
+    <div class="tip-box"><strong>Next:</strong> Module 4 moves from center to spread, measuring how dispersed a distribution is using range, variance, standard deviation, and shape descriptors like skewness and kurtosis.</div>
+  </div>
+
+  <!-- NAV -->
+  <div class="slide-nav">
+    <button class="btn btn-ghost" id="prevBtn">← Previous</button>
+    <span class="key-hint">Use <span class="kbd">←</span> <span class="kbd">→</span> keys</span>
+    <button class="btn btn-primary" id="nextBtn">Next →</button>
+  </div>
+</div>
+</div>
+
+<!-- ========== QUIZ ========== -->
+<div id="tab-quiz" class="tab-content">
+<div class="quiz-intro">
+  <h2>&#128221; Module Quiz</h2>
+  <p>10 questions on mean, median, mode, and their use in grouped and weighted data.</p>
+  <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
+</div>
+<div id="quiz-questions" style="display:none;">
+  <div class="quiz-question" id="qq-1">
+    <h4><span class="q-num">1.</span>Five exam scores: 55, 60, 60, 85, 90. What is the mean?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(1,this,false)">60</button>
+      <button class="quiz-option" onclick="answerQ(1,this,true)">70</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">75</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">85</button>
+    </div>
+    <div class="quiz-explain" id="qe-1">Sum = 55+60+60+85+90 = 350. Mean = 350 / 5 = 70.</div>
+  </div>
+  <div class="quiz-question" id="qq-2">
+    <h4><span class="q-num">2.</span>Using the same five scores (55, 60, 60, 85, 90), what is the median?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(2,this,false)">55</button>
+      <button class="quiz-option" onclick="answerQ(2,this,true)">60</button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">70</button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">85</button>
+    </div>
+    <div class="quiz-explain" id="qe-2">Already sorted: 55, 60, 60, 85, 90 (n=5, odd). The middle (3rd) value is 60.</div>
+  </div>
+  <div class="quiz-question" id="qq-3">
+    <h4><span class="q-num">3.</span>A dataset has 8 sorted values. The median is calculated as:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(3,this,false)">The 4th value</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">The 5th value</button>
+      <button class="quiz-option" onclick="answerQ(3,this,true)">The average of the 4th and 5th values</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">The average of the 1st and 8th values</button>
+    </div>
+    <div class="quiz-explain" id="qe-3">For an even n, the median is the average of the two middle values, here in positions n/2 = 4 and n/2 + 1 = 5.</div>
+  </div>
+  <div class="quiz-question" id="qq-4">
+    <h4><span class="q-num">4.</span>Which measure of central tendency can be used for nominal data such as favorite color?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(4,this,false)">Mean</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">Median</button>
+      <button class="quiz-option" onclick="answerQ(4,this,true)">Mode</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">Weighted mean</button>
+    </div>
+    <div class="quiz-explain" id="qe-4">The mode requires only counting frequencies, not ranking or arithmetic, so it is the only measure of central tendency valid for nominal categories.</div>
+  </div>
+  <div class="quiz-question" id="qq-5">
+    <h4><span class="q-num">5.</span>A dataset of household incomes contains a few extremely wealthy households. Which measure best describes the "typical" household income?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(5,this,false)">Mean</button>
+      <button class="quiz-option" onclick="answerQ(5,this,true)">Median</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">Mode</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">All three give identical answers</button>
+    </div>
+    <div class="quiz-explain" id="qe-5">Income distributions are typically right-skewed due to a small number of very high earners. The median, being resistant to extreme values, better represents the typical household than the mean, which is pulled upward.</div>
+  </div>
+  <div class="quiz-question" id="qq-6">
+    <h4><span class="q-num">6.</span>If Mean &gt; Median &gt; Mode for a distribution, the distribution is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(6,this,false)">Symmetric</button>
+      <button class="quiz-option" onclick="answerQ(6,this,true)">Right-skewed</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">Left-skewed</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">Bimodal</button>
+    </div>
+    <div class="quiz-explain" id="qe-6">A long right tail pulls the mean above the median, which in turn sits above the mode. This ordering, Mean &gt; Median &gt; Mode, is the signature of a right-skewed (positively skewed) distribution.</div>
+  </div>
+  <div class="quiz-question" id="qq-7">
+    <h4><span class="q-num">7.</span>In the grouped-data median formula, what does \(CF\) represent?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(7,this,false)">The frequency of the median class</button>
+      <button class="quiz-option" onclick="answerQ(7,this,true)">The cumulative frequency before the median class</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">The class width</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">The total number of observations</button>
+    </div>
+    <div class="quiz-explain" id="qe-7">\(CF\) is the cumulative frequency accumulated in all classes before the median class begins. It tells us how many observations must already be accounted for before reaching the class that contains the median.</div>
+  </div>
+  <div class="quiz-question" id="qq-8">
+    <h4><span class="q-num">8.</span>A student computes their GPA by simply averaging grade points across courses, ignoring credit hours. This is incorrect because:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(8,this,false)">The mean should never be used for grades</button>
+      <button class="quiz-option" onclick="answerQ(8,this,true)">Courses with different credit hours should not be weighted equally</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">Grade points are categorical, not quantitative</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">The median should be used instead</button>
+    </div>
+    <div class="quiz-explain" id="qe-8">A 4-credit course represents more academic work than a 2-credit course and should contribute proportionally more to the overall GPA. A weighted mean using credit hours as weights is the correct calculation.</div>
+  </div>
+  <div class="quiz-question" id="qq-9">
+    <h4><span class="q-num">9.</span>An exam's score distribution shows two distinct peaks, one near 50 and one near 90, with few scores in between. This pattern is called:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(9,this,false)">Right-skewed</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">Symmetric</button>
+      <button class="quiz-option" onclick="answerQ(9,this,true)">Bimodal</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">Uniform</button>
+    </div>
+    <div class="quiz-explain" id="qe-9">Two distinct peaks define a bimodal distribution, often indicating that the data combines two different subgroups, for example, students who grasped the material and students who did not.</div>
+  </div>
+  <div class="quiz-question" id="qq-10">
+    <h4><span class="q-num">10.</span>A factory's mean salary is much higher than its median salary. The most likely explanation is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(10,this,false)">A data entry error</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">The distribution is symmetric</button>
+      <button class="quiz-option" onclick="answerQ(10,this,true)">A small number of very high salaries are pulling the mean upward</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">The median was calculated incorrectly</button>
+    </div>
+    <div class="quiz-explain" id="qe-10">When the mean substantially exceeds the median, the distribution is right-skewed: a small number of unusually high values (such as a manager's much larger salary) pull the mean upward while the median, being resistant to outliers, remains close to what most employees actually earn.</div>
+  </div>
+  <div class="quiz-footer">
+    <span class="quiz-progress-text" id="quiz-progress">0 of 10 answered</span>
+    <button class="btn btn-primary" onclick="submitQuiz()" id="btn-submit-quiz" disabled>Submit Quiz</button>
+  </div>
+  <div class="quiz-result" id="quiz-result">
+    <h3>Quiz Complete</h3>
+    <div class="score" id="quiz-score-display">0<span class="total"> / 10</span></div>
+    <div class="verdict" id="quiz-verdict"></div>
+    <p id="quiz-msg"></p>
+    <button class="btn btn-primary" onclick="retakeQuiz()">Retake Quiz</button>
+  </div>
+</div>
+</div>
+
+<!-- ========== FLASHCARDS ========== -->
+<div id="tab-flashcards" class="tab-content">
+<div class="flashcards-header">
+  <h2>&#127183; Flashcards</h2>
+  <p>16 key terms from Module 3. Click any card to reveal its definition.</p>
+</div>
+<div class="flashcards-grid" id="fc-grid"></div>
+</div>
+
+<!-- ========== REAL CASES ========== -->
+<div id="tab-cases" class="tab-content">
+<div class="cases-header">
+  <h2>&#127919; Real Cases</h2>
+  <p>Read each scenario, write your interpretation, then reveal what most people miss and what the careful reading looks like.</p>
+</div>
+
+<div class="case-card" id="case-1">
+  <h4>Case 1: The Startup's "Average" Salary</h4>
+  <p class="case-prompt">A 12-person startup advertises itself as a great place to work, citing an "average employee salary of 95,000 taka per month." In reality, ten junior employees earn 35,000 taka each, one senior engineer earns 90,000, and the founder/CEO draws a salary of 7,75,000 taka per month.</p>
+  <p class="case-q">Is the advertised figure accurate? What does it conceal?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-1','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-1','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-1" onclick="markCaseWorked(1)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-1">Most readers accept the figure at face value: a six-figure average salary sounds attractive, and the arithmetic is not actually wrong.</div>
+  <div class="reveal-panel right-panel" id="right-case-1">Mean = (10 &times; 35,000 + 90,000 + 775,000) / 12 = (350,000 + 90,000 + 775,000) / 12 = 1,215,000 / 12 = 101,250, close to the stated figure. But the median, the 6th and 7th values among 12 sorted salaries (both 35,000), is just 35,000 taka. Ten of twelve employees, more than 80% of staff, earn 35,000, nowhere near the advertised "average." The CEO's single salary inflates the mean dramatically. The advertised number is arithmetically correct and practically misleading: it describes no actual employee's pay.</div>
+</div>
+
+<div class="case-card" id="case-2">
+  <h4>Case 2: National Income Headlines</h4>
+  <p class="case-prompt">A news article reports: "Average per-capita income has risen to 3,200 USD, signaling rising prosperity for citizens." A reader who works a typical job notices their own income, and the incomes of most people they know, are well below this figure.</p>
+  <p class="case-q">How can "average" income rise while most people's income stays flat or grows much more slowly?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-2','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-2','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-2" onclick="markCaseWorked(2)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-2">Many readers assume that a rising national average implies that a typical citizen's income is also rising at a similar pace.</div>
+  <div class="reveal-panel right-panel" id="right-case-2">National income distributions are almost always strongly right-skewed: a relatively small share of very high earners can raise the mean substantially even while the income of a typical (median) citizen barely moves. This is precisely why economists distinguish "mean per-capita income" from "median household income," and why the latter is usually the more meaningful figure for assessing the experience of a typical citizen. The headline is not false, but reporting the mean alone, without the median for comparison, gives an incomplete and often overly optimistic picture.</div>
+</div>
+
+<div class="case-card" id="case-3">
+  <h4>Case 3: The Bimodal Midterm</h4>
+  <p class="case-prompt">An instructor reports a class midterm mean of 68 out of 100 and concludes that "students performed adequately, with room for improvement." A closer look at the score distribution reveals two distinct clusters: about 40% of students scored between 85 and 95, and about 45% scored between 40 and 55, with very few scores between 60 and 80.</p>
+  <p class="case-q">Does the mean of 68 accurately describe this class's performance?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-3','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-3','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-3" onclick="markCaseWorked(3)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-3">Most readers interpret 68 as describing a class of students who performed moderately, picturing scores clustered somewhere near that value.</div>
+  <div class="reveal-panel right-panel" id="right-case-3">The score of 68 falls in a near-empty region of the actual distribution: almost no student actually scored close to 68. The mean here is a mathematical artifact of averaging two separated clusters, not a description of any real subgroup. This bimodal pattern usually signals that two distinct populations exist within the class, perhaps students who mastered a prerequisite concept and students who did not. A single mean obscures this entirely. The more honest summary acknowledges two groups and their separate centers (roughly 90 and 47) rather than reporting one number that represents neither.</div>
+</div>
+
+<div class="case-card" id="case-4">
+  <h4>Case 4: Comparing Section Averages Without Weights</h4>
+  <p class="case-prompt">A department head wants the overall average exam score across three sections of the same course. Section A (15 students) averaged 72, Section B (60 students) averaged 80, and Section C (25 students) averaged 65. The department head computes (72 + 80 + 65) / 3 = 72.3 and reports this as the course-wide average.</p>
+  <p class="case-q">Is this calculation correct? If not, what should be done instead?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-4','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-4','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-4" onclick="markCaseWorked(4)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-4">Averaging the three section means directly seems like the natural shortcut, since it requires no further data and produces a clean, plausible-looking number.</div>
+  <div class="reveal-panel right-panel" id="right-case-4">This is incorrect because the sections have very different sizes. Simply averaging the three means treats each section as equally important, even though Section B (60 students) represents far more students than Section A (15 students). The correct approach is a weighted mean using section size as weights: (15 &times; 72 + 60 &times; 80 + 25 &times; 65) / (15+60+25) = (1,080 + 4,800 + 1,625) / 100 = 7,505 / 100 = 75.05. The properly weighted course-wide average (75.05) is noticeably higher than the naive calculation (72.3), because it correctly gives Section B's strong performance more influence, proportional to its larger enrollment.</div>
+</div>
+
+</div>
+
+<button class="reset-btn" onclick="resetProgress()">&#8635; Reset Progress</button>
+
+<script>
+const STORAGE_KEY='stats101-module3-progress-v1';
+const TOTAL_SLIDES=11,TOTAL_CARDS=16,TOTAL_CASES=4,TOTAL_QUIZ=10;
+
+const flashcardData=[
+  {term:'Mean (arithmetic mean)',def:'The sum of all values divided by the number of values. The algebraic balancing point of the data. Sensitive to outliers and skewness.'},
+  {term:'Median',def:'The middle value of an ordered dataset. For odd n, the single middle value; for even n, the average of the two middle values. Resistant to outliers.'},
+  {term:'Mode',def:'The most frequently occurring value or category. The only measure of central tendency usable for nominal data.'},
+  {term:'Unimodal',def:'A distribution with exactly one value or category occurring most frequently; exactly one peak.'},
+  {term:'Bimodal',def:'A distribution with two values tied for highest frequency, or two distinct peaks, often signaling two underlying subgroups.'},
+  {term:'Multimodal',def:'A distribution with more than two peaks, often indicating that several distinct populations have been combined in one dataset.'},
+  {term:'Symmetric distribution',def:'A distribution where the mean, median, and mode all coincide at the same central point.'},
+  {term:'Right-skewed (positive) distribution',def:'A distribution with a long tail toward higher values. Mean > Median > Mode. The mean is pulled upward by the tail.'},
+  {term:'Left-skewed (negative) distribution',def:'A distribution with a long tail toward lower values. Mean < Median < Mode. The mean is pulled downward by the tail.'},
+  {term:'Resistant (robust) measure',def:'A statistic, such as the median, whose value does not change much when extreme observations are added or altered.'},
+  {term:'Class midpoint',def:'The value halfway between a class lower boundary and upper boundary, used to approximate every observation within that class when computing a grouped mean.'},
+  {term:'Grouped mean formula',def:'x-bar = sum(f_i times m_i) / n, where m_i is the midpoint of class i and f_i its frequency. Estimates the mean from a frequency distribution.'},
+  {term:'Median class',def:'The class interval in a grouped frequency distribution that contains the n/2 position, identified using cumulative frequency.'},
+  {term:'Modal class',def:'The class interval in a grouped frequency distribution with the highest frequency, used as the basis for estimating the mode.'},
+  {term:'Weighted mean',def:'A mean in which each value is multiplied by a weight reflecting its relative importance before summing and dividing by the total weight.'},
+  {term:'Cumulative frequency (CF)',def:'The running total of frequencies up to and including a given class, used to locate the median class in grouped data.'}
+];
+
+let state={slidesViewed:new Set(),quizScore:null,cardsFlipped:new Set(),casesWorked:new Set(),quizAnswers:{},quizSubmitted:false,currentSlide:1};
+
+function loadState(){
+  try{const s=localStorage.getItem(STORAGE_KEY);if(s){const p=JSON.parse(s);state.slidesViewed=new Set(p.slidesViewed||[]);state.quizScore=p.quizScore!==undefined?p.quizScore:null;state.cardsFlipped=new Set(p.cardsFlipped||[]);state.casesWorked=new Set(p.casesWorked||[]);state.quizAnswers=p.quizAnswers||{};state.quizSubmitted=p.quizSubmitted||false;state.currentSlide=p.currentSlide||1;}}catch(e){}
+}
+function saveState(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify({slidesViewed:[...state.slidesViewed],quizScore:state.quizScore,cardsFlipped:[...state.cardsFlipped],casesWorked:[...state.casesWorked],quizAnswers:state.quizAnswers,quizSubmitted:state.quizSubmitted,currentSlide:state.currentSlide}));}catch(e){}
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');btn.classList.add('active');
+}
+
+const prevBtn=document.getElementById('prevBtn');
+const nextBtn=document.getElementById('nextBtn');
+function showSlide(n){
+  if(n<1||n>TOTAL_SLIDES)return;
+  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+  document.getElementById('slide-'+n).classList.add('active');
+  state.currentSlide=n;state.slidesViewed.add(n);saveState();updateSlideUI();updateStats();
+}
+function updateSlideUI(){
+  const n=state.currentSlide;
+  document.getElementById('slide-counter').textContent='Slide '+n+' of '+TOTAL_SLIDES;
+  document.getElementById('slide-progress').style.width=(n/TOTAL_SLIDES*100)+'%';
+  prevBtn.disabled=n===1;
+  nextBtn.textContent=n===TOTAL_SLIDES?'Finish ✓':'Next →';
+}
+prevBtn.addEventListener('click',()=>showSlide(state.currentSlide-1));
+nextBtn.addEventListener('click',()=>{if(state.currentSlide<TOTAL_SLIDES)showSlide(state.currentSlide+1);});
+document.addEventListener('keydown',e=>{
+  const activeTab=document.querySelector('.tab-content.active');
+  if(!activeTab||activeTab.id!=='tab-slides')return;
+  if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
+  if(e.key==='ArrowRight'){e.preventDefault();nextBtn.click();}
+  else if(e.key==='ArrowLeft'){e.preventDefault();prevBtn.click();}
+});
+
+function checkPrac(id,btn,correct){
+  document.querySelectorAll('#'+id+' .practice-btn').forEach(b=>b.classList.add('disabled'));
+  const fb=document.getElementById(id+'-fb');
+  if(correct){btn.classList.add('correct');fb.textContent='Correct. For n = 12 (even), the median averages the values at positions n/2 = 6 and n/2 + 1 = 7.';fb.className='practice-feedback show right';}
+  else{btn.classList.add('wrong');fb.textContent='Not quite. For an even n, the median uses positions n/2 and (n/2)+1. With n = 12, that is positions 6 and 7.';fb.className='practice-feedback show wrong';}
+}
+
+let quizAnswered=0,quizCorrect=0;
+function startQuiz(){document.querySelector('.quiz-intro').style.display='none';document.getElementById('quiz-questions').style.display='block';if(state.quizSubmitted)restoreQuizState();}
+function answerQ(qNum,btn,correct){
+  const qq=document.getElementById('qq-'+qNum);if(qq.classList.contains('answered'))return;
+  qq.classList.add('answered');qq.querySelectorAll('.quiz-option').forEach(o=>o.classList.add('disabled'));
+  btn.classList.add(correct?'correct':'wrong');if(correct)quizCorrect++;
+  document.getElementById('qe-'+qNum).classList.add('show');
+  state.quizAnswers[qNum]=correct;quizAnswered++;
+  document.getElementById('quiz-progress').textContent=quizAnswered+' of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=quizAnswered<TOTAL_QUIZ;saveState();
+}
+function submitQuiz(){
+  state.quizScore=quizCorrect;state.quizSubmitted=true;saveState();
+  document.getElementById('quiz-score-display').innerHTML=quizCorrect+'<span class="total"> / '+TOTAL_QUIZ+'</span>';
+  const v=document.getElementById('quiz-verdict'),m=document.getElementById('quiz-msg');
+  if(quizCorrect>=9){v.textContent='Excellent';v.className='verdict great';m.textContent='Strong command of central tendency concepts.';}
+  else if(quizCorrect>=7){v.textContent='Good';v.className='verdict good';m.textContent='Solid. Review the explanations on questions you missed.';}
+  else{v.textContent='Keep going';v.className='verdict ok';m.textContent='Revisit the slides on skewness and grouped-data formulas before retaking.';}
+  document.getElementById('quiz-result').classList.add('show');updateStats();
+}
+function retakeQuiz(){
+  state.quizScore=null;state.quizSubmitted=false;state.quizAnswers={};quizCorrect=0;quizAnswered=0;saveState();
+  document.getElementById('quiz-result').classList.remove('show');
+  document.querySelectorAll('.quiz-question').forEach(q=>{q.classList.remove('answered');q.querySelectorAll('.quiz-option').forEach(o=>o.classList.remove('correct','wrong','disabled'));q.querySelectorAll('.quiz-explain').forEach(e=>e.classList.remove('show'));});
+  document.getElementById('quiz-progress').textContent='0 of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=true;updateStats();
+}
+function restoreQuizState(){
+  Object.entries(state.quizAnswers).forEach(([qNum,correct])=>{
+    const qq=document.getElementById('qq-'+qNum);if(!qq)return;
+    qq.classList.add('answered');qq.querySelectorAll('.quiz-option').forEach(o=>o.classList.add('disabled'));
+    document.getElementById('qe-'+qNum).classList.add('show');quizAnswered++;if(correct)quizCorrect++;
+  });
+  document.getElementById('quiz-progress').textContent=quizAnswered+' of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=quizAnswered<TOTAL_QUIZ;
+  if(state.quizSubmitted)submitQuiz();
+}
+
+function buildFlashcards(){
+  const grid=document.getElementById('fc-grid');
+  flashcardData.forEach((fc,i)=>{
+    const div=document.createElement('div');div.className='flashcard'+(state.cardsFlipped.has(i)?' flipped':'');
+    div.innerHTML='<div class="flashcard-inner"><div class="flashcard-front">'+fc.term+'<span class="fc-hint">Click to reveal definition</span></div><div class="flashcard-back">'+fc.def+'</div></div>';
+    div.addEventListener('click',()=>{div.classList.toggle('flipped');state.cardsFlipped.add(i);saveState();updateStats();});
+    grid.appendChild(div);
+  });
+}
+
+function revealCase(id,type){document.getElementById(type+'-'+id).classList.add('show');}
+function markCaseWorked(n){
+  state.casesWorked.add(n);saveState();
+  const btn=document.getElementById('worked-case-'+n);btn.textContent='Worked';btn.classList.add('done');updateStats();
+}
+
+function updateStats(){
+  document.getElementById('stat-slides').textContent=Math.round(state.slidesViewed.size/TOTAL_SLIDES*100)+'%';
+  document.getElementById('stat-quiz').textContent=state.quizScore!==null?state.quizScore+' / '+TOTAL_QUIZ:'—';
+  document.getElementById('stat-cards').textContent=state.cardsFlipped.size+' / '+TOTAL_CARDS;
+  document.getElementById('stat-cases').textContent=state.casesWorked.size+' / '+TOTAL_CASES;
+}
+function resetProgress(){if(!confirm('Reset all progress for this module?'))return;localStorage.removeItem(STORAGE_KEY);location.reload();}
+
+loadState();buildFlashcards();showSlide(state.currentSlide);updateStats();
+if(state.quizSubmitted){document.querySelector('.quiz-intro').style.display='none';document.getElementById('quiz-questions').style.display='block';restoreQuizState();}
+state.casesWorked.forEach(n=>{const btn=document.getElementById('worked-case-'+n);if(btn){btn.textContent='Worked';btn.classList.add('done');}});
+</script>
+</div>
+</body>
+</html>
