@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 5: Correlation</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;
+  --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#dbeafe;
+  --accent:#4f46e5;--success:#059669;--success-light:#d1fae5;
+  --danger:#dc2626;--danger-light:#fee2e2;
+  --warning:#d97706;--warning-light:#fef3c7;
+  --border:#e2e8f0;
+  --shadow:0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.08),0 4px 10px rgba(0,0,0,.04);
+  --radius:12px;--radius-sm:8px;--transition:.2s cubic-bezier(.4,0,.2,1);
+}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;}
+.app{max-width:1100px;margin:0 auto;padding:24px 20px 80px;}
+header.mod-header{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%);color:#fff;padding:32px 28px;border-radius:var(--radius);margin-bottom:20px;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;}
+header.mod-header::before{content:"";position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:rgba(255,255,255,.08);border-radius:50%;}
+header.mod-header::after{content:"";position:absolute;bottom:-30px;right:80px;width:100px;height:100px;background:rgba(255,255,255,.05);border-radius:50%;}
+.mod-badge{display:inline-block;background:rgba(255,255,255,.2);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:.5px;position:relative;z-index:1;}
+header.mod-header h1{font-size:28px;margin:12px 0 8px;font-weight:700;position:relative;z-index:1;}
+header.mod-header p.mod-sub{font-size:14px;opacity:.88;max-width:640px;position:relative;z-index:1;}
+header.mod-header p.mod-instructor{font-size:13px;opacity:.8;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.2);position:relative;z-index:1;}
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;padding:14px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;}
+.stat{text-align:center;padding:6px;}
+.stat .stat-value{font-size:22px;font-weight:700;color:var(--primary);line-height:1.2;}
+.stat .stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:2px;}
+.tabs{display:flex;gap:4px;background:#fff;padding:6px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;flex-wrap:wrap;}
+.tab-btn{flex:1;min-width:110px;padding:11px 16px;background:transparent;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;transition:all var(--transition);font-family:inherit;}
+.tab-btn:hover{background:var(--bg);color:var(--text);}
+.tab-btn.active{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.28);}
+.tab-content{display:none;animation:fadeIn .28s ease-in-out;}
+.tab-content.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);margin-bottom:16px;}
+.progress-bar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:12px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:3px;transition:width .4s ease;}
+.slide-counter{text-align:center;color:var(--muted);font-size:13px;margin-bottom:14px;font-weight:500;}
+.slide{display:none;min-height:440px;padding:4px;animation:slideIn .3s ease;}
+.slide.active{display:block;}
+@keyframes slideIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+.slide h2{font-size:26px;margin-bottom:6px;color:var(--primary-dark);font-weight:700;line-height:1.25;}
+.slide h3{font-size:18px;margin:20px 0 8px;color:var(--text);font-weight:600;}
+.slide p{margin-bottom:12px;color:#334155;}
+.slide ul,.slide ol{margin:0 0 14px 22px;}
+.slide li{margin-bottom:7px;color:#334155;}
+.slide .slide-sub{color:var(--muted);font-size:15px;margin-bottom:18px;font-style:italic;}
+.obj-list{list-style:none;padding:0;margin:14px 0;}
+.obj-list li{padding:9px 0 9px 32px;position:relative;color:#334155;border-bottom:1px solid var(--border);}
+.obj-list li:last-child{border-bottom:none;}
+.obj-list li::before{content:"";position:absolute;left:0;top:13px;width:18px;height:18px;background:var(--success-light);border-radius:50%;}
+.obj-list li::after{content:"✓";position:absolute;left:3px;top:10px;color:var(--success);font-size:11px;font-weight:700;}
+.example-box{background:var(--primary-light);border-left:4px solid var(--primary);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.example-box strong{color:var(--primary-dark);}
+.tip-box{background:var(--success-light);border-left:4px solid var(--success);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.tip-box strong{color:var(--success);}
+.warn-box{background:var(--warning-light);border-left:4px solid var(--warning);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.warn-box strong{color:var(--warning);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:14px 0;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:14px 0;}
+.def-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;}
+.def-card .def-term{font-weight:700;color:var(--primary-dark);font-size:15px;margin-bottom:6px;}
+.def-card .def-body{font-size:14px;color:#334155;}
+.formula-box{background:#0f172a;color:#e2e8f0;padding:18px 22px;border-radius:var(--radius-sm);margin:14px 0;text-align:center;font-size:16px;overflow-x:auto;}
+.freq-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;}
+.freq-table th{background:var(--primary);color:#fff;padding:9px 12px;text-align:left;font-weight:600;}
+.freq-table th:not(:first-child),.freq-table td:not(:first-child){text-align:right;}
+.freq-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:#334155;}
+.freq-table tr:nth-child(even) td{background:#f8fafc;}
+.freq-table tr.total-row td{font-weight:700;background:var(--primary-light);color:var(--primary-dark);border-top:2px solid var(--primary);}
+.freq-table tr.highlight-row td{background:#fef3c7;}
+.freq-table th:first-child{border-radius:8px 0 0 0;}.freq-table th:last-child{border-radius:0 8px 0 0;}
+.practice{background:#f1f5f9;border:2px dashed #cbd5e1;border-radius:var(--radius-sm);padding:18px;margin:20px 0;}
+.practice h4{color:var(--primary);margin-bottom:10px;font-size:15px;}
+.practice-q{margin-bottom:10px;color:var(--text);font-weight:500;}
+.practice-options{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+.practice-btn{padding:8px 14px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;font-size:14px;transition:all var(--transition);color:var(--text);}
+.practice-btn:hover{border-color:var(--primary);background:var(--primary-light);}
+.practice-btn.correct{background:var(--success-light);border-color:var(--success);color:var(--success);font-weight:600;}
+.practice-btn.wrong{background:var(--danger-light);border-color:var(--danger);color:var(--danger);}
+.practice-btn.disabled{pointer-events:none;opacity:.75;}
+.practice-feedback{margin-top:10px;padding:10px 14px;border-radius:6px;font-size:14px;display:none;}
+.practice-feedback.show{display:block;}
+.practice-feedback.right{background:var(--success-light);color:var(--success);border:1px solid var(--success);}
+.practice-feedback.wrong{background:var(--danger-light);color:var(--danger);border:1px solid var(--danger);}
+.slide-nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border);gap:10px;flex-wrap:wrap;}
+.key-hint{font-size:12px;color:var(--muted);}
+.kbd{display:inline-block;background:#f1f5f9;border:1px solid var(--border);border-bottom-width:2px;border-radius:4px;padding:1px 6px;font-family:monospace;font-size:11px;color:var(--text);}
+.btn{padding:10px 20px;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;transition:all var(--transition);font-family:inherit;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover:not(:disabled){background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,.28);}
+.btn-primary:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover:not(:disabled){background:var(--bg);color:var(--text);}
+.btn-ghost:disabled{opacity:.45;cursor:not-allowed;}
+.quiz-intro{background:#fff;padding:22px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;text-align:center;}
+.quiz-intro h2{color:var(--primary-dark);margin-bottom:8px;}
+.quiz-intro p{color:var(--muted);margin-bottom:14px;}
+.quiz-question{background:#fff;border-radius:var(--radius);padding:22px;margin-bottom:14px;box-shadow:var(--shadow);border:1px solid var(--border);}
+.quiz-question h4{font-size:16px;margin-bottom:14px;color:var(--text);font-weight:600;}
+.q-num{color:var(--primary);font-weight:700;margin-right:6px;}
+.quiz-options{display:grid;gap:8px;}
+.quiz-option{padding:11px 16px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:#fff;transition:all var(--transition);font-size:14px;color:var(--text);text-align:left;font-family:inherit;}
+.quiz-option:hover{border-color:var(--primary);background:var(--primary-light);transform:translateX(2px);}
+.quiz-option.correct{border-color:var(--success);background:var(--success-light);color:var(--success);font-weight:600;}
+.quiz-option.wrong{border-color:var(--danger);background:var(--danger-light);color:var(--danger);}
+.quiz-option.disabled{pointer-events:none;}
+.quiz-explain{display:none;margin-top:10px;padding:10px 14px;background:#f8fafc;border-left:3px solid var(--primary);border-radius:4px;font-size:13px;color:#334155;}
+.quiz-explain.show{display:block;}
+.quiz-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px 20px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);flex-wrap:wrap;}
+.quiz-progress-text{font-size:13px;color:var(--muted);}
+.quiz-result{display:none;padding:30px;background:linear-gradient(135deg,#f0fdf4 0%,#dbeafe 100%);border-radius:var(--radius);text-align:center;margin-top:16px;box-shadow:var(--shadow);}
+.quiz-result.show{display:block;}
+.quiz-result h3{font-size:24px;margin-bottom:10px;color:var(--primary-dark);}
+.quiz-result .score{font-size:48px;font-weight:700;color:var(--primary);margin:14px 0;line-height:1;}
+.quiz-result .score .total{font-size:26px;color:var(--muted);}
+.quiz-result p{color:#334155;margin-bottom:16px;font-size:15px;}
+.verdict{display:inline-block;padding:6px 14px;border-radius:16px;font-weight:600;font-size:14px;margin-bottom:8px;}
+.verdict.great{background:var(--success-light);color:var(--success);}
+.verdict.good{background:var(--primary-light);color:var(--primary-dark);}
+.verdict.ok{background:var(--warning-light);color:var(--warning);}
+.flashcards-header{background:#fff;padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;text-align:center;}
+.flashcards-header h2{color:var(--primary-dark);margin-bottom:6px;}
+.flashcards-header p{color:var(--muted);font-size:14px;}
+.flashcards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+.flashcard{perspective:1000px;height:170px;cursor:pointer;}
+.flashcard-inner{position:relative;width:100%;height:100%;transition:transform .55s;transform-style:preserve-3d;}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+.flashcard-front,.flashcard-back{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:var(--shadow);}
+.flashcard-front{background:linear-gradient(135deg,#fff 0%,#f8fafc 100%);border:2px solid var(--primary-light);color:var(--primary-dark);font-weight:600;font-size:16px;}
+.flashcard-front .fc-hint{font-size:11px;color:var(--muted);font-weight:400;margin-top:8px;font-style:italic;}
+.flashcard-back{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%);color:#fff;transform:rotateY(180deg);font-size:13px;line-height:1.55;}
+.cases-header{background:#fff;padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;}
+.cases-header h2{color:var(--primary-dark);margin-bottom:6px;}
+.cases-header p{color:var(--muted);font-size:14px;}
+.case-card{background:#fff;border-radius:var(--radius);padding:24px;margin-bottom:16px;box-shadow:var(--shadow);border-left:4px solid var(--primary);}
+.case-card h4{font-size:16px;color:var(--primary-dark);font-weight:700;margin-bottom:12px;}
+.case-prompt{color:#334155;font-size:15px;margin-bottom:14px;line-height:1.6;}
+.case-q{font-weight:600;color:var(--text);margin-bottom:12px;font-size:15px;}
+.case-textarea{width:100%;min-height:80px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;resize:vertical;background:#f8fafc;color:var(--text);transition:border-color var(--transition);}
+.case-textarea:focus{outline:none;border-color:var(--primary);background:#fff;}
+.reveal-btns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+.reveal-btn{padding:8px 16px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;transition:all var(--transition);}
+.reveal-btn.miss{color:var(--warning);border-color:var(--warning);}
+.reveal-btn.miss:hover{background:var(--warning-light);}
+.reveal-btn.right{color:var(--success);border-color:var(--success);}
+.reveal-btn.right:hover{background:var(--success-light);}
+.reveal-panel{display:none;margin-top:12px;padding:14px 16px;border-radius:var(--radius-sm);font-size:14px;line-height:1.6;}
+.reveal-panel.show{display:block;}
+.reveal-panel.miss-panel{background:var(--warning-light);border-left:3px solid var(--warning);color:#78350f;}
+.reveal-panel.right-panel{background:var(--success-light);border-left:3px solid var(--success);color:#064e3b;}
+.case-worked-btn{margin-top:10px;padding:6px 14px;background:var(--primary-light);color:var(--primary-dark);border:none;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;}
+.case-worked-btn.done{background:var(--success-light);color:var(--success);}
+.takeaway-list{list-style:none;padding:0;margin:16px 0;}
+.takeaway-list li{padding:12px 16px 12px 48px;position:relative;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:10px;font-size:15px;color:#1e293b;border:1px solid var(--border);}
+.takeaway-list li .t-num{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:24px;height:24px;background:var(--primary);color:#fff;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.reset-btn{position:fixed;bottom:18px;right:18px;background:#fff;border:1px solid var(--border);padding:8px 14px;border-radius:20px;font-size:13px;color:var(--muted);cursor:pointer;box-shadow:var(--shadow);font-family:inherit;transition:all var(--transition);z-index:100;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.cricket-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;}
+.cricket-table th{background:#1e293b;color:#fff;padding:7px 8px;text-align:center;font-weight:600;}
+.cricket-table td{padding:6px 8px;text-align:center;border-bottom:1px solid var(--border);color:#334155;}
+.cricket-table tr:nth-child(even) td{background:#f8fafc;}
+@media(max-width:720px){
+  .app{padding:14px 12px 80px;}
+  header.mod-header{padding:22px 18px;}
+  header.mod-header h1{font-size:22px;}
+  .card{padding:20px 16px;}
+  .two-col,.three-col{grid-template-columns:1fr;}
+  .stats-bar{grid-template-columns:repeat(2,1fr);}
+  .slide h2{font-size:22px;}
+  .freq-table,.cricket-table{font-size:12px;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="mod-header">
+  <span class="mod-badge">Module 5 of 16</span>
+  <h1>Correlation</h1>
+  <p class="mod-sub">Scatter plots, Pearson's r, interpreting strength and direction, and the most common trap in statistics: mistaking correlation for causation.</p>
+  <p class="mod-instructor"><strong>K.M. Tanvir</strong> &nbsp;·&nbsp; Statistics for Non-Statisticians</p>
+</header>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-value" id="stat-slides">0%</div><div class="stat-label">Slides Viewed</div></div>
+  <div class="stat"><div class="stat-value" id="stat-quiz">&#8212;</div><div class="stat-label">Quiz Score</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cards">0 / 14</div><div class="stat-label">Cards Flipped</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cases">0 / 4</div><div class="stat-label">Cases Worked</div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('slides',this)">&#128214; Slides</button>
+  <button class="tab-btn" onclick="switchTab('quiz',this)">&#128221; Quiz</button>
+  <button class="tab-btn" onclick="switchTab('flashcards',this)">&#127183; Flashcards</button>
+  <button class="tab-btn" onclick="switchTab('cases',this)">&#127919; Real Cases</button>
+</div>
+
+<!-- ========== SLIDES ========== -->
+<div id="tab-slides" class="tab-content active">
+<div class="card">
+  <div class="progress-bar"><div class="progress-fill" id="slide-progress"></div></div>
+  <div class="slide-counter" id="slide-counter">Slide 1 of 11</div>
+
+  <!-- S1: objectives -->
+  <div class="slide active" id="slide-1">
+    <h2>Correlation</h2>
+    <p class="slide-sub">Module 5 &nbsp;·&nbsp; By the end of this module, you will be able to:</p>
+    <ul class="obj-list">
+      <li>Read direction and strength of a relationship directly from a scatter plot</li>
+      <li>Calculate and interpret Pearson's correlation coefficient, r</li>
+      <li>Recognize the properties and limits of r, including its blindness to nonlinear patterns</li>
+      <li>Distinguish correlation from causation, and name the three explanations behind any correlation</li>
+      <li>Identify confounding variables and reverse causation in real reported relationships</li>
+    </ul>
+    <div class="tip-box"><strong>The question this module answers:</strong> Modules 1 through 4 described one variable at a time. Most interesting questions involve two: does fertilizer affect yield, does study time affect exam scores, does rainfall affect dengue cases. This module gives the first formal tool for measuring how two variables move together.</div>
+  </div>
+
+  <!-- S2: scatter recap -->
+  <div class="slide" id="slide-2">
+    <h2>Reading a Relationship From a Scatter Plot</h2>
+    <p>Module 2 introduced the scatter plot as the right chart for two quantitative variables. Before assigning a number to a relationship, it helps to recognize its basic shape by eye.</p>
+    <svg viewBox="0 0 700 175" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:650px;margin:10px auto;display:block;">
+      <text x="115" y="14" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af" font-family="Inter,sans-serif">Positive</text>
+      <line x1="30" y1="135" x2="200" y2="135" stroke="#cbd5e1" stroke-width="1"/>
+      <line x1="30" y1="135" x2="30" y2="20" stroke="#cbd5e1" stroke-width="1"/>
+      <g fill="#2563eb">
+        <circle cx="40" cy="125" r="4"/><circle cx="58" cy="112" r="4"/><circle cx="74" cy="100" r="4"/><circle cx="92" cy="93" r="4"/><circle cx="108" cy="80" r="4"/><circle cx="126" cy="68" r="4"/><circle cx="142" cy="58" r="4"/><circle cx="160" cy="48" r="4"/><circle cx="178" cy="38" r="4"/><circle cx="194" cy="28" r="4"/>
+      </g>
+      <text x="115" y="155" text-anchor="middle" font-size="10" fill="#475569" font-family="Inter,sans-serif">As x rises, y rises</text>
+
+      <text x="350" y="14" text-anchor="middle" font-size="12" font-weight="700" fill="#991b1b" font-family="Inter,sans-serif">Negative</text>
+      <line x1="265" y1="135" x2="435" y2="135" stroke="#cbd5e1" stroke-width="1"/>
+      <line x1="265" y1="135" x2="265" y2="20" stroke="#cbd5e1" stroke-width="1"/>
+      <g fill="#dc2626">
+        <circle cx="275" cy="28" r="4"/><circle cx="293" cy="38" r="4"/><circle cx="309" cy="48" r="4"/><circle cx="327" cy="58" r="4"/><circle cx="343" cy="68" r="4"/><circle cx="361" cy="80" r="4"/><circle cx="377" cy="93" r="4"/><circle cx="395" cy="100" r="4"/><circle cx="413" cy="112" r="4"/><circle cx="429" cy="125" r="4"/>
+      </g>
+      <text x="350" y="155" text-anchor="middle" font-size="10" fill="#475569" font-family="Inter,sans-serif">As x rises, y falls</text>
+
+      <text x="585" y="14" text-anchor="middle" font-size="12" font-weight="700" fill="#475569" font-family="Inter,sans-serif">Little or none</text>
+      <line x1="500" y1="135" x2="670" y2="135" stroke="#cbd5e1" stroke-width="1"/>
+      <line x1="500" y1="135" x2="500" y2="20" stroke="#cbd5e1" stroke-width="1"/>
+      <g fill="#64748b">
+        <circle cx="510" cy="100" r="4"/><circle cx="528" cy="45" r="4"/><circle cx="544" cy="85" r="4"/><circle cx="562" cy="55" r="4"/><circle cx="580" cy="115" r="4"/><circle cx="598" cy="35" r="4"/><circle cx="616" cy="95" r="4"/><circle cx="634" cy="65" r="4"/><circle cx="650" cy="105" r="4"/><circle cx="664" cy="50" r="4"/>
+      </g>
+      <text x="585" y="155" text-anchor="middle" font-size="10" fill="#475569" font-family="Inter,sans-serif">No consistent pattern</text>
+    </svg>
+    <p>A relationship has two basic properties: <strong>direction</strong> (do the variables move together or in opposite directions) and <strong>strength</strong> (how tightly the points cluster around a clear trend, versus scattering widely). Pearson's r turns both properties into a single number.</p>
+  </div>
+
+  <!-- S3: pearson r formula -->
+  <div class="slide" id="slide-3">
+    <h2>Pearson's Correlation Coefficient, r</h2>
+    <p>Pearson's r measures the strength and direction of the <strong>linear</strong> relationship between two quantitative variables. It is calculated from the same deviations from the mean used in Module 4, but now for two variables at once.</p>
+    <div class="formula-box">\[ r = \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum (x_i - \bar{x})^2 \sum (y_i - \bar{y})^2}} \]</div>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Sign of r</div><div class="def-body">Positive r: as one variable rises, the other tends to rise too. Negative r: as one rises, the other tends to fall.</div></div>
+      <div class="def-card"><div class="def-term">Magnitude of r</div><div class="def-body">Always between &minus;1 and +1. The closer |r| is to 1, the more tightly the points cluster around a straight line.</div></div>
+    </div>
+    <div class="tip-box"><strong>r = 0 does not mean "no relationship.</strong>" It means no <em>linear</em> relationship. Slide 7 shows why this distinction matters.</div>
+  </div>
+
+  <!-- S4: worked example -->
+  <div class="slide" id="slide-4">
+    <h2>Worked Example: Study Hours and Exam Score</h2>
+    <p>Six students report hours studied for an exam and their resulting score out of 100.</p>
+    <table class="freq-table">
+      <thead><tr><th>Student</th><th>Hours studied (x)</th><th>Exam score (y)</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>2</td><td>50</td></tr>
+        <tr><td>2</td><td>4</td><td>55</td></tr>
+        <tr><td>3</td><td>5</td><td>65</td></tr>
+        <tr><td>4</td><td>6</td><td>70</td></tr>
+        <tr><td>5</td><td>8</td><td>80</td></tr>
+        <tr><td>6</td><td>9</td><td>88</td></tr>
+      </tbody>
+    </table>
+    <div class="example-box">Mean hours = 5.67, mean score = 68.
+    <br>&Sigma;(x &minus; mean x)(y &minus; mean y) = 185.0
+    <br>&Sigma;(x &minus; mean x)&sup2; = 33.33, &Sigma;(y &minus; mean y)&sup2; = 1050
+    <br>r = 185.0 &divide; &radic;(33.33 &times; 1050) = 185.0 &divide; 187.03 = <strong>0.99</strong></div>
+    <p>An r of 0.99 indicates an almost perfectly straight, strongly positive relationship: in this small dataset, more hours studied is very consistently associated with a higher score.</p>
+  </div>
+
+  <!-- S5: interpreting strength -->
+  <div class="slide" id="slide-5">
+    <h2>Interpreting the Strength of r</h2>
+    <p>There is no single official cutoff, but the following rule of thumb is widely used across the social and natural sciences for interpreting the magnitude of r, regardless of sign.</p>
+    <table class="freq-table">
+      <thead><tr><th>|r| range</th><th>Interpretation</th></tr></thead>
+      <tbody>
+        <tr><td>0.00 – 0.10</td><td>Negligible</td></tr>
+        <tr><td>0.10 – 0.30</td><td>Weak</td></tr>
+        <tr><td>0.30 – 0.50</td><td>Moderate</td></tr>
+        <tr><td>0.50 – 0.70</td><td>Strong</td></tr>
+        <tr><td>0.70 – 0.90</td><td>Very strong</td></tr>
+        <tr><td>0.90 – 1.00</td><td>Near perfect</td></tr>
+      </tbody>
+    </table>
+    <div class="warn-box"><strong>These bands are guidelines, not laws.</strong> What counts as a "strong" correlation in a controlled physics experiment may be considered weak in social or economic data, where many factors are always at play. Always read r in light of the field and the stakes of the question.</div>
+  </div>
+
+  <!-- S6: properties and limits -->
+  <div class="slide" id="slide-6">
+    <h2>Properties and Limits of r</h2>
+    <ul>
+      <li><strong>Unitless:</strong> r has no units, so it can compare relationships across completely different kinds of variables.</li>
+      <li><strong>Symmetric:</strong> the correlation between x and y is identical to the correlation between y and x.</li>
+      <li><strong>Only linear:</strong> r measures how close points fall to a straight line. A strong curved relationship can produce a low r.</li>
+      <li><strong>Sensitive to outliers:</strong> a single extreme point can pull r noticeably higher or lower than what the bulk of the data would suggest.</li>
+      <li><strong>Says nothing about causation:</strong> a high r describes a pattern, not an explanation for why that pattern exists.</li>
+    </ul>
+    <div class="tip-box"><strong>Carried forward from Module 4:</strong> just as the mean alone hid important information that the standard deviation revealed, r alone can hide important information that only a look at the actual scatter plot reveals. Never compute r without plotting the data first.</div>
+  </div>
+
+  <!-- S7: nonlinear trap -->
+  <div class="slide" id="slide-7">
+    <h2>When r Misses the Real Relationship</h2>
+    <p>Recall the Module 2 scatter plot of fertilizer amount against crop yield. Suppose the true relationship is not a straight line but an inverted U: yield rises with fertilizer up to a point, then falls as over-fertilization damages the soil.</p>
+    <svg viewBox="0 0 700 170" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:600px;margin:10px auto;display:block;">
+      <line x1="40" y1="150" x2="660" y2="150" stroke="#cbd5e1" stroke-width="1"/>
+      <line x1="40" y1="150" x2="40" y2="15" stroke="#cbd5e1" stroke-width="1"/>
+      <path d="M 40,135 C 200,10 500,10 660,135" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <g fill="#059669">
+        <circle cx="55" cy="130" r="5"/><circle cx="115" cy="100" r="5"/><circle cx="175" cy="68" r="5"/><circle cx="235" cy="42" r="5"/><circle cx="295" cy="28" r="5"/><circle cx="355" cy="22" r="5"/><circle cx="415" cy="28" r="5"/><circle cx="475" cy="42" r="5"/><circle cx="535" cy="68" r="5"/><circle cx="595" cy="100" r="5"/><circle cx="645" cy="130" r="5"/>
+      </g>
+      <text x="350" y="166" text-anchor="middle" font-size="11" fill="#475569" font-family="Inter,sans-serif">Fertilizer amount &rarr;</text>
+    </svg>
+    <div class="warn-box"><strong>If r were calculated on this exact data, it would come out close to zero</strong>, even though fertilizer and yield are obviously and strongly related. A straight line simply cannot describe a curve that goes up and then down; r can only ask "how close to a line," and the honest answer here is "not close at all."</div>
+    <div class="tip-box"><strong>The lesson:</strong> always look at the scatter plot before trusting r. A low r means no straight-line relationship was found. It never proves that no relationship exists at all.</div>
+  </div>
+
+  <!-- S8: correlation vs causation -->
+  <div class="slide" id="slide-8">
+    <h2>Correlation Is Not Causation</h2>
+    <p>Across many summer seasons, the number of cold drinks sold at roadside stalls and the number of recorded river drowning incidents both rise and fall together, producing a strong positive correlation.</p>
+    <div class="example-box"><strong>The tempting, wrong conclusion:</strong> drinking more cold drinks somehow causes more drownings, or fewer drownings would somehow reduce cold drink sales.</div>
+    <div class="tip-box"><strong>The actual explanation:</strong> hot weather independently drives both. Hotter days lead more people to buy cold drinks, and separately lead more people to swim and bathe in rivers and ponds, raising drowning risk. Temperature is the hidden common cause behind a correlation that has nothing to do with cold drinks themselves.</div>
+    <div class="warn-box"><strong>The general principle:</strong> observing that two variables move together, no matter how strong the correlation, is never by itself enough to conclude that one causes the other.</div>
+  </div>
+
+  <!-- S9: three explanations -->
+  <div class="slide" id="slide-9">
+    <h2>Three Explanations Behind Any Correlation</h2>
+    <p>Whenever two variables, X and Y, show a meaningful correlation, there are exactly three possible explanations, and a correlation coefficient alone cannot tell you which one is true.</p>
+    <div class="three-col">
+      <div class="def-card"><div class="def-term">1. Direct causation</div><div class="def-body">X genuinely causes Y (or Y causes X). Establishing this convincingly usually requires a controlled experiment, as discussed in Module 1.</div></div>
+      <div class="def-card"><div class="def-term">2. Reverse causation</div><div class="def-body">The assumed direction is backwards: it is actually Y that drives X, not X that drives Y.</div></div>
+      <div class="def-card"><div class="def-term">3. Confounding variable</div><div class="def-body">A third variable, Z, independently influences both X and Y, creating a correlation between them with no direct link at all.</div></div>
+    </div>
+    <p>The cold drinks and drowning example from the previous slide is a confounding variable case, with temperature as Z. The next two slides examine reverse causation and confounding in development data.</p>
+  </div>
+
+  <!-- S10: anchor case -->
+  <div class="slide" id="slide-10">
+    <h2>Anchor Case: NGOs and Poverty</h2>
+    <p>A district-level dataset shows that districts with a higher density of NGO field offices also tend to have higher poverty rates, a moderately strong positive correlation.</p>
+    <div class="example-box"><strong>A careless headline:</strong> "NGO presence linked to higher poverty," implying NGOs are making poverty worse, or are at least ineffective.</div>
+    <div class="tip-box"><strong>The more plausible explanation: reverse causation.</strong> NGOs do not select districts at random. They deliberately concentrate their offices in the districts that already have the greatest need, precisely because poverty is high there. The poverty did not result from the NGO presence; the NGO presence resulted from the poverty.</div>
+    <div class="warn-box"><strong>Why this matters for policy:</strong> mistaking the direction of this relationship could lead to the damaging conclusion that NGO programs should be reduced. A careful reading instead asks whether outcomes in NGO-served districts are improving faster than comparable districts started at the same poverty level, a much harder but far more meaningful question than reading the raw correlation alone.</div>
+  </div>
+
+  <!-- S11: recap -->
+  <div class="slide" id="slide-11">
+    <h2>Module 5 Recap</h2>
+    <p class="slide-sub">Five principles to carry forward:</p>
+    <ul class="takeaway-list">
+      <li><span class="t-num">1</span>A scatter plot reveals the direction and strength of a relationship before any number is calculated.</li>
+      <li><span class="t-num">2</span>Pearson's r summarizes the strength and direction of a <em>linear</em> relationship in a single number between &minus;1 and +1.</li>
+      <li><span class="t-num">3</span>r is unitless, symmetric, sensitive to outliers, and blind to nonlinear patterns; always plot the data before trusting it.</li>
+      <li><span class="t-num">4</span>Correlation alone never establishes causation. Every correlation has three possible explanations: direct causation, reverse causation, or a confounding variable.</li>
+      <li><span class="t-num">5</span>Spotting which explanation is plausible requires real-world reasoning about the variables involved, not just a larger or smaller r.</li>
+    </ul>
+    <div class="tip-box"><strong>Next:</strong> Module 6 builds on correlation by fitting an actual line through the data, the regression line, turning a relationship into a tool that can describe slope, intercept, and prediction.</div>
+  </div>
+
+  <!-- NAV -->
+  <div class="slide-nav">
+    <button class="btn btn-ghost" id="prevBtn">← Previous</button>
+    <span class="key-hint">Use <span class="kbd">←</span> <span class="kbd">→</span> keys</span>
+    <button class="btn btn-primary" id="nextBtn">Next →</button>
+  </div>
+</div>
+</div>
+
+<!-- ========== QUIZ ========== -->
+<div id="tab-quiz" class="tab-content">
+<div class="quiz-intro">
+  <h2>&#128221; Module Quiz</h2>
+  <p>10 questions on scatter plots, Pearson's r, its properties and limits, and correlation versus causation.</p>
+  <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
+</div>
+<div id="quiz-questions" style="display:none;">
+  <div class="quiz-question" id="qq-1">
+    <h4><span class="q-num">1.</span>A scatter plot shows that as advertising spend increases, monthly sales also consistently increase. This pattern describes:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(1,this,true)">A positive correlation</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">A negative correlation</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">No correlation</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">A confounding variable</button>
+    </div>
+    <div class="quiz-explain" id="qe-1">When both variables tend to rise together, the relationship is a positive correlation.</div>
+  </div>
+  <div class="quiz-question" id="qq-2">
+    <h4><span class="q-num">2.</span>Pearson's correlation coefficient r can take which range of values?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(2,this,false)">0 to 100</button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">0 to 1 only</button>
+      <button class="quiz-option" onclick="answerQ(2,this,true)">&minus;1 to +1</button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">Any real number, with no fixed limit</button>
+    </div>
+    <div class="quiz-explain" id="qe-2">Pearson's r is always between &minus;1 and +1, with the sign showing direction and the magnitude showing strength.</div>
+  </div>
+  <div class="quiz-question" id="qq-3">
+    <h4><span class="q-num">3.</span>Two variables have a correlation of r = &minus;0.85. What does this indicate?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(3,this,false)">A weak positive relationship</button>
+      <button class="quiz-option" onclick="answerQ(3,this,true)">A very strong negative relationship</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">No relationship at all</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">A nonlinear relationship only</button>
+    </div>
+    <div class="quiz-explain" id="qe-3">The negative sign indicates the variables move in opposite directions, and a magnitude of 0.85 falls in the very strong range.</div>
+  </div>
+  <div class="quiz-question" id="qq-4">
+    <h4><span class="q-num">4.</span>A dataset has a true relationship shaped like an inverted U (rising, then falling). Pearson's r calculated on this data is likely to be:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(4,this,false)">Close to +1</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">Close to &minus;1</button>
+      <button class="quiz-option" onclick="answerQ(4,this,true)">Close to 0, despite a real relationship existing</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">Impossible to calculate</button>
+    </div>
+    <div class="quiz-explain" id="qe-4">r only detects straight-line patterns. A symmetric rise-then-fall pattern produces an r near zero even though fertilizer and yield are clearly related.</div>
+  </div>
+  <div class="quiz-question" id="qq-5">
+    <h4><span class="q-num">5.</span>Which of the following is a genuine property of Pearson's r?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(5,this,false)">It changes value depending on which units the variables are measured in</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">It is completely unaffected by outliers</button>
+      <button class="quiz-option" onclick="answerQ(5,this,true)">It is unitless and symmetric between the two variables</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">It directly proves that one variable causes the other</button>
+    </div>
+    <div class="quiz-explain" id="qe-5">r is unitless (it does not change if units are converted) and symmetric (the correlation of x with y equals the correlation of y with x).</div>
+  </div>
+  <div class="quiz-question" id="qq-6">
+    <h4><span class="q-num">6.</span>Adding a single extreme outlier to an otherwise weakly correlated dataset can:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(6,this,true)">Substantially change the value of r, in either direction</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">Never affect r at all</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">Force r to equal exactly zero</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">Convert a linear relationship into a nonlinear one</button>
+    </div>
+    <div class="quiz-explain" id="qe-6">Because r is built from squared-style deviation products, a single extreme point can pull its value noticeably higher or lower than what the bulk of the data supports.</div>
+  </div>
+  <div class="quiz-question" id="qq-7">
+    <h4><span class="q-num">7.</span>Cold drink sales and river drowning incidents both rise and fall together across the year, producing a strong positive correlation. The best explanation is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(7,this,false)">Drinking cold drinks directly causes drowning</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">Drowning incidents cause people to buy more cold drinks</button>
+      <button class="quiz-option" onclick="answerQ(7,this,true)">Hot weather is a confounding variable that independently drives both</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">The correlation must be a calculation error</button>
+    </div>
+    <div class="quiz-explain" id="qe-7">Temperature independently increases both cold drink purchases and swimming-related drowning risk, making it a classic confounding variable.</div>
+  </div>
+  <div class="quiz-question" id="qq-8">
+    <h4><span class="q-num">8.</span>Districts with more NGO field offices tend to have higher poverty rates. The most plausible explanation is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(8,this,false)">NGOs cause poverty to rise wherever they operate</button>
+      <button class="quiz-option" onclick="answerQ(8,this,true)">Reverse causation: NGOs deliberately locate where poverty is already highest</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">The relationship must be purely coincidental</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">Higher poverty has no relationship to where NGOs operate</button>
+    </div>
+    <div class="quiz-explain" id="qe-8">NGOs target high-need districts, so existing poverty drives NGO placement, not the other way around. This is reverse causation.</div>
+  </div>
+  <div class="quiz-question" id="qq-9">
+    <h4><span class="q-num">9.</span>In a small dataset, every time x increases, y consistently decreases by a roughly proportional amount. The sign of Pearson's r for this data would be:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(9,this,false)">Positive</button>
+      <button class="quiz-option" onclick="answerQ(9,this,true)">Negative</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">Exactly zero</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">Undefined</button>
+      </div>
+    <div class="quiz-explain" id="qe-9">A consistent decrease in y as x increases is the definition of a negative linear relationship, so r would be negative.</div>
+  </div>
+  <div class="quiz-question" id="qq-10">
+    <h4><span class="q-num">10.</span>Why is observing a strong correlation between two variables never sufficient, by itself, to prove causation?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(10,this,false)">Because strong correlations are always calculation mistakes</button>
+      <button class="quiz-option" onclick="answerQ(10,this,true)">Because the same correlation could equally arise from direct causation, reverse causation, or a confounding variable</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">Because correlation can only be computed for nominal data</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">Because causation requires a correlation of exactly 1</button>
+    </div>
+    <div class="quiz-explain" id="qe-10">A correlation coefficient cannot distinguish among the three possible explanations behind it; ruling out reverse causation and confounding requires additional reasoning or, ideally, a controlled experiment.</div>
+  </div>
+  <div class="quiz-footer">
+    <span class="quiz-progress-text" id="quiz-progress">0 of 10 answered</span>
+    <button class="btn btn-primary" onclick="submitQuiz()" id="btn-submit-quiz" disabled>Submit Quiz</button>
+  </div>
+  <div class="quiz-result" id="quiz-result">
+    <h3>Quiz Complete</h3>
+    <div class="score" id="quiz-score-display">0<span class="total"> / 10</span></div>
+    <div class="verdict" id="quiz-verdict"></div>
+    <p id="quiz-msg"></p>
+    <button class="btn btn-primary" onclick="retakeQuiz()">Retake Quiz</button>
+  </div>
+</div>
+</div>
+
+<!-- ========== FLASHCARDS ========== -->
+<div id="tab-flashcards" class="tab-content">
+<div class="flashcards-header">
+  <h2>&#127183; Flashcards</h2>
+  <p>14 key terms from Module 5. Click any card to reveal its definition.</p>
+</div>
+<div class="flashcards-grid" id="fc-grid"></div>
+</div>
+
+<!-- ========== REAL CASES ========== -->
+<div id="tab-cases" class="tab-content">
+<div class="cases-header">
+  <h2>&#127919; Real Cases</h2>
+  <p>Read each scenario, write your interpretation, then reveal what most people miss and what the careful reading looks like.</p>
+</div>
+
+<div class="case-card" id="case-1">
+  <h4>Case 1: Cold Drinks and Drowning</h4>
+  <p class="case-prompt">A district health office notices that, month by month over several years, sales of cold drinks at roadside stalls and the number of river and pond drowning incidents rise and fall together with a strong positive correlation.</p>
+  <p class="case-q">Should the office conclude that cold drinks somehow contribute to drowning risk, or that reducing drink sales would reduce drownings?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-1','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-1','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-1" onclick="markCaseWorked(1)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-1">A strong, consistent correlation feels like solid evidence of a direct link between the two variables, especially when it holds up year after year.</div>
+  <div class="reveal-panel right-panel" id="right-case-1">Hot weather is the hidden common cause. Hotter months independently increase cold drink purchases and independently increase swimming and bathing in open water, which raises drowning risk. Neither variable causes the other; both respond to the season. Reducing cold drink sales would do nothing to make rivers safer.</div>
+</div>
+
+<div class="case-card" id="case-2">
+  <h4>Case 2: NGO Presence and Poverty</h4>
+  <p class="case-prompt">A national dataset shows that districts with more NGO field offices per capita also have higher poverty rates than districts with fewer NGO offices.</p>
+  <p class="case-q">Does this mean NGO activity is making poverty worse, or that NGO programs are not working?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-2','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-2','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-2" onclick="markCaseWorked(2)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-2">It is easy to assume the correlation runs from NGO presence to poverty, since that is the order the variables are usually listed in.</div>
+  <div class="reveal-panel right-panel" id="right-case-2">The causal arrow almost certainly runs the other way. NGOs choose where to work based on where need is greatest, so high poverty draws in NGOs rather than NGOs creating poverty. This is reverse causation. A fair evaluation of NGO effectiveness would need to compare how poverty changes over time in served districts against similarly poor districts that were not served, not simply compare poverty levels across districts at one point in time.</div>
+</div>
+
+<div class="case-card" id="case-3">
+  <h4>Case 3: Mobile Financial Service Agents and Household Savings</h4>
+  <p class="case-prompt">Across upazilas, the number of mobile financial service agent points per 1,000 people correlates strongly with the average household savings rate. Areas with more agent points also tend to have noticeably higher savings.</p>
+  <p class="case-q">Can the office conclude that placing more agent points in an area would directly raise household savings there?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-3','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-3','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-3" onclick="markCaseWorked(3)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-3">Because mobile financial services are designed to encourage saving, it feels natural to read the correlation as direct proof that the agents themselves are causing higher savings.</div>
+  <div class="reveal-panel right-panel" id="right-case-3">Urbanization and income level are plausible confounding variables. Areas that are more urbanized and have higher average income tend to attract more agent points as a business decision, and separately tend to have higher savings simply because residents have more disposable income. Without accounting for income and urbanization, the raw correlation overstates what installing more agent points alone would achieve in a low-income, low-density area.</div>
+</div>
+
+<div class="case-card" id="case-4">
+  <h4>Case 4: Fertilizer and Crop Yield, Revisited</h4>
+  <p class="case-prompt">An agricultural extension office collects fertilizer-amount and yield data across 40 plots. The true underlying relationship rises with fertilizer up to a point and then falls as overuse damages the soil, but the office only reports that "the correlation between fertilizer and yield was weak (r = 0.08), so fertilizer amount does not matter much for yield."</p>
+  <p class="case-q">Is this conclusion justified by the data described?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-4','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-4','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-4" onclick="markCaseWorked(4)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-4">A low r is often read as final proof that two variables are unrelated, since r is the standard number used to summarize a relationship.</div>
+  <div class="reveal-panel right-panel" id="right-case-4">A low r only rules out a straight-line relationship; it says nothing about curved ones. If the true pattern is an inverted U, fertilizer matters enormously for yield, but in a way that increases yield up to an optimal amount and then decreases it, a pattern that nearly cancels out in a linear correlation calculation. The office's conclusion is not justified; a scatter plot, not r alone, is the only way to catch this.</div>
+</div>
+
+</div>
+
+<button class="reset-btn" onclick="resetProgress()">&#8635; Reset Progress</button>
+
+<script>
+const STORAGE_KEY='stats101-module5-progress-v1';
+const TOTAL_SLIDES=11,TOTAL_CARDS=14,TOTAL_CASES=4,TOTAL_QUIZ=10;
+
+const flashcardData=[
+  {term:'Correlation',def:'A statistical relationship between two quantitative variables describing how they tend to move together.'},
+  {term:'Pearson correlation coefficient (r)',def:'A number between minus 1 and plus 1 that measures the strength and direction of the linear relationship between two quantitative variables.'},
+  {term:'Positive correlation',def:'A relationship in which the two variables tend to rise and fall together. Corresponds to a positive value of r.'},
+  {term:'Negative correlation',def:'A relationship in which one variable tends to rise as the other falls. Corresponds to a negative value of r.'},
+  {term:'No correlation (r near 0)',def:'No detectable straight-line relationship between two variables. Does not necessarily mean the variables are unrelated in every sense.'},
+  {term:'Strength of correlation',def:'How tightly data points cluster around a straight line, judged by the magnitude of r: negligible, weak, moderate, strong, very strong, or near perfect.'},
+  {term:'Linear relationship',def:'A relationship that can be reasonably well described by a straight line, the type of pattern Pearson r is designed to detect.'},
+  {term:'Nonlinear relationship',def:'A relationship with a curved or non-straight-line shape, such as an inverted U. Can be strong and meaningful even when Pearson r is close to zero.'},
+  {term:'Confounding variable',def:'A third variable that independently influences both variables being studied, creating a correlation between them with no direct causal link.'},
+  {term:'Reverse causation',def:'A situation where the assumed direction of cause and effect is backwards: the presumed effect is actually driving the presumed cause.'},
+  {term:'Spurious correlation',def:'A correlation between two variables that does not reflect any meaningful direct or indirect relationship between them.'},
+  {term:'Outlier sensitivity of r',def:'The tendency of Pearson r to be substantially pulled higher or lower by a single extreme data point.'},
+  {term:'Scatter plot',def:'A chart plotting paired values of two quantitative variables as points, used to visually assess direction, strength, and shape of a relationship before computing r.'},
+  {term:'Coefficient of determination (r-squared)',def:'The square of the correlation coefficient, interpreted as the proportion of variation in one variable associated with the other. Introduced fully in Module 6 on regression.'}
+];
+
+let state={slidesViewed:new Set(),quizScore:null,cardsFlipped:new Set(),casesWorked:new Set(),quizAnswers:{},quizSubmitted:false,currentSlide:1};
+
+function loadState(){
+  try{const s=localStorage.getItem(STORAGE_KEY);if(s){const p=JSON.parse(s);state.slidesViewed=new Set(p.slidesViewed||[]);state.quizScore=p.quizScore!==undefined?p.quizScore:null;state.cardsFlipped=new Set(p.cardsFlipped||[]);state.casesWorked=new Set(p.casesWorked||[]);state.quizAnswers=p.quizAnswers||{};state.quizSubmitted=p.quizSubmitted||false;state.currentSlide=p.currentSlide||1;}}catch(e){}
+}
+function saveState(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify({slidesViewed:[...state.slidesViewed],quizScore:state.quizScore,cardsFlipped:[...state.cardsFlipped],casesWorked:[...state.casesWorked],quizAnswers:state.quizAnswers,quizSubmitted:state.quizSubmitted,currentSlide:state.currentSlide}));}catch(e){}
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');btn.classList.add('active');
+}
+
+const prevBtn=document.getElementById('prevBtn');
+const nextBtn=document.getElementById('nextBtn');
+function showSlide(n){
+  if(n<1||n>TOTAL_SLIDES)return;
+  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+  document.getElementById('slide-'+n).classList.add('active');
+  state.currentSlide=n;state.slidesViewed.add(n);saveState();updateSlideUI();updateStats();
+}
+function updateSlideUI(){
+  const n=state.currentSlide;
+  document.getElementById('slide-counter').textContent='Slide '+n+' of '+TOTAL_SLIDES;
+  document.getElementById('slide-progress').style.width=(n/TOTAL_SLIDES*100)+'%';
+  prevBtn.disabled=n===1;
+  nextBtn.textContent=n===TOTAL_SLIDES?'Finish ✓':'Next →';
+}
+prevBtn.addEventListener('click',()=>showSlide(state.currentSlide-1));
+nextBtn.addEventListener('click',()=>{if(state.currentSlide<TOTAL_SLIDES)showSlide(state.currentSlide+1);});
+document.addEventListener('keydown',e=>{
+  const activeTab=document.querySelector('.tab-content.active');
+  if(!activeTab||activeTab.id!=='tab-slides')return;
+  if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
+  if(e.key==='ArrowRight'){e.preventDefault();nextBtn.click();}
+  else if(e.key==='ArrowLeft'){e.preventDefault();prevBtn.click();}
+});
+
+let quizAnswered=0,quizCorrect=0;
+function startQuiz(){document.querySelector('.quiz-intro').style.display='none';document.getElementById('quiz-questions').style.display='block';if(state.quizSubmitted)restoreQuizState();}
+function answerQ(qNum,btn,correct){
+  const qq=document.getElementById('qq-'+qNum);if(qq.classList.contains('answered'))return;
+  qq.classList.add('answered');qq.querySelectorAll('.quiz-option').forEach(o=>o.classList.add('disabled'));
+  btn.classList.add(correct?'correct':'wrong');if(correct)quizCorrect++;
+  document.getElementById('qe-'+qNum).classList.add('show');
+  state.quizAnswers[qNum]=correct;quizAnswered++;
+  document.getElementById('quiz-progress').textContent=quizAnswered+' of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=quizAnswered<TOTAL_QUIZ;saveState();
+}
+function submitQuiz(){
+  state.quizScore=quizCorrect;state.quizSubmitted=true;saveState();
+  document.getElementById('quiz-score-display').innerHTML=quizCorrect+'<span class="total"> / '+TOTAL_QUIZ+'</span>';
+  const v=document.getElementById('quiz-verdict'),m=document.getElementById('quiz-msg');
+  if(quizCorrect>=9){v.textContent='Excellent';v.className='verdict great';m.textContent='Strong command of correlation and its pitfalls.';}
+  else if(quizCorrect>=7){v.textContent='Good';v.className='verdict good';m.textContent='Solid. Review the explanations on questions you missed.';}
+  else{v.textContent='Keep going';v.className='verdict ok';m.textContent='Revisit the slides on Pearson r and correlation versus causation before retaking.';}
+  document.getElementById('quiz-result').classList.add('show');updateStats();
+}
+function retakeQuiz(){
+  state.quizScore=null;state.quizSubmitted=false;state.quizAnswers={};quizCorrect=0;quizAnswered=0;saveState();
+  document.getElementById('quiz-result').classList.remove('show');
+  document.querySelectorAll('.quiz-question').forEach(q=>{q.classList.remove('answered');q.querySelectorAll('.quiz-option').forEach(o=>o.classList.remove('correct','wrong','disabled'));q.querySelectorAll('.quiz-explain').forEach(e=>e.classList.remove('show'));});
+  document.getElementById('quiz-progress').textContent='0 of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=true;updateStats();
+}
+function restoreQuizState(){
+  Object.entries(state.quizAnswers).forEach(([qNum,correct])=>{
+    const qq=document.getElementById('qq-'+qNum);if(!qq)return;
+    qq.classList.add('answered');qq.querySelectorAll('.quiz-option').forEach(o=>o.classList.add('disabled'));
+    document.getElementById('qe-'+qNum).classList.add('show');quizAnswered++;if(correct)quizCorrect++;
+  });
+  document.getElementById('quiz-progress').textContent=quizAnswered+' of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=quizAnswered<TOTAL_QUIZ;
+  if(state.quizSubmitted)submitQuiz();
+}
+
+function buildFlashcards(){
+  const grid=document.getElementById('fc-grid');
+  flashcardData.forEach((fc,i)=>{
+    const div=document.createElement('div');div.className='flashcard'+(state.cardsFlipped.has(i)?' flipped':'');
+    div.innerHTML='<div class="flashcard-inner"><div class="flashcard-front">'+fc.term+'<span class="fc-hint">Click to reveal definition</span></div><div class="flashcard-back">'+fc.def+'</div></div>';
+    div.addEventListener('click',()=>{div.classList.toggle('flipped');state.cardsFlipped.add(i);saveState();updateStats();});
+    grid.appendChild(div);
+  });
+}
+
+function revealCase(id,type){document.getElementById(type+'-'+id).classList.add('show');}
+function markCaseWorked(n){
+  state.casesWorked.add(n);saveState();
+  const btn=document.getElementById('worked-case-'+n);btn.textContent='Worked';btn.classList.add('done');updateStats();
+}
+
+function updateStats(){
+  document.getElementById('stat-slides').textContent=Math.round(state.slidesViewed.size/TOTAL_SLIDES*100)+'%';
+  document.getElementById('stat-quiz').textContent=state.quizScore!==null?state.quizScore+' / '+TOTAL_QUIZ:'—';
+  document.getElementById('stat-cards').textContent=state.cardsFlipped.size+' / '+TOTAL_CARDS;
+  document.getElementById('stat-cases').textContent=state.casesWorked.size+' / '+TOTAL_CASES;
+}
+function resetProgress(){if(!confirm('Reset all progress for this module?'))return;localStorage.removeItem(STORAGE_KEY);location.reload();}
+
+loadState();buildFlashcards();showSlide(state.currentSlide);updateStats();
+if(state.quizSubmitted){document.querySelector('.quiz-intro').style.display='none';document.getElementById('quiz-questions').style.display='block';restoreQuizState();}
+state.casesWorked.forEach(n=>{const btn=document.getElementById('worked-case-'+n);if(btn){btn.textContent='Worked';btn.classList.add('done');}});
+</script>
+</div>
+</body>
+</html>
