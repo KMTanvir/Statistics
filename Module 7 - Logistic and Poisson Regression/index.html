@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 7: Logistic and Poisson Regression</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;
+  --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#dbeafe;
+  --accent:#4f46e5;--success:#059669;--success-light:#d1fae5;
+  --danger:#dc2626;--danger-light:#fee2e2;
+  --warning:#d97706;--warning-light:#fef3c7;
+  --border:#e2e8f0;
+  --shadow:0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.08),0 4px 10px rgba(0,0,0,.04);
+  --radius:12px;--radius-sm:8px;--transition:.2s cubic-bezier(.4,0,.2,1);
+}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;}
+.app{max-width:1100px;margin:0 auto;padding:24px 20px 80px;}
+header.mod-header{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%);color:#fff;padding:32px 28px;border-radius:var(--radius);margin-bottom:20px;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;}
+header.mod-header::before{content:"";position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:rgba(255,255,255,.08);border-radius:50%;}
+header.mod-header::after{content:"";position:absolute;bottom:-30px;right:80px;width:100px;height:100px;background:rgba(255,255,255,.05);border-radius:50%;}
+.mod-badge{display:inline-block;background:rgba(255,255,255,.2);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:.5px;position:relative;z-index:1;}
+header.mod-header h1{font-size:28px;margin:12px 0 8px;font-weight:700;position:relative;z-index:1;}
+header.mod-header p.mod-sub{font-size:14px;opacity:.88;max-width:640px;position:relative;z-index:1;}
+header.mod-header p.mod-instructor{font-size:13px;opacity:.8;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.2);position:relative;z-index:1;}
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;padding:14px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;}
+.stat{text-align:center;padding:6px;}
+.stat .stat-value{font-size:22px;font-weight:700;color:var(--primary);line-height:1.2;}
+.stat .stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:2px;}
+.tabs{display:flex;gap:4px;background:#fff;padding:6px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;flex-wrap:wrap;}
+.tab-btn{flex:1;min-width:110px;padding:11px 16px;background:transparent;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;transition:all var(--transition);font-family:inherit;}
+.tab-btn:hover{background:var(--bg);color:var(--text);}
+.tab-btn.active{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.28);}
+.tab-content{display:none;animation:fadeIn .28s ease-in-out;}
+.tab-content.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);margin-bottom:16px;}
+.progress-bar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:12px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:3px;transition:width .4s ease;}
+.slide-counter{text-align:center;color:var(--muted);font-size:13px;margin-bottom:14px;font-weight:500;}
+.slide{display:none;min-height:440px;padding:4px;animation:slideIn .3s ease;}
+.slide.active{display:block;}
+@keyframes slideIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+.slide h2{font-size:26px;margin-bottom:6px;color:var(--primary-dark);font-weight:700;line-height:1.25;}
+.slide h3{font-size:18px;margin:20px 0 8px;color:var(--text);font-weight:600;}
+.slide p{margin-bottom:12px;color:#334155;}
+.slide ul,.slide ol{margin:0 0 14px 22px;}
+.slide li{margin-bottom:7px;color:#334155;}
+.slide .slide-sub{color:var(--muted);font-size:15px;margin-bottom:18px;font-style:italic;}
+.obj-list{list-style:none;padding:0;margin:14px 0;}
+.obj-list li{padding:9px 0 9px 32px;position:relative;color:#334155;border-bottom:1px solid var(--border);}
+.obj-list li:last-child{border-bottom:none;}
+.obj-list li::before{content:"";position:absolute;left:0;top:13px;width:18px;height:18px;background:var(--success-light);border-radius:50%;}
+.obj-list li::after{content:"✓";position:absolute;left:3px;top:10px;color:var(--success);font-size:11px;font-weight:700;}
+.example-box{background:var(--primary-light);border-left:4px solid var(--primary);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.example-box strong{color:var(--primary-dark);}
+.tip-box{background:var(--success-light);border-left:4px solid var(--success);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.tip-box strong{color:var(--success);}
+.warn-box{background:var(--warning-light);border-left:4px solid var(--warning);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.warn-box strong{color:var(--warning);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:14px 0;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:14px 0;}
+.def-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;}
+.def-card .def-term{font-weight:700;color:var(--primary-dark);font-size:15px;margin-bottom:6px;}
+.def-card .def-body{font-size:14px;color:#334155;}
+.formula-box{background:#0f172a;color:#e2e8f0;padding:18px 22px;border-radius:var(--radius-sm);margin:14px 0;text-align:center;font-size:16px;overflow-x:auto;}
+.freq-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;}
+.freq-table th{background:var(--primary);color:#fff;padding:9px 12px;text-align:left;font-weight:600;}
+.freq-table th:not(:first-child),.freq-table td:not(:first-child){text-align:right;}
+.freq-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:#334155;}
+.freq-table tr:nth-child(even) td{background:#f8fafc;}
+.freq-table tr.total-row td{font-weight:700;background:var(--primary-light);color:var(--primary-dark);border-top:2px solid var(--primary);}
+.freq-table tr.highlight-row td{background:#fef3c7;}
+.freq-table th:first-child{border-radius:8px 0 0 0;}.freq-table th:last-child{border-radius:0 8px 0 0;}
+.practice{background:#f1f5f9;border:2px dashed #cbd5e1;border-radius:var(--radius-sm);padding:18px;margin:20px 0;}
+.practice h4{color:var(--primary);margin-bottom:10px;font-size:15px;}
+.practice-q{margin-bottom:10px;color:var(--text);font-weight:500;}
+.practice-options{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+.practice-btn{padding:8px 14px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;font-size:14px;transition:all var(--transition);color:var(--text);}
+.practice-btn:hover{border-color:var(--primary);background:var(--primary-light);}
+.practice-btn.correct{background:var(--success-light);border-color:var(--success);color:var(--success);font-weight:600;}
+.practice-btn.wrong{background:var(--danger-light);border-color:var(--danger);color:var(--danger);}
+.practice-btn.disabled{pointer-events:none;opacity:.75;}
+.practice-feedback{margin-top:10px;padding:10px 14px;border-radius:6px;font-size:14px;display:none;}
+.practice-feedback.show{display:block;}
+.practice-feedback.right{background:var(--success-light);color:var(--success);border:1px solid var(--success);}
+.practice-feedback.wrong{background:var(--danger-light);color:var(--danger);border:1px solid var(--danger);}
+.slide-nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border);gap:10px;flex-wrap:wrap;}
+.key-hint{font-size:12px;color:var(--muted);}
+.kbd{display:inline-block;background:#f1f5f9;border:1px solid var(--border);border-bottom-width:2px;border-radius:4px;padding:1px 6px;font-family:monospace;font-size:11px;color:var(--text);}
+.btn{padding:10px 20px;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;transition:all var(--transition);font-family:inherit;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover:not(:disabled){background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,.28);}
+.btn-primary:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover:not(:disabled){background:var(--bg);color:var(--text);}
+.btn-ghost:disabled{opacity:.45;cursor:not-allowed;}
+.quiz-intro{background:#fff;padding:22px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;text-align:center;}
+.quiz-intro h2{color:var(--primary-dark);margin-bottom:8px;}
+.quiz-intro p{color:var(--muted);margin-bottom:14px;}
+.quiz-question{background:#fff;border-radius:var(--radius);padding:22px;margin-bottom:14px;box-shadow:var(--shadow);border:1px solid var(--border);}
+.quiz-question h4{font-size:16px;margin-bottom:14px;color:var(--text);font-weight:600;}
+.q-num{color:var(--primary);font-weight:700;margin-right:6px;}
+.quiz-options{display:grid;gap:8px;}
+.quiz-option{padding:11px 16px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:#fff;transition:all var(--transition);font-size:14px;color:var(--text);text-align:left;font-family:inherit;}
+.quiz-option:hover{border-color:var(--primary);background:var(--primary-light);transform:translateX(2px);}
+.quiz-option.correct{border-color:var(--success);background:var(--success-light);color:var(--success);font-weight:600;}
+.quiz-option.wrong{border-color:var(--danger);background:var(--danger-light);color:var(--danger);}
+.quiz-option.disabled{pointer-events:none;}
+.quiz-explain{display:none;margin-top:10px;padding:10px 14px;background:#f8fafc;border-left:3px solid var(--primary);border-radius:4px;font-size:13px;color:#334155;}
+.quiz-explain.show{display:block;}
+.quiz-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px 20px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);flex-wrap:wrap;}
+.quiz-progress-text{font-size:13px;color:var(--muted);}
+.quiz-result{display:none;padding:30px;background:linear-gradient(135deg,#f0fdf4 0%,#dbeafe 100%);border-radius:var(--radius);text-align:center;margin-top:16px;box-shadow:var(--shadow);}
+.quiz-result.show{display:block;}
+.quiz-result h3{font-size:24px;margin-bottom:10px;color:var(--primary-dark);}
+.quiz-result .score{font-size:48px;font-weight:700;color:var(--primary);margin:14px 0;line-height:1;}
+.quiz-result .score .total{font-size:26px;color:var(--muted);}
+.quiz-result p{color:#334155;margin-bottom:16px;font-size:15px;}
+.verdict{display:inline-block;padding:6px 14px;border-radius:16px;font-weight:600;font-size:14px;margin-bottom:8px;}
+.verdict.great{background:var(--success-light);color:var(--success);}
+.verdict.good{background:var(--primary-light);color:var(--primary-dark);}
+.verdict.ok{background:var(--warning-light);color:var(--warning);}
+.flashcards-header{background:#fff;padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;text-align:center;}
+.flashcards-header h2{color:var(--primary-dark);margin-bottom:6px;}
+.flashcards-header p{color:var(--muted);font-size:14px;}
+.flashcards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+.flashcard{perspective:1000px;height:170px;cursor:pointer;}
+.flashcard-inner{position:relative;width:100%;height:100%;transition:transform .55s;transform-style:preserve-3d;}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+.flashcard-front,.flashcard-back{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:var(--shadow);}
+.flashcard-front{background:linear-gradient(135deg,#fff 0%,#f8fafc 100%);border:2px solid var(--primary-light);color:var(--primary-dark);font-weight:600;font-size:16px;}
+.flashcard-front .fc-hint{font-size:11px;color:var(--muted);font-weight:400;margin-top:8px;font-style:italic;}
+.flashcard-back{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%);color:#fff;transform:rotateY(180deg);font-size:13px;line-height:1.55;}
+.cases-header{background:#fff;padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;}
+.cases-header h2{color:var(--primary-dark);margin-bottom:6px;}
+.cases-header p{color:var(--muted);font-size:14px;}
+.case-card{background:#fff;border-radius:var(--radius);padding:24px;margin-bottom:16px;box-shadow:var(--shadow);border-left:4px solid var(--primary);}
+.case-card h4{font-size:16px;color:var(--primary-dark);font-weight:700;margin-bottom:12px;}
+.case-prompt{color:#334155;font-size:15px;margin-bottom:14px;line-height:1.6;}
+.case-q{font-weight:600;color:var(--text);margin-bottom:12px;font-size:15px;}
+.case-textarea{width:100%;min-height:80px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;resize:vertical;background:#f8fafc;color:var(--text);transition:border-color var(--transition);}
+.case-textarea:focus{outline:none;border-color:var(--primary);background:#fff;}
+.reveal-btns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+.reveal-btn{padding:8px 16px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;transition:all var(--transition);}
+.reveal-btn.miss{color:var(--warning);border-color:var(--warning);}
+.reveal-btn.miss:hover{background:var(--warning-light);}
+.reveal-btn.right{color:var(--success);border-color:var(--success);}
+.reveal-btn.right:hover{background:var(--success-light);}
+.reveal-panel{display:none;margin-top:12px;padding:14px 16px;border-radius:var(--radius-sm);font-size:14px;line-height:1.6;}
+.reveal-panel.show{display:block;}
+.reveal-panel.miss-panel{background:var(--warning-light);border-left:3px solid var(--warning);color:#78350f;}
+.reveal-panel.right-panel{background:var(--success-light);border-left:3px solid var(--success);color:#064e3b;}
+.case-worked-btn{margin-top:10px;padding:6px 14px;background:var(--primary-light);color:var(--primary-dark);border:none;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;}
+.case-worked-btn.done{background:var(--success-light);color:var(--success);}
+.takeaway-list{list-style:none;padding:0;margin:16px 0;}
+.takeaway-list li{padding:12px 16px 12px 48px;position:relative;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:10px;font-size:15px;color:#1e293b;border:1px solid var(--border);}
+.takeaway-list li .t-num{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:24px;height:24px;background:var(--primary);color:#fff;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.reset-btn{position:fixed;bottom:18px;right:18px;background:#fff;border:1px solid var(--border);padding:8px 14px;border-radius:20px;font-size:13px;color:var(--muted);cursor:pointer;box-shadow:var(--shadow);font-family:inherit;transition:all var(--transition);z-index:100;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.cricket-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;}
+.cricket-table th{background:#1e293b;color:#fff;padding:7px 8px;text-align:center;font-weight:600;}
+.cricket-table td{padding:6px 8px;text-align:center;border-bottom:1px solid var(--border);color:#334155;}
+.cricket-table tr:nth-child(even) td{background:#f8fafc;}
+@media(max-width:720px){
+  .app{padding:14px 12px 80px;}
+  header.mod-header{padding:22px 18px;}
+  header.mod-header h1{font-size:22px;}
+  .card{padding:20px 16px;}
+  .two-col,.three-col{grid-template-columns:1fr;}
+  .stats-bar{grid-template-columns:repeat(2,1fr);}
+  .slide h2{font-size:22px;}
+  .freq-table,.cricket-table{font-size:12px;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="mod-header">
+  <span class="mod-badge">Module 7 of 17</span>
+  <h1>Logistic and Poisson Regression</h1>
+  <p class="mod-sub">When the outcome isn't a plain number: predicting yes/no outcomes with logistic regression and predicting event counts with Poisson regression.</p>
+  <p class="mod-instructor"><strong>K.M. Tanvir</strong> &nbsp;·&nbsp; Statistics for Non-Statisticians</p>
+</header>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-value" id="stat-slides">0%</div><div class="stat-label">Slides Viewed</div></div>
+  <div class="stat"><div class="stat-value" id="stat-quiz">&#8212;</div><div class="stat-label">Quiz Score</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cards">0 / 20</div><div class="stat-label">Cards Flipped</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cases">0 / 4</div><div class="stat-label">Cases Worked</div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('slides',this)">&#128214; Slides</button>
+  <button class="tab-btn" onclick="switchTab('quiz',this)">&#128221; Quiz</button>
+  <button class="tab-btn" onclick="switchTab('flashcards',this)">&#127183; Flashcards</button>
+  <button class="tab-btn" onclick="switchTab('cases',this)">&#127919; Real Cases</button>
+</div>
+
+<!-- ========== SLIDES ========== -->
+<div id="tab-slides" class="tab-content active">
+<div class="card">
+  <div class="progress-bar"><div class="progress-fill" id="slide-progress"></div></div>
+  <div class="slide-counter" id="slide-counter">Slide 1 of 17</div>
+  <!-- S1: objectives -->
+  <div class="slide active" id="slide-1">
+    <h2>Logistic and Poisson Regression</h2>
+    <p class="slide-sub">Module 7 &nbsp;·&nbsp; By the end of this module, you will be able to:</p>
+    <ul class="obj-list">
+      <li>Explain why an outcome that is binary (yes/no) or a count (0, 1, 2, ...) needs a different regression model than a continuous outcome</li>
+      <li>Write and interpret the logistic regression equation, including the logit and odds ratio</li>
+      <li>Use a fitted logistic model to compute a predicted probability and turn it into a yes/no decision</li>
+      <li>Write and interpret the Poisson regression equation, including the rate ratio</li>
+      <li>Use a fitted Poisson model to compute a predicted count</li>
+      <li>Recognize overdispersion in count data and know what a negative binomial regression offers instead</li>
+      <li>Compare linear, logistic, and Poisson regression as three members of the same family of models</li>
+    </ul>
+    <div class="tip-box"><strong>The question this module answers:</strong> Module 6 fit a straight line to a continuous outcome, such as an exam score or a yield in tons per hectare. But many outcomes that matter in practice are not continuous numbers at all: a loan either defaults or it does not, a patient either is or is not hospitalized, and the number of dengue cases in a week is a count that cannot be negative. This module extends regression to handle exactly these two outcome types.</div>
+  </div>
+
+  <!-- S2: why not linear regression -->
+  <div class="slide" id="slide-2">
+    <h2>Why Not Just Use Linear Regression?</h2>
+    <p>Fitting an ordinary straight line to a binary outcome or a count outcome runs into real problems, not just stylistic ones.</p>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Binary outcome problem</div><div class="def-body">A binary outcome only takes the values 0 and 1. A straight line has no upper or lower bound, so it can predict negative probabilities or probabilities above 1, both of which are meaningless.</div></div>
+      <div class="def-card"><div class="def-term">Count outcome problem</div><div class="def-body">A count outcome can only be a non-negative whole number: 0, 1, 2, and so on. A straight line can still predict a negative count, and counts are typically right-skewed rather than evenly scattered around the line as linear regression assumes.</div></div>
+    </div>
+    <p>Both logistic and Poisson regression solve this the same way: instead of modeling the outcome directly with a straight line, they model a transformed version of the outcome that has no such boundary problem, then translate the result back to a probability or a count at the end.</p>
+    <div class="tip-box"><strong>Same family:</strong> linear, logistic, and Poisson regression are all members of a broader family called generalized linear models. Each pairs a type of outcome with a transformation, called a link function, that connects the straight-line part of the model to that outcome.</div>
+  </div>
+
+  <!-- S3: logistic regression intro -->
+  <div class="slide" id="slide-3">
+    <h2>Logistic Regression: Predicting Yes/No</h2>
+    <p><strong>Logistic regression</strong> is used when the outcome is binary: default or no default, hospitalized or not, passed or failed. Rather than predicting the outcome itself, it predicts the <strong>probability</strong> that the outcome equals 1.</p>
+    <svg viewBox="0 0 420 200" style="width:100%;max-width:420px;display:block;margin:14px auto;">
+      <line x1="30" y1="180" x2="400" y2="180" stroke="#94a3b8" stroke-width="1"/>
+      <line x1="30" y1="180" x2="30" y2="20" stroke="#94a3b8" stroke-width="1"/>
+      <path d="M40,170 C120,170 160,30 220,30 C280,30 320,170 nothing" fill="none" stroke="none"/>
+      <path d="M40,168 C110,165 150,140 185,95 C220,50 260,32 380,30" fill="none" stroke="#2563eb" stroke-width="2.5"/>
+      <text x="200" y="198" font-size="11" fill="#64748b" text-anchor="middle">x (explanatory variable)</text>
+      <text x="14" y="100" font-size="11" fill="#64748b" text-anchor="middle" transform="rotate(-90 14 100)">predicted probability</text>
+      <line x1="30" y1="30" x2="400" y2="30" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="395" y="26" font-size="10" fill="#94a3b8" text-anchor="end">1</text>
+      <text x="395" y="178" font-size="10" fill="#94a3b8" text-anchor="end">0</text>
+    </svg>
+    <p>The fitted curve is S-shaped rather than straight. It stays between 0 and 1 for every possible value of x, which is exactly what a probability must do.</p>
+    <div class="tip-box"><strong>The trick behind the curve:</strong> the S-shape is what you get when a perfectly ordinary straight line, written on the log-odds scale, is converted back to the probability scale. The next slide shows that line.</div>
+  </div>
+
+  <!-- S4: logit equation -->
+  <div class="slide" id="slide-4">
+    <h2>The Logit: A Straight Line on the Log-Odds Scale</h2>
+    <p>Logistic regression still fits a straight line, just not to the probability itself. It fits a line to the <strong>log-odds</strong>, also called the <strong>logit</strong>, of the probability:</p>
+    <div class="formula-box">\[ \text{logit}(p) = \ln\left(\frac{p}{1-p}\right) = b_0 + b_1 x \]</div>
+    <p>Here \(p\) is the probability that the outcome equals 1, and \(\frac{p}{1-p}\) is the <strong>odds</strong> of the outcome occurring. The right-hand side looks exactly like the simple linear regression equation from Module 6, because it is one, just written on a different scale.</p>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Odds</div><div class="def-body">The ratio of the probability of an event happening to the probability of it not happening. Odds of 0.25 mean the event is one-quarter as likely to happen as not to happen.</div></div>
+      <div class="def-card"><div class="def-term">Why the log?</div><div class="def-body">Odds range from 0 to infinity, still a boundary problem at zero. Taking the natural log of the odds removes that lower boundary, leaving a scale that can take any value, positive or negative, exactly what a straight line needs.</div></div>
+    </div>
+    <div class="tip-box"><strong>Going back to a probability:</strong> once \(b_0 + b_1 x\) is calculated, it can be converted back to a probability with \( p = \frac{1}{1 + e^{-(b_0 + b_1 x)}} \), which is exactly the S-shaped curve from the previous slide.</div>
+  </div>
+
+  <!-- S5: odds ratio interpretation -->
+  <div class="slide" id="slide-5">
+    <h2>Interpreting Coefficients: The Odds Ratio</h2>
+    <p>A logistic coefficient \(b_1\) is the change in the log-odds for a one-unit increase in x. Log-odds are not an intuitive scale for most audiences, so coefficients are usually translated into an <strong>odds ratio</strong>:</p>
+    <div class="formula-box">\[ \text{odds ratio} = e^{b_1} \]</div>
+    <table class="freq-table">
+      <thead><tr><th>Odds ratio</th><th>Interpretation</th></tr></thead>
+      <tbody>
+        <tr><td>Greater than 1</td><td>Each one-unit increase in x multiplies the odds of the outcome, making it more likely</td></tr>
+        <tr><td>Equal to 1</td><td>x has no association with the odds of the outcome</td></tr>
+        <tr><td>Less than 1</td><td>Each one-unit increase in x multiplies the odds by a fraction, making the outcome less likely</td></tr>
+      </tbody>
+    </table>
+    <div class="warn-box"><strong>Odds ratio is not a probability ratio:</strong> an odds ratio of 2 does not mean the probability doubles. It means the odds, the ratio of probability to its complement, double. When the baseline probability is small, the two are close; when it is not small, they can differ noticeably.</div>
+  </div>
+
+  <!-- S6: worked example logistic -->
+  <div class="slide" id="slide-6">
+    <h2>Worked Example: Predicting Loan Default</h2>
+    <p>A microfinance lender models whether a small business loan defaults (1 = default, 0 = no default) using the borrower's monthly business revenue, x, in thousand taka. The fitted model is:</p>
+    <div class="formula-box">\[ \text{logit}(p) = -1 - 0.03x \]</div>
+    <div class="example-box"><strong>Borrower with revenue = 20:</strong> logit(p) = &minus;1 &minus; 0.03(20) = &minus;1.6. Odds = e<sup>&minus;1.6</sup> = 0.202. Probability p = 0.202 &divide; (1 + 0.202) = <strong>0.168</strong>, about a 16.8 percent chance of default.
+    <br><br><strong>Borrower with revenue = 80:</strong> logit(p) = &minus;1 &minus; 0.03(80) = &minus;3.4. Odds = e<sup>&minus;3.4</sup> = 0.033. Probability p = 0.033 &divide; (1 + 0.033) = <strong>0.032</strong>, about a 3.2 percent chance of default.</div>
+    <p>In plain English: each additional thousand taka of monthly revenue is associated with the odds of default being multiplied by e<sup>&minus;0.03</sup> &asymp; 0.970, roughly a 3 percent reduction in the odds of default, holding everything else fixed.</p>
+  </div>
+
+  <!-- S7: classification threshold -->
+  <div class="slide" id="slide-7">
+    <h2>From Probability to Decision: The Classification Threshold</h2>
+    <p>A predicted probability is often turned into a yes/no decision by comparing it to a <strong>threshold</strong>, commonly 0.5: predict the outcome will occur if \(p\) exceeds the threshold, and predict it will not otherwise.</p>
+    <div class="example-box">In the loan example, the borrower with revenue 20 has predicted probability 0.168, below 0.5, so the model predicts <strong>no default</strong>. Both borrowers in the worked example would be predicted as non-defaulters at this threshold, even though their estimated risk differs by a factor of five.</div>
+    <div class="warn-box"><strong>The threshold is a choice, not a law of nature:</strong> a lender worried about missing risky borrowers might lower the threshold to 0.2, catching more true defaulters at the cost of also flagging more borrowers who would actually have repaid. There is no single correct threshold; it depends on the relative cost of the two kinds of mistakes.</div>
+  </div>
+
+  <!-- S8: assessing logistic fit -->
+  <div class="slide" id="slide-8">
+    <h2>Assessing a Logistic Model</h2>
+    <p>Logistic regression does not have an R-squared in the same sense as linear regression, since residuals are not defined the same way for a binary outcome. Two common alternatives are used instead.</p>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Classification accuracy</div><div class="def-body">The proportion of cases where the predicted yes/no decision, using a chosen threshold, matches the actual outcome. Simple to explain, but can be misleading when one outcome is rare.</div></div>
+      <div class="def-card"><div class="def-term">Pseudo R-squared</div><div class="def-body">Several measures exist that mimic the spirit of R-squared for logistic models, summarizing how much the predictors improve on simply guessing the overall proportion. They do not have the same direct percentage-of-variation interpretation as ordinary R-squared.</div></div>
+    </div>
+    <div class="warn-box"><strong>Beware of class imbalance:</strong> if only 2 percent of loans actually default, a model that predicts "no default" for every single borrower would already be 98 percent accurate while being completely useless for identifying risk. Accuracy alone can hide this kind of failure.</div>
+  </div>
+
+  <!-- S9: poisson regression intro -->
+  <div class="slide" id="slide-9">
+    <h2>Poisson Regression: Predicting Counts</h2>
+    <p><strong>Poisson regression</strong> is used when the outcome is a count: the number of events occurring in a fixed period of time or area of space, such as weekly dengue cases in a district, monthly customer complaints, or the number of road accidents at an intersection per year.</p>
+    <p>This connects directly back to the Poisson distribution from Module 11: that module described the probability of observing a given count when events happen randomly at a constant average rate. Poisson regression lets that average rate itself depend on explanatory variables.</p>
+    <div class="tip-box"><strong>The core idea:</strong> instead of assuming every observation shares one fixed average rate, Poisson regression allows the expected count to rise or fall with x, for instance allowing the expected number of dengue cases to depend on weekly rainfall.</div>
+  </div>
+
+  <!-- S10: poisson equation -->
+  <div class="slide" id="slide-10">
+    <h2>The Poisson Regression Equation</h2>
+    <p>Counts cannot be negative, so Poisson regression fits a straight line to the <strong>log</strong> of the expected count, \(\lambda\), rather than to the count itself:</p>
+    <div class="formula-box">\[ \ln(\lambda) = b_0 + b_1 x \]</div>
+    <p>Equivalently, the expected count itself is:</p>
+    <div class="formula-box">\[ \lambda = e^{b_0 + b_1 x} \]</div>
+    <p>Because \(e\) raised to any power is always positive, \(\lambda\) can never come out negative, no matter what values x and the coefficients take. This is the same logic as the logit link in logistic regression: transform the outcome to a scale with no boundary problem, fit a straight line there, then transform back.</p>
+  </div>
+
+  <!-- S11: rate ratio interpretation -->
+  <div class="slide" id="slide-11">
+    <h2>Interpreting Coefficients: The Rate Ratio</h2>
+    <p>As with logistic regression, the raw coefficient \(b_1\) is most easily interpreted after exponentiating it, this time producing a <strong>rate ratio</strong>:</p>
+    <div class="formula-box">\[ \text{rate ratio} = e^{b_1} \]</div>
+    <table class="freq-table">
+      <thead><tr><th>Rate ratio</th><th>Interpretation</th></tr></thead>
+      <tbody>
+        <tr><td>Greater than 1</td><td>Each one-unit increase in x multiplies the expected count upward</td></tr>
+        <tr><td>Equal to 1</td><td>x has no association with the expected count</td></tr>
+        <tr><td>Less than 1</td><td>Each one-unit increase in x multiplies the expected count downward</td></tr>
+      </tbody>
+    </table>
+    <div class="tip-box"><strong>Plain-English template:</strong> "For each additional [one unit of x], the expected count of [event] is multiplied by [rate ratio], holding other predictors fixed." This is the count-data equivalent of the slope sentence used for linear regression in Module 6.</div>
+  </div>
+
+  <!-- S12: worked example poisson -->
+  <div class="slide" id="slide-12">
+    <h2>Worked Example: Predicting Dengue Case Counts</h2>
+    <p>A district health office models the expected number of dengue cases per week, &lambda;, using average weekly rainfall, x, in millimeters. The fitted model is:</p>
+    <div class="formula-box">\[ \ln(\lambda) = 0.5 + 0.004x \]</div>
+    <div class="example-box"><strong>Week with rainfall = 100mm:</strong> ln(&lambda;) = 0.5 + 0.004(100) = 0.9. &lambda; = e<sup>0.9</sup> = <strong>2.46 cases per week</strong>.
+    <br><br><strong>Week with rainfall = 300mm:</strong> ln(&lambda;) = 0.5 + 0.004(300) = 1.7. &lambda; = e<sup>1.7</sup> = <strong>5.47 cases per week</strong>.</div>
+    <p>In plain English: each additional millimeter of weekly rainfall is associated with the expected number of dengue cases being multiplied by e<sup>0.004</sup> &asymp; 1.004, about a 0.4 percent increase in expected cases per millimeter, holding other factors fixed. Over 200 extra millimeters this compounds into more than double the expected case count.</p>
+  </div>
+
+  <!-- S13: overdispersion -->
+  <div class="slide" id="slide-13">
+    <h2>Overdispersion: When the Poisson Assumption Breaks</h2>
+    <p>The Poisson distribution makes a specific assumption: the variance of the counts equals the mean. Real count data, such as disease counts driven by outbreaks or clustering, very often have a variance considerably larger than the mean, a problem called <strong>overdispersion</strong>.</p>
+    <div class="warn-box"><strong>Why it matters:</strong> fitting an ordinary Poisson model to overdispersed data still gives reasonable estimates of the coefficients themselves, but understates how uncertain those estimates are, making results look more precise and more statistically significant than they really are.</div>
+    <div class="tip-box"><strong>The fix:</strong> when overdispersion is present, a <strong>negative binomial regression</strong>, built on the negative binomial distribution introduced in Module 10, replaces the Poisson assumption with one that allows variance to exceed the mean, giving more honest uncertainty estimates while keeping the same log-link structure and rate-ratio interpretation.</div>
+  </div>
+
+  <!-- S14: comparison table -->
+  <div class="slide" id="slide-14">
+    <h2>Three Members of One Family</h2>
+    <p>Linear, logistic, and Poisson regression share the same basic structure: a straight line in the predictors, connected to the outcome through a link function suited to that outcome's type.</p>
+    <table class="freq-table">
+      <thead><tr><th>Model</th><th>Outcome type</th><th>Link function</th><th>Coefficient becomes</th></tr></thead>
+      <tbody>
+        <tr><td>Linear regression</td><td>Continuous (any value)</td><td>Identity (none needed)</td><td>A direct change in y</td></tr>
+        <tr><td>Logistic regression</td><td>Binary (0 or 1)</td><td>Logit (log-odds)</td><td>An odds ratio</td></tr>
+        <tr><td>Poisson regression</td><td>Count (0, 1, 2, ...)</td><td>Log</td><td>A rate ratio</td></tr>
+      </tbody>
+    </table>
+    <div class="tip-box"><strong>One mental model, three outcomes:</strong> in every case, the model finds the best-fitting straight line on a transformed scale, and the choice of scale is dictated by what the outcome is physically allowed to be.</div>
+  </div>
+
+  <!-- S15: limitations -->
+  <div class="slide" id="slide-15">
+    <h2>Limitations and Cautions</h2>
+    <ul>
+      <li>Both models still assume the chosen predictors are correctly specified; a relationship that is curved on the logit or log scale in some more complex way will be fit poorly</li>
+      <li>Both inherit the correlation-versus-causation caution from every other regression model in this course: a significant coefficient describes an association, not proof that x causes the outcome</li>
+      <li>Logistic regression's classification accuracy can be misleading under class imbalance, where one outcome is rare</li>
+      <li>Poisson regression's standard errors are understated when overdispersion is present and left uncorrected</li>
+      <li>Both require a reasonably large sample to produce stable coefficient estimates, more so than simple linear regression with a continuous outcome</li>
+      <li>Multiple predictors can be added to either model, in which case multicollinearity, the same complication from Module 6, can again make individual coefficients unstable</li>
+    </ul>
+    <div class="tip-box"><strong>Takeaway:</strong> these models extend regression's reach to outcomes that linear regression cannot honestly handle, but they do not remove the need for the same careful habits: checking assumptions, being cautious about causal claims, and reporting uncertainty honestly.</div>
+  </div>
+
+  <!-- S16: anchor case -->
+  <div class="slide" id="slide-16">
+    <h2>Anchor Case: A District Dengue Outbreak</h2>
+    <p>During a dengue outbreak, a district health office uses both models from this module. A logistic regression predicts the probability that an individual patient will require hospitalization, using the patient's age and the day of illness onset. A separate Poisson regression predicts the expected number of new dengue cases per week across the district, using weekly rainfall.</p>
+    <div class="example-box">The logistic model gives officials a patient-level triage tool: a patient with a high predicted probability of hospitalization can be prioritized for closer monitoring. The Poisson model gives a district-level planning tool: a forecast of next week's expected caseload, used to allocate hospital beds and staff.</div>
+    <div class="warn-box"><strong>Why both are needed, and why neither is enough alone:</strong> the logistic model says nothing about how many new patients to expect in total, and the Poisson model says nothing about which specific patients are at higher risk. Combining them, while still remembering that both are associations estimated from past outbreaks and may not hold exactly in a new and different outbreak, gives a fuller and more honest picture than either model alone.</div>
+  </div>
+
+  <!-- S17: recap -->
+  <div class="slide" id="slide-17">
+    <h2>Module Recap</h2>
+    <ul class="takeaway-list">
+      <li><span class="t-num">1</span>Linear regression cannot honestly handle binary or count outcomes, since its straight line has no upper or lower bound</li>
+      <li><span class="t-num">2</span>Logistic regression fits a straight line to the logit, ln(p/(1&minus;p)), and converts it back to a probability between 0 and 1</li>
+      <li><span class="t-num">3</span>A logistic coefficient, exponentiated, becomes an odds ratio: how much the odds of the outcome are multiplied per one-unit increase in x</li>
+      <li><span class="t-num">4</span>A predicted probability becomes a yes/no decision only after choosing a threshold, and the threshold itself is a judgment call</li>
+      <li><span class="t-num">5</span>Poisson regression fits a straight line to ln(&lambda;), the log of the expected count, keeping the predicted count always non-negative</li>
+      <li><span class="t-num">6</span>A Poisson coefficient, exponentiated, becomes a rate ratio: how much the expected count is multiplied per one-unit increase in x</li>
+      <li><span class="t-num">7</span>Overdispersion, where variance exceeds the mean in count data, understates uncertainty in a plain Poisson model and motivates negative binomial regression instead</li>
+      <li><span class="t-num">8</span>Linear, logistic, and Poisson regression are one family of models, differing only in the outcome type and the link function connecting it to a straight line</li>
+    </ul>
+    <div class="tip-box"><strong>Next module:</strong> Module 8 turns to elementary probability, the formal language of uncertainty that underlies every statistical method covered from this point forward, including the models in this module.</div>
+  </div>
+
+  <div class="slide-nav">
+    <button class="btn btn-ghost" id="prevBtn">&larr; Previous</button>
+    <span class="key-hint">Use <span class="kbd">&larr;</span> <span class="kbd">&rarr;</span> arrow keys to navigate</span>
+    <button class="btn btn-primary" id="nextBtn">Next &rarr;</button>
+  </div>
+</div>
+</div>
+
+<!-- ========== QUIZ ========== -->
+<div id="tab-quiz" class="tab-content">
+<div class="quiz-intro">
+  <h2>&#128221; Module Quiz</h2>
+  <p>14 questions on logistic regression, the logit and odds ratio, Poisson regression, the rate ratio, and overdispersion.</p>
+  <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
+</div>
+<div id="quiz-questions" style="display:none;">
+  <div class="quiz-question" id="qq-1">
+    <h4><span class="q-num">1.</span>Why can't ordinary linear regression be used directly to predict a binary (yes/no) outcome?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(1,this,false)">Linear regression can only be used with whole numbers</button>
+      <button class="quiz-option" onclick="answerQ(1,this,true)">A straight line is unbounded and can predict values below 0 or above 1, which are not valid probabilities</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">Linear regression requires at least two predictors</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">Binary outcomes cannot be analyzed with any regression model</button>
+    </div>
+    <div class="quiz-explain" id="qe-1">A straight line has no upper or lower bound, but a probability must stay between 0 and 1, so an unbounded line is the wrong tool.</div>
+  </div>
+  <div class="quiz-question" id="qq-2">
+    <h4><span class="q-num">2.</span>In logistic regression, the quantity ln(p / (1&minus;p)) is called the:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(2,this,false)">Residual</button>
+      <button class="quiz-option" onclick="answerQ(2,this,true)">Logit, or log-odds</button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">Rate ratio</button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">R-squared</button>
+    </div>
+    <div class="quiz-explain" id="qe-2">The logit is the natural log of the odds, p divided by 1 minus p, and it is this quantity that logistic regression models as a straight line.</div>
+  </div>
+  <div class="quiz-question" id="qq-3">
+    <h4><span class="q-num">3.</span>"Odds" of an event are defined as:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(3,this,false)">The probability of the event occurring</button>
+      <button class="quiz-option" onclick="answerQ(3,this,true)">The probability of the event occurring divided by the probability of it not occurring</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">The square of the probability</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">One minus the probability</button>
+    </div>
+    <div class="quiz-explain" id="qe-3">Odds compare the probability of an event happening to the probability of it not happening: p divided by (1 minus p).</div>
+  </div>
+  <div class="quiz-question" id="qq-4">
+    <h4><span class="q-num">4.</span>A logistic regression coefficient, once exponentiated (raised as a power of e), is interpreted as a(n):</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(4,this,false)">Correlation coefficient</button>
+      <button class="quiz-option" onclick="answerQ(4,this,true)">Odds ratio</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">Rate ratio</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">R-squared</button>
+    </div>
+    <div class="quiz-explain" id="qe-4">Exponentiating a logistic coefficient converts a change in log-odds into an odds ratio, how much the odds are multiplied per one-unit increase in x.</div>
+  </div>
+  <div class="quiz-question" id="qq-5">
+    <h4><span class="q-num">5.</span>An odds ratio of 0.6 for a predictor means that each one-unit increase in that predictor is associated with:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(5,this,false)">The probability of the outcome dropping by exactly 0.6</button>
+      <button class="quiz-option" onclick="answerQ(5,this,true)">The odds of the outcome being multiplied by 0.6, making the outcome less likely</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">The odds of the outcome increasing by 60 percent</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">No association of any kind</button>
+    </div>
+    <div class="quiz-explain" id="qe-5">An odds ratio below 1 means the odds are multiplied by a fraction less than 1, making the outcome less likely as the predictor increases.</div>
+  </div>
+  <div class="quiz-question" id="qq-6">
+    <h4><span class="q-num">6.</span>A predicted probability of default is 0.35, and the decision threshold is 0.5. The model's classification decision is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(6,this,false)">Predict default</button>
+      <button class="quiz-option" onclick="answerQ(6,this,true)">Predict no default</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">No decision can be made</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">The threshold does not affect the decision</button>
+    </div>
+    <div class="quiz-explain" id="qe-6">Since 0.35 is below the 0.5 threshold, the model predicts the outcome will not occur.</div>
+  </div>
+  <div class="quiz-question" id="qq-7">
+    <h4><span class="q-num">7.</span>A dataset where only 2 percent of cases are positive presents a particular risk for which logistic regression metric?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(7,this,false)">The odds ratio becomes undefined</button>
+      <button class="quiz-option" onclick="answerQ(7,this,true)">Classification accuracy can look high while the model fails to identify any positive cases</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">The logit can no longer be calculated</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">The model can no longer produce probabilities</button>
+    </div>
+    <div class="quiz-explain" id="qe-7">Under severe class imbalance, always predicting the majority outcome yields high accuracy while being practically useless for detecting the rare outcome.</div>
+  </div>
+  <div class="quiz-question" id="qq-8">
+    <h4><span class="q-num">8.</span>Why is Poisson regression, rather than ordinary linear regression, typically used to model event counts?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(8,this,false)">Counts can take any real number value</button>
+      <button class="quiz-option" onclick="answerQ(8,this,true)">Counts cannot be negative, and a straight line on the raw count can still predict a negative value</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">Counts are always normally distributed</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">Linear regression cannot use a quantitative predictor</button>
+    </div>
+    <div class="quiz-explain" id="qe-8">A count must be 0 or a positive whole number, but an ordinary straight line is unbounded below and can predict an impossible negative count.</div>
+  </div>
+  <div class="quiz-question" id="qq-9">
+    <h4><span class="q-num">9.</span>Poisson regression fits a straight line to which transformed quantity?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(9,this,false)">The square root of the count</button>
+      <button class="quiz-option" onclick="answerQ(9,this,true)">The natural log of the expected count, ln(&lambda;)</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">The odds of the count being zero</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">The count divided by its mean</button>
+    </div>
+    <div class="quiz-explain" id="qe-9">Poisson regression models ln(&lambda;), the log of the expected count, as a straight line in the predictors, which keeps the expected count always non-negative.</div>
+  </div>
+  <div class="quiz-question" id="qq-10">
+    <h4><span class="q-num">10.</span>A Poisson regression coefficient, once exponentiated, gives a:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(10,this,false)">Odds ratio</button>
+      <button class="quiz-option" onclick="answerQ(10,this,true)">Rate ratio</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">Correlation coefficient</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">Residual</button>
+    </div>
+    <div class="quiz-explain" id="qe-10">Exponentiating a Poisson coefficient gives a rate ratio, how much the expected count is multiplied per one-unit increase in x.</div>
+  </div>
+  <div class="quiz-question" id="qq-11">
+    <h4><span class="q-num">11.</span>In a Poisson model for weekly dengue cases, the rate ratio for rainfall is 1.004. This means:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(11,this,false)">Each extra millimeter of rainfall adds exactly 1.004 cases</button>
+      <button class="quiz-option" onclick="answerQ(11,this,true)">Each extra millimeter of rainfall multiplies the expected case count by 1.004, about a 0.4 percent increase</button>
+      <button class="quiz-option" onclick="answerQ(11,this,false)">Rainfall has no effect on case counts</button>
+      <button class="quiz-option" onclick="answerQ(11,this,false)">The probability of any case occurring is 1.004</button>
+    </div>
+    <div class="quiz-explain" id="qe-11">A rate ratio above 1 means the expected count is multiplied, not added to, so 1.004 corresponds to a 0.4 percent increase in expected count per unit of x.</div>
+  </div>
+  <div class="quiz-question" id="qq-12">
+    <h4><span class="q-num">12.</span>Overdispersion in count data refers to a situation where:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(12,this,false)">The mean of the counts is larger than expected</button>
+      <button class="quiz-option" onclick="answerQ(12,this,true)">The variance of the counts is considerably larger than the mean, violating the Poisson assumption</button>
+      <button class="quiz-option" onclick="answerQ(12,this,false)">All counts in the dataset are identical</button>
+      <button class="quiz-option" onclick="answerQ(12,this,false)">The count data contains negative values</button>
+    </div>
+    <div class="quiz-explain" id="qe-12">The Poisson distribution assumes the variance equals the mean; overdispersion is when the actual variance considerably exceeds the mean.</div>
+  </div>
+  <div class="quiz-question" id="qq-13">
+    <h4><span class="q-num">13.</span>When overdispersion is present and ignored, the main consequence of still using a plain Poisson model is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(13,this,false)">The coefficients themselves become impossible to calculate</button>
+      <button class="quiz-option" onclick="answerQ(13,this,true)">The model understates how uncertain the coefficient estimates really are</button>
+      <button class="quiz-option" onclick="answerQ(13,this,false)">The expected counts become negative</button>
+      <button class="quiz-option" onclick="answerQ(13,this,false)">The rate ratio can no longer be calculated</button>
+    </div>
+    <div class="quiz-explain" id="qe-13">Overdispersion mainly distorts the precision of estimates, making results look more statistically significant than they really are, rather than changing the point estimates much.</div>
+  </div>
+  <div class="quiz-question" id="qq-14">
+    <h4><span class="q-num">14.</span>Linear, logistic, and Poisson regression are best described as:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(14,this,false)">Three unrelated and unrelated statistical techniques</button>
+      <button class="quiz-option" onclick="answerQ(14,this,true)">Members of one family of models, differing in outcome type and link function</button>
+      <button class="quiz-option" onclick="answerQ(14,this,false)">Three names for exactly the same calculation</button>
+      <button class="quiz-option" onclick="answerQ(14,this,false)">Methods that can only be used with categorical predictors</button>
+    </div>
+    <div class="quiz-explain" id="qe-14">All three fit a straight line in the predictors and connect it to the outcome through a link function suited to that outcome's type: identity, logit, or log.</div>
+  </div>
+  <div class="quiz-footer">
+    <span class="quiz-progress-text" id="quiz-progress">0 of 14 answered</span>
+    <button class="btn btn-primary" onclick="submitQuiz()" id="btn-submit-quiz" disabled>Submit Quiz</button>
+  </div>
+  <div class="quiz-result" id="quiz-result">
+    <h3>Quiz Complete</h3>
+    <div class="score" id="quiz-score-display">0<span class="total"> / 14</span></div>
+    <div class="verdict" id="quiz-verdict"></div>
+    <p id="quiz-msg"></p>
+    <button class="btn btn-primary" onclick="retakeQuiz()">Retake Quiz</button>
+  </div>
+</div>
+</div>
+
+<!-- ========== FLASHCARDS ========== -->
+<div id="tab-flashcards" class="tab-content">
+<div class="flashcards-header">
+  <h2>&#127183; Flashcards</h2>
+  <p>20 key terms from Module 7. Click any card to reveal its definition.</p>
+</div>
+<div class="flashcards-grid" id="fc-grid"></div>
+</div>
+
+<!-- ========== REAL CASES ========== -->
+<div id="tab-cases" class="tab-content">
+<div class="cases-header">
+  <h2>&#127919; Real Cases</h2>
+  <p>Read each scenario, write your interpretation, then reveal what most people miss and what the careful reading looks like.</p>
+</div>
+
+<div class="case-card" id="case-1">
+  <h4>Case 1: A Hospital Readmission Model</h4>
+  <p class="case-prompt">A hospital fits a logistic regression predicting whether a discharged patient will be readmitted within 30 days (1 = readmitted, 0 = not), using the patient's age and number of prior admissions. The model reports an odds ratio of 1.8 for prior admissions, and a classification accuracy of 91 percent. Only 9 percent of patients in the dataset are actually readmitted.</p>
+  <p class="case-q">Is the 91 percent accuracy figure, by itself, good evidence that the model is clinically useful?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-1','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-1','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-1" onclick="markCaseWorked(1)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-1">A 91 percent accuracy figure sounds impressive on its own, and it is easy to stop reading right there.</div>
+  <div class="reveal-panel right-panel" id="right-case-1">Because only 9 percent of patients are actually readmitted, a model that simply predicted "not readmitted" for every patient would already be about 91 percent accurate, while being completely useless for the hospital's actual goal of identifying at-risk patients. The odds ratio of 1.8 for prior admissions is informative on its own terms, but accuracy alone, under this much class imbalance, says almost nothing about whether the model actually catches the patients who go on to be readmitted.</div>
+</div>
+
+<div class="case-card" id="case-2">
+  <h4>Case 2: Reading an Odds Ratio in a News Report</h4>
+  <p class="case-prompt">A news article reports that a study found smokers have "2.5 times the odds" of developing a certain respiratory condition compared to non-smokers, based on a logistic regression. A reader concludes that smokers are "2.5 times more likely" to develop the condition.</p>
+  <p class="case-q">Is restating "2.5 times the odds" as "2.5 times more likely" an accurate translation?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-2','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-2','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-2" onclick="markCaseWorked(2)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-2">Odds and probability sound close enough in everyday language that swapping one phrase for the other feels harmless.</div>
+  <div class="reveal-panel right-panel" id="right-case-2">An odds ratio of 2.5 means the odds, probability divided by its complement, are multiplied by 2.5, not the probability itself. If the baseline probability of the condition among non-smokers is small, say 2 percent, an odds ratio of 2.5 corresponds to a probability among smokers of roughly 4.8 percent, which is close to, but not exactly, 2.5 times higher. If the baseline probability were larger, say 40 percent, the same odds ratio would correspond to a probability increase that is noticeably less than a 2.5-fold jump. The two phrases are only approximately interchangeable when the outcome is rare.</div>
+</div>
+
+<div class="case-card" id="case-3">
+  <h4>Case 3: Forecasting Call Center Volume</h4>
+  <p class="case-prompt">A telecom company fits a Poisson regression predicting the expected number of customer complaint calls per day during a billing cycle, using the number of billing errors flagged that day, x. The fitted model is ln(&lambda;) = 1.2 + 0.15x, and a manager wants to use it to staff the call center for a day with 40 flagged billing errors, far more than the 0 to 10 range seen in the data used to fit the model.</p>
+  <p class="case-q">What should the manager be cautious about before staffing based on this forecast?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-3','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-3','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-3" onclick="markCaseWorked(3)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-3">A formula that exponentiates cleanly to a specific number of expected calls can feel precise and trustworthy, regardless of how far the input strays from the data that produced it.</div>
+  <div class="reveal-panel right-panel" id="right-case-3">A value of 40 flagged errors is far outside the observed range of 0 to 10, so this is extrapolation, the same risk that applied to linear regression in Module 6. Because the model is on the log scale, errors compound multiplicatively: a small misspecification near the edge of the data becomes a very large one when extrapolated to x = 40, since e raised to a large number grows extremely fast. The manager should treat any forecast this far outside the observed range as a rough guess at best, not a staffing guarantee.</div>
+</div>
+
+<div class="case-card" id="case-4">
+  <h4>Case 4: Overdispersion in Outbreak Data</h4>
+  <p class="case-prompt">A health office fits a Poisson regression for weekly dengue cases across upazilas. The mean weekly case count is 4.2, but the variance of weekly case counts is 31.6, more than seven times the mean. The office reports the rainfall coefficient as highly statistically significant.</p>
+  <p class="case-q">Given the relationship between the mean and the variance here, should the office trust the reported statistical significance at face value?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-4','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-4','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-4" onclick="markCaseWorked(4)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-4">A statistically significant coefficient from standard software output looks like a finished, trustworthy result, with no obvious sign that anything is wrong.</div>
+  <div class="reveal-panel right-panel" id="right-case-4">A variance more than seven times the mean is a clear sign of overdispersion, which violates the Poisson model's core assumption that variance equals the mean. Under overdispersion, a plain Poisson model understates the true uncertainty in its coefficients, which can make a result look statistically significant when a model that properly accounts for the extra variance, such as a negative binomial regression, would show much wider uncertainty around the same rainfall coefficient. The office should refit the model as a negative binomial regression before relying on the significance claim.</div>
+</div>
+
+</div>
+
+<button class="reset-btn" onclick="resetProgress()">&#8635; Reset Progress</button>
+
+<script>
+const STORAGE_KEY='stats101-module7-progress-v1';
+const TOTAL_SLIDES=17,TOTAL_CARDS=20,TOTAL_CASES=4,TOTAL_QUIZ=14;
+
+const flashcardData=[
+  {term:'Generalized linear model',def:'A family of regression models that fit a straight line in the predictors and connect it to the outcome through a link function suited to the outcome type; linear, logistic, and Poisson regression are all members.'},
+  {term:'Logistic regression',def:'A regression model used when the outcome is binary (0 or 1), predicting the probability that the outcome equals 1.'},
+  {term:'Logit (log-odds)',def:'The natural log of the odds, ln(p / (1 minus p)); the quantity that logistic regression models as a straight line in the predictors.'},
+  {term:'Odds',def:'The ratio of the probability of an event occurring to the probability of it not occurring: p divided by (1 minus p).'},
+  {term:'Odds ratio',def:'The exponentiated logistic regression coefficient, e to the power b1; the factor by which the odds of the outcome are multiplied per one-unit increase in x.'},
+  {term:'Sigmoid (S-shaped) curve',def:'The S-shaped curve produced when the logit line is converted back to the probability scale, always staying between 0 and 1.'},
+  {term:'Classification threshold',def:'The cutoff probability, often 0.5, used to convert a predicted probability into a yes/no decision.'},
+  {term:'Classification accuracy',def:'The proportion of cases where the predicted yes/no decision matches the actual outcome; can be misleading under class imbalance.'},
+  {term:'Class imbalance',def:'A situation where one outcome category is much rarer than the other, which can make accuracy alone a misleading measure of model quality.'},
+  {term:'Pseudo R-squared',def:'A family of measures that mimic the spirit of R-squared for logistic models, without the same direct percentage-of-variation interpretation as ordinary R-squared.'},
+  {term:'Poisson regression',def:'A regression model used when the outcome is a non-negative count, predicting the expected count, lambda, as a function of explanatory variables.'},
+  {term:'Log link',def:'The transformation, ln(lambda), that Poisson regression models as a straight line, ensuring the expected count is always non-negative.'},
+  {term:'Rate ratio',def:'The exponentiated Poisson regression coefficient, e to the power b1; the factor by which the expected count is multiplied per one-unit increase in x.'},
+  {term:'Expected count (lambda)',def:'The average or expected number of events predicted by a Poisson regression model for a given set of predictor values.'},
+  {term:'Overdispersion',def:'A situation in count data where the variance considerably exceeds the mean, violating the Poisson distribution’s assumption that variance equals the mean.'},
+  {term:'Negative binomial regression',def:'A count regression model, built on the negative binomial distribution, that allows variance to exceed the mean, correcting for overdispersion left uncorrected by a plain Poisson model.'},
+  {term:'Link function',def:'The transformation connecting the straight-line part of a generalized linear model to the outcome: identity for linear regression, logit for logistic, log for Poisson.'},
+  {term:'Partial effect (logistic or Poisson)',def:'The change attributed to a one-unit increase in a single predictor, holding all other predictors in the model constant, expressed as an odds ratio or rate ratio.'},
+  {term:'Extrapolation on the link scale',def:'Predicting for an x value far outside the observed data range; especially risky in logistic and Poisson models since small errors near the data’s edge are exponentiated into much larger errors after transforming back.'},
+  {term:'Identity link',def:'The link function used in ordinary linear regression, where the straight line is fit directly to the outcome itself with no transformation.'}
+];
+
+let state={slidesViewed:new Set(),quizScore:null,cardsFlipped:new Set(),casesWorked:new Set(),quizAnswers:{},quizSubmitted:false,currentSlide:1};
+
+function loadState(){
+  try{const s=localStorage.getItem(STORAGE_KEY);if(s){const p=JSON.parse(s);state.slidesViewed=new Set(p.slidesViewed||[]);state.quizScore=p.quizScore!==undefined?p.quizScore:null;state.cardsFlipped=new Set(p.cardsFlipped||[]);state.casesWorked=new Set(p.casesWorked||[]);state.quizAnswers=p.quizAnswers||{};state.quizSubmitted=p.quizSubmitted||false;state.currentSlide=p.currentSlide||1;}}catch(e){}
+}
+function saveState(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify({slidesViewed:[...state.slidesViewed],quizScore:state.quizScore,cardsFlipped:[...state.cardsFlipped],casesWorked:[...state.casesWorked],quizAnswers:state.quizAnswers,quizSubmitted:state.quizSubmitted,currentSlide:state.currentSlide}));}catch(e){}
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');btn.classList.add('active');
+}
+
+const prevBtn=document.getElementById('prevBtn');
+const nextBtn=document.getElementById('nextBtn');
+function showSlide(n){
+  if(n<1||n>TOTAL_SLIDES)return;
+  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+  document.getElementById('slide-'+n).classList.add('active');
+  state.currentSlide=n;state.slidesViewed.add(n);saveState();updateSlideUI();updateStats();
+}
+function updateSlideUI(){
+  const n=state.currentSlide;
+  document.getElementById('slide-counter').textContent='Slide '+n+' of '+TOTAL_SLIDES;
+  document.getElementById('slide-progress').style.width=(n/TOTAL_SLIDES*100)+'%';
+  prevBtn.disabled=n===1;
+  nextBtn.textContent=n===TOTAL_SLIDES?'Finish ✓':'Next →';
+}
+prevBtn.addEventListener('click',()=>showSlide(state.currentSlide-1));
+nextBtn.addEventListener('click',()=>{if(state.currentSlide<TOTAL_SLIDES)showSlide(state.currentSlide+1);});
+document.addEventListener('keydown',e=>{
+  const activeTab=document.querySelector('.tab-content.active');
+  if(!activeTab||activeTab.id!=='tab-slides')return;
+  if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
+  if(e.key==='ArrowRight'){e.preventDefault();nextBtn.click();}
+  else if(e.key==='ArrowLeft'){e.preventDefault();prevBtn.click();}
+});
+
+let quizAnswered=0,quizCorrect=0;
+function startQuiz(){document.querySelector('.quiz-intro').style.display='none';document.getElementById('quiz-questions').style.display='block';if(state.quizSubmitted)restoreQuizState();}
+function answerQ(qNum,btn,correct){
+  const qq=document.getElementById('qq-'+qNum);if(qq.classList.contains('answered'))return;
+  qq.classList.add('answered');qq.querySelectorAll('.quiz-option').forEach(o=>o.classList.add('disabled'));
+  btn.classList.add(correct?'correct':'wrong');if(correct)quizCorrect++;
+  document.getElementById('qe-'+qNum).classList.add('show');
+  state.quizAnswers[qNum]=correct;quizAnswered++;
+  document.getElementById('quiz-progress').textContent=quizAnswered+' of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=quizAnswered<TOTAL_QUIZ;saveState();
+}
+function submitQuiz(){
+  state.quizScore=quizCorrect;state.quizSubmitted=true;saveState();
+  document.getElementById('quiz-score-display').innerHTML=quizCorrect+'<span class="total"> / '+TOTAL_QUIZ+'</span>';
+  const v=document.getElementById('quiz-verdict'),m=document.getElementById('quiz-msg');
+  if(quizCorrect>=13){v.textContent='Excellent';v.className='verdict great';m.textContent='Strong command of logistic regression, Poisson regression, and their interpretation.';}
+  else if(quizCorrect>=9){v.textContent='Good';v.className='verdict good';m.textContent='Solid. Review the explanations on questions you missed.';}
+  else{v.textContent='Keep going';v.className='verdict ok';m.textContent='Revisit the slides on the logit, odds ratio, log link, and rate ratio before retaking.';}
+  document.getElementById('quiz-result').classList.add('show');updateStats();
+}
+function retakeQuiz(){
+  state.quizScore=null;state.quizSubmitted=false;state.quizAnswers={};quizCorrect=0;quizAnswered=0;saveState();
+  document.getElementById('quiz-result').classList.remove('show');
+  document.querySelectorAll('.quiz-question').forEach(q=>{q.classList.remove('answered');q.querySelectorAll('.quiz-option').forEach(o=>o.classList.remove('correct','wrong','disabled'));q.querySelectorAll('.quiz-explain').forEach(e=>e.classList.remove('show'));});
+  document.getElementById('quiz-progress').textContent='0 of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=true;updateStats();
+}
+function restoreQuizState(){
+  Object.entries(state.quizAnswers).forEach(([qNum,correct])=>{
+    const qq=document.getElementById('qq-'+qNum);if(!qq)return;
+    qq.classList.add('answered');qq.querySelectorAll('.quiz-option').forEach(o=>o.classList.add('disabled'));
+    document.getElementById('qe-'+qNum).classList.add('show');quizAnswered++;if(correct)quizCorrect++;
+  });
+  document.getElementById('quiz-progress').textContent=quizAnswered+' of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=quizAnswered<TOTAL_QUIZ;
+  if(state.quizSubmitted)submitQuiz();
+}
+
+function buildFlashcards(){
+  const grid=document.getElementById('fc-grid');
+  flashcardData.forEach((fc,i)=>{
+    const div=document.createElement('div');div.className='flashcard'+(state.cardsFlipped.has(i)?' flipped':'');
+    div.innerHTML='<div class="flashcard-inner"><div class="flashcard-front">'+fc.term+'<span class="fc-hint">Click to reveal definition</span></div><div class="flashcard-back">'+fc.def+'</div></div>';
+    div.addEventListener('click',()=>{div.classList.toggle('flipped');state.cardsFlipped.add(i);saveState();updateStats();});
+    grid.appendChild(div);
+  });
+}
+
+function revealCase(id,type){document.getElementById(type+'-'+id).classList.add('show');}
+function markCaseWorked(n){
+  state.casesWorked.add(n);saveState();
+  const btn=document.getElementById('worked-case-'+n);btn.textContent='Worked';btn.classList.add('done');updateStats();
+}
+
+function updateStats(){
+  document.getElementById('stat-slides').textContent=Math.round(state.slidesViewed.size/TOTAL_SLIDES*100)+'%';
+  document.getElementById('stat-quiz').textContent=state.quizScore!==null?state.quizScore+' / '+TOTAL_QUIZ:'—';
+  document.getElementById('stat-cards').textContent=state.cardsFlipped.size+' / '+TOTAL_CARDS;
+  document.getElementById('stat-cases').textContent=state.casesWorked.size+' / '+TOTAL_CASES;
+}
+function resetProgress(){if(!confirm('Reset all progress for this module?'))return;localStorage.removeItem(STORAGE_KEY);location.reload();}
+
+loadState();buildFlashcards();showSlide(state.currentSlide);updateStats();
+if(state.quizSubmitted){document.querySelector('.quiz-intro').style.display='none';document.getElementById('quiz-questions').style.display='block';restoreQuizState();}
+state.casesWorked.forEach(n=>{const btn=document.getElementById('worked-case-'+n);if(btn){btn.textContent='Worked';btn.classList.add('done');}});
+</script>
+</div>
+</body>
+</html>
