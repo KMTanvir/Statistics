@@ -183,7 +183,7 @@ header.mod-header p.mod-instructor{font-size:13px;opacity:.8;margin-top:14px;pad
 <div class="app">
 
 <header class="mod-header">
-  <span class="mod-badge">Module 3 of 16</span>
+  <span class="mod-badge">Module 3 of 17</span>
   <h1>Measures of Central Tendency</h1>
   <p class="mod-sub">Mean, median, and mode: three different answers to "what is typical," and why picking the wrong one can mislead an entire room.</p>
   <p class="mod-instructor"><strong>K.M. Tanvir</strong> &nbsp;·&nbsp; Statistics for Non-Statisticians</p>
@@ -192,8 +192,8 @@ header.mod-header p.mod-instructor{font-size:13px;opacity:.8;margin-top:14px;pad
 <div class="stats-bar">
   <div class="stat"><div class="stat-value" id="stat-slides">0%</div><div class="stat-label">Slides Viewed</div></div>
   <div class="stat"><div class="stat-value" id="stat-quiz">&#8212;</div><div class="stat-label">Quiz Score</div></div>
-  <div class="stat"><div class="stat-value" id="stat-cards">0 / 16</div><div class="stat-label">Cards Flipped</div></div>
-  <div class="stat"><div class="stat-value" id="stat-cases">0 / 4</div><div class="stat-label">Cases Worked</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cards">0 / 18</div><div class="stat-label">Cards Flipped</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cases">0 / 5</div><div class="stat-label">Cases Worked</div></div>
 </div>
 
 <div class="tabs">
@@ -207,7 +207,7 @@ header.mod-header p.mod-instructor{font-size:13px;opacity:.8;margin-top:14px;pad
 <div id="tab-slides" class="tab-content active">
 <div class="card">
   <div class="progress-bar"><div class="progress-fill" id="slide-progress"></div></div>
-  <div class="slide-counter" id="slide-counter">Slide 1 of 11</div>
+  <div class="slide-counter" id="slide-counter">Slide 1 of 14</div>
 
   <!-- S1: objectives -->
   <div class="slide active" id="slide-1">
@@ -219,6 +219,8 @@ header.mod-header p.mod-instructor{font-size:13px;opacity:.8;margin-top:14px;pad
       <li>Explain why the mean is sensitive to outliers and skewness while the median is resistant</li>
       <li>Choose the most appropriate measure of center given the variable type and distribution shape</li>
       <li>Compute a weighted mean and explain why simple averaging is sometimes incorrect</li>
+      <li>Compute a geometric mean and explain why the arithmetic mean overstates average growth rates</li>
+      <li>Compute a harmonic mean and explain why the arithmetic mean misstates average rates such as speed</li>
       <li>Recognize situations where a reported "average" misrepresents what is typical</li>
     </ul>
     <div class="tip-box"><strong>Continuing from Module 2:</strong> You already organized the 2,000-student BMI dataset into a frequency table and several charts. This module asks the next natural question: if you could report just one number to describe this distribution, which number, and why?</div>
@@ -420,8 +422,57 @@ header.mod-header p.mod-instructor{font-size:13px;opacity:.8;margin-top:14px;pad
     <div class="warn-box"><strong>The two answers differ.</strong> The unweighted mean incorrectly treats a 2-credit course the same as a 4-credit course. Since Programming carries the most credit hours and the lowest grade point, ignoring credit weight overstates the GPA. Whenever observations represent different amounts (credit hours, population sizes, transaction volumes), the weighted mean is the correct calculation.</div>
   </div>
 
-  <!-- S10: when average misleads -->
+  <!-- S10: geometric mean -->
   <div class="slide" id="slide-10">
+    <h2>The Geometric Mean</h2>
+    <p>The arithmetic mean adds values and divides by their count. That works when values combine by <em>addition</em>. But growth rates, interest rates, and ratios combine by <em>multiplication</em>: a 20% gain followed by a 20% loss does not cancel out, because the loss is taken on a larger base. For such quantities, the correct average is the <strong>geometric mean</strong>, the nth root of the product of n values.</p>
+    <div class="formula-box">\[ GM = \sqrt[n]{x_1 \times x_2 \times \cdots \times x_n} = \left( \prod_{i=1}^{n} x_i \right)^{1/n} \]</div>
+    <div class="example-box"><strong>Worked example: a three-year investment.</strong> A mutual fund's value changes by growth factors of 1.20 (a 20% gain) in Year 1, 1.50 (a 50% gain) in Year 2, and 0.60 (a 40% loss) in Year 3.
+    <br><br>Arithmetic mean of the percentage changes = (20 + 50 &minus; 40) / 3 = <strong>10% per year</strong>, suggesting steady healthy growth.
+    <br><br>What actually happened: ending value = 1.20 &times; 1.50 &times; 0.60 = <strong>1.08</strong> times the starting value, an 8% total gain over three years, not three years of 10% gains compounding to roughly 33%.
+    <br><br>Geometric mean growth factor = (1.08)<sup>1/3</sup> &asymp; <strong>1.026</strong>, a true average annual growth rate of about <strong>2.6%</strong>, not 10%.</div>
+    <div class="warn-box"><strong>Why the arithmetic mean fails here:</strong> the arithmetic mean of growth rates ignores compounding and treats a gain and a loss of the same percentage as if they offset each other. They do not: losing 40% from a larger post-gain base destroys far more value than the percentage alone suggests. The geometric mean is calculated on the growth <em>factors</em> (1.20, 1.50, 0.60), not on the percentages directly, which is why it correctly reflects the compounding path the investment actually took.</div>
+    <div class="tip-box"><strong>Where this matters:</strong> compound annual growth rate (CAGR) of an investment or an economy, average inflation rate over several years, population growth rate, and any index number built by chaining ratios together (such as a price index) should be averaged geometrically, not arithmetically.</div>
+  </div>
+
+  <!-- S11: harmonic mean -->
+  <div class="slide" id="slide-11">
+    <h2>The Harmonic Mean</h2>
+    <p>Some quantities are themselves ratios, such as speed (distance per time) or efficiency (output per input). When several such rates apply to <em>equal amounts of the denominator</em>, the arithmetic mean overstates the true overall rate. The correct average is the <strong>harmonic mean</strong>, defined as the number of values divided by the sum of their reciprocals.</p>
+    <div class="formula-box">\[ HM = \frac{n}{\displaystyle\sum_{i=1}^{n} \frac{1}{x_i}} = \frac{n}{\frac{1}{x_1} + \frac{1}{x_2} + \cdots + \frac{1}{x_n}} \]</div>
+    <div class="example-box"><strong>Worked example: a bus route.</strong> A bus covers the first half of a 240 km route at 40 km/h and the second half at 60 km/h. What is its average speed for the whole trip?
+    <br><br>Arithmetic mean of the two speeds = (40 + 60) / 2 = <strong>50 km/h</strong>, which looks like the obvious answer.
+    <br><br>Actual travel time: first 120 km at 40 km/h takes 120/40 = 3 hours; second 120 km at 60 km/h takes 120/60 = 2 hours. Total time = 5 hours for 240 km, so the true average speed = 240 / 5 = <strong>48 km/h</strong>.
+    <br><br>Harmonic mean = 2 / (1/40 + 1/60) = 2 / (0.025 + 0.01667) = 2 / 0.04167 = <strong>48 km/h</strong>, exactly matching the true average speed.</div>
+    <div class="warn-box"><strong>Why the arithmetic mean fails here:</strong> the bus spends more time traveling at the slower speed (3 hours) than at the faster speed (2 hours), since the two legs cover equal distance, not equal time. Arithmetic averaging of the two speeds implicitly assumes equal time at each speed, which is wrong here, and so it overstates the true average. The harmonic mean automatically weights each rate by how much time (or input) it actually consumed.</div>
+    <div class="tip-box"><strong>Where this matters:</strong> average speed over equal distances, average price paid when investing a fixed amount of money each period regardless of unit price (dollar-cost averaging), and averaging ratios such as the price-to-earnings ratio across companies of different sizes are all classic harmonic mean situations.</div>
+  </div>
+
+  <!-- S12: comparing the three means -->
+  <div class="slide" id="slide-12">
+    <h2>Comparing the Three Means</h2>
+    <p>For any set of positive, non-constant values, the three means always sit in the same order: the arithmetic mean is the largest, the geometric mean is in the middle, and the harmonic mean is the smallest. They are equal only when every value in the dataset is identical.</p>
+    <div class="formula-box">\[ AM \ge GM \ge HM \]</div>
+    <div class="example-box"><strong>Checking the bus example:</strong> speeds 40 and 60. AM = 50.0, GM = &radic;(40&times;60) = &radic;2400 &asymp; 48.99, HM = 48.0. Indeed 50.0 &gt; 48.99 &gt; 48.0, confirming the inequality.</div>
+    <svg viewBox="0 0 700 130" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;margin:10px auto;display:block;">
+      <text x="10" y="22" font-size="10" font-weight="700" fill="#94a3b8" font-family="Inter,sans-serif" letter-spacing="0.5">QUANTITY BEING AVERAGED</text>
+      <text x="460" y="22" font-size="10" font-weight="700" fill="#94a3b8" font-family="Inter,sans-serif" letter-spacing="0.5">CORRECT MEAN</text>
+      <line x1="0" y1="28" x2="700" y2="28" stroke="#e2e8f0" stroke-width="1"/>
+      <rect x="0" y="30"  width="700" height="30" rx="4" fill="#eff6ff"/>
+      <rect x="0" y="64"  width="700" height="30" rx="4" fill="#fef3c7"/>
+      <rect x="0" y="98"  width="700" height="30" rx="4" fill="#f0fdf4"/>
+      <text x="10" y="50" font-size="13" fill="#1e40af" font-family="Inter,sans-serif">Quantities that add up naturally (scores, heights, salaries)</text>
+      <text x="460" y="50" font-size="13" font-weight="700" fill="#1e40af" font-family="Inter,sans-serif">Arithmetic mean</text>
+      <text x="10" y="84" font-size="13" fill="#92400e" font-family="Inter,sans-serif">Growth rates, ratios, and index numbers that compound</text>
+      <text x="460" y="84" font-size="13" font-weight="700" fill="#92400e" font-family="Inter,sans-serif">Geometric mean</text>
+      <text x="10" y="118" font-size="13" fill="#065f46" font-family="Inter,sans-serif">Rates (per unit time, per unit money) over equal denominators</text>
+      <text x="460" y="118" font-size="13" font-weight="700" fill="#065f46" font-family="Inter,sans-serif">Harmonic mean</text>
+    </svg>
+    <div class="tip-box"><strong>The general lesson:</strong> "take the average" is not one operation, it is a family of operations, and using the wrong one produces a number that is arithmetically valid but practically wrong, exactly like using the mean instead of the median for skewed income data.</div>
+  </div>
+
+  <!-- S13: when average misleads -->
+  <div class="slide" id="slide-13">
     <h2>When "Average" Misleads</h2>
     <p>A reported average is a single number standing in for an entire distribution. When the underlying distribution is highly skewed, that single number can create a badly distorted impression of what is typical.</p>
     <div class="example-box"><strong>A small garment factory reports an "average monthly salary" of 20,762 taka across its 21 employees.</strong> Nineteen sewing-machine operators earn 12,000 taka each, one line supervisor earns 28,000 taka, and the factory manager earns 1,80,000 taka.</div>
@@ -439,10 +490,10 @@ header.mod-header p.mod-instructor{font-size:13px;opacity:.8;margin-top:14px;pad
     <div class="tip-box"><strong>This pattern recurs constantly:</strong> national income statistics, house prices, company salaries, and city-level wealth figures are all commonly skewed by a small number of very high values. Whenever you read "the average is X," it is worth asking whether the median would tell a different story.</div>
   </div>
 
-  <!-- S11: recap -->
-  <div class="slide" id="slide-11">
+  <!-- S14: recap -->
+  <div class="slide" id="slide-14">
     <h2>Module 3 Recap</h2>
-    <p class="slide-sub">Six principles to carry forward:</p>
+    <p class="slide-sub">Eight principles to carry forward:</p>
     <ul class="takeaway-list">
       <li><span class="t-num">1</span>The mean uses every value and is the algebraic balancing point of the data, but it is sensitive to outliers and skewness.</li>
       <li><span class="t-num">2</span>The median depends only on rank, splits the data exactly in half, and is resistant to extreme values.</li>
@@ -450,6 +501,8 @@ header.mod-header p.mod-instructor{font-size:13px;opacity:.8;margin-top:14px;pad
       <li><span class="t-num">4</span>In a right-skewed distribution, Mean &gt; Median &gt; Mode. In a left-skewed distribution, the order reverses. In a symmetric distribution, all three coincide.</li>
       <li><span class="t-num">5</span>For grouped data, the mean uses class midpoints, while the median and mode use interpolation formulas that locate a value within the relevant class.</li>
       <li><span class="t-num">6</span>A weighted mean is required whenever observations carry different importance. Skewed real-world quantities like income are best summarized by the median, not the mean.</li>
+      <li><span class="t-num">7</span>The geometric mean, the nth root of the product of n values, is the correct average for growth rates and ratios, since growth compounds multiplicatively rather than adding.</li>
+      <li><span class="t-num">8</span>The harmonic mean, n divided by the sum of the reciprocals, is the correct average for rates such as speed when equal amounts of the denominator (distance, money, work) are involved at each rate. For any positive dataset that is not constant, AM &gt; GM &gt; HM.</li>
     </ul>
     <div class="tip-box"><strong>Next:</strong> Module 4 moves from center to spread, measuring how dispersed a distribution is using range, variance, standard deviation, and shape descriptors like skewness and kurtosis.</div>
   </div>
@@ -467,7 +520,7 @@ header.mod-header p.mod-instructor{font-size:13px;opacity:.8;margin-top:14px;pad
 <div id="tab-quiz" class="tab-content">
 <div class="quiz-intro">
   <h2>&#128221; Module Quiz</h2>
-  <p>10 questions on mean, median, mode, and their use in grouped and weighted data.</p>
+  <p>12 questions on mean, median, mode, geometric mean, harmonic mean, and their use in grouped and weighted data.</p>
   <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
 </div>
 <div id="quiz-questions" style="display:none;">
@@ -571,13 +624,33 @@ header.mod-header p.mod-instructor{font-size:13px;opacity:.8;margin-top:14px;pad
     </div>
     <div class="quiz-explain" id="qe-10">When the mean substantially exceeds the median, the distribution is right-skewed: a small number of unusually high values (such as a manager's much larger salary) pull the mean upward while the median, being resistant to outliers, remains close to what most employees actually earn.</div>
   </div>
+  <div class="quiz-question" id="qq-11">
+    <h4><span class="q-num">11.</span>An investment grows by factors of 1.20, 1.50, and 0.60 over three successive years. Why is the arithmetic mean of the percentage changes (20%, 50%, &minus;40%) misleading?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(11,this,false)">It is not misleading; the arithmetic mean is always correct for percentages</button>
+      <button class="quiz-option" onclick="answerQ(11,this,true)">It ignores compounding; the loss is taken on a larger base, so the true average growth rate is much lower than the arithmetic mean suggests</button>
+      <button class="quiz-option" onclick="answerQ(11,this,false)">The percentages should have been added without dividing by 3</button>
+      <button class="quiz-option" onclick="answerQ(11,this,false)">The harmonic mean would give the same answer as the arithmetic mean here</button>
+    </div>
+    <div class="quiz-explain" id="qe-11">The arithmetic mean of 10% per year implies roughly 33% total growth, but the actual outcome is 1.20 &times; 1.50 &times; 0.60 = 1.08, only 8% total growth. The geometric mean, about 2.6% per year, correctly reflects the compounding path, since growth combines multiplicatively, not additively.</div>
+  </div>
+  <div class="quiz-question" id="qq-12">
+    <h4><span class="q-num">12.</span>A bus travels the first half of a route at 40 km/h and the second half (equal distance) at 60 km/h. What is the correct way to average these two speeds?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(12,this,false)">Arithmetic mean: (40+60)/2 = 50 km/h</button>
+      <button class="quiz-option" onclick="answerQ(12,this,true)">Harmonic mean: 2 / (1/40 + 1/60) = 48 km/h</button>
+      <button class="quiz-option" onclick="answerQ(12,this,false)">Geometric mean: &radic;(40&times;60) &asymp; 49 km/h</button>
+      <button class="quiz-option" onclick="answerQ(12,this,false)">Mode: there is no mode, so no average exists</button>
+    </div>
+    <div class="quiz-explain" id="qe-12">Since the two legs cover equal distance, not equal time, the bus spends more time at the slower speed. The harmonic mean (48 km/h) correctly equals total distance divided by total time; the arithmetic mean (50 km/h) overstates the true average speed.</div>
+  </div>
   <div class="quiz-footer">
-    <span class="quiz-progress-text" id="quiz-progress">0 of 10 answered</span>
+    <span class="quiz-progress-text" id="quiz-progress">0 of 12 answered</span>
     <button class="btn btn-primary" onclick="submitQuiz()" id="btn-submit-quiz" disabled>Submit Quiz</button>
   </div>
   <div class="quiz-result" id="quiz-result">
     <h3>Quiz Complete</h3>
-    <div class="score" id="quiz-score-display">0<span class="total"> / 10</span></div>
+    <div class="score" id="quiz-score-display">0<span class="total"> / 12</span></div>
     <div class="verdict" id="quiz-verdict"></div>
     <p id="quiz-msg"></p>
     <button class="btn btn-primary" onclick="retakeQuiz()">Retake Quiz</button>
@@ -589,7 +662,7 @@ header.mod-header p.mod-instructor{font-size:13px;opacity:.8;margin-top:14px;pad
 <div id="tab-flashcards" class="tab-content">
 <div class="flashcards-header">
   <h2>&#127183; Flashcards</h2>
-  <p>16 key terms from Module 3. Click any card to reveal its definition.</p>
+  <p>18 key terms from Module 3. Click any card to reveal its definition.</p>
 </div>
 <div class="flashcards-grid" id="fc-grid"></div>
 </div>
@@ -657,13 +730,27 @@ header.mod-header p.mod-instructor{font-size:13px;opacity:.8;margin-top:14px;pad
   <div class="reveal-panel right-panel" id="right-case-4">This is incorrect because the sections have very different sizes. Simply averaging the three means treats each section as equally important, even though Section B (60 students) represents far more students than Section A (15 students). The correct approach is a weighted mean using section size as weights: (15 &times; 72 + 60 &times; 80 + 25 &times; 65) / (15+60+25) = (1,080 + 4,800 + 1,625) / 100 = 7,505 / 100 = 75.05. The properly weighted course-wide average (75.05) is noticeably higher than the naive calculation (72.3), because it correctly gives Section B's strong performance more influence, proportional to its larger enrollment.</div>
 </div>
 
+<div class="case-card" id="case-5">
+  <h4>Case 5: An Asset Manager's "Average Annual Return"</h4>
+  <p class="case-prompt">An asset manager advertises a mutual fund's performance: "the fund has averaged a 10% annual return over the past three years." Internal records show the fund's actual year-by-year growth factors were 1.20, 1.50, and 0.60 (a 20% gain, a 50% gain, then a 40% loss), and the arithmetic mean of these three percentage changes is indeed (20 + 50 &minus; 40) / 3 = 10%.</p>
+  <p class="case-q">If you invested 100,000 taka at the start of Year 1, is the advertised "10% average annual return" consistent with what your investment would actually be worth at the end of Year 3?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-5','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-5','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-5" onclick="markCaseWorked(5)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-5">A "10% average annual return" sounds like it implies the investment would be worth roughly 100,000 &times; (1.10)<sup>3</sup> &asymp; 133,100 taka after three years, and the 10% arithmetic-mean figure is not actually a fabricated number, which makes the advertisement feel honest.</div>
+  <div class="reveal-panel right-panel" id="right-case-5">The actual ending value is 100,000 &times; 1.20 &times; 1.50 &times; 0.60 = <strong>108,000 taka</strong>, an 8% total gain over three years, nowhere near the 33% growth a true 10% annual return would have produced. The honest "average annual return" is the geometric mean growth rate, (1.08)<sup>1/3</sup> &minus; 1 &asymp; <strong>2.6% per year</strong>, the rate that, compounded for three years, reproduces the actual 108,000 taka outcome. The advertised figure used the arithmetic mean of the percentage changes, which is the wrong average for a compounding quantity and substantially overstates real performance. This is precisely why financial regulators generally require fund returns to be reported as compound annual growth rate (a geometric mean), not as a simple average of yearly percentage changes.</div>
+</div>
+
 </div>
 
 <button class="reset-btn" onclick="resetProgress()">&#8635; Reset Progress</button>
 
 <script>
 const STORAGE_KEY='stats101-module3-progress-v1';
-const TOTAL_SLIDES=11,TOTAL_CARDS=16,TOTAL_CASES=4,TOTAL_QUIZ=10;
+const TOTAL_SLIDES=14,TOTAL_CARDS=18,TOTAL_CASES=5,TOTAL_QUIZ=12;
 
 const flashcardData=[
   {term:'Mean (arithmetic mean)',def:'The sum of all values divided by the number of values. The algebraic balancing point of the data. Sensitive to outliers and skewness.'},
@@ -681,7 +768,9 @@ const flashcardData=[
   {term:'Median class',def:'The class interval in a grouped frequency distribution that contains the n/2 position, identified using cumulative frequency.'},
   {term:'Modal class',def:'The class interval in a grouped frequency distribution with the highest frequency, used as the basis for estimating the mode.'},
   {term:'Weighted mean',def:'A mean in which each value is multiplied by a weight reflecting its relative importance before summing and dividing by the total weight.'},
-  {term:'Cumulative frequency (CF)',def:'The running total of frequencies up to and including a given class, used to locate the median class in grouped data.'}
+  {term:'Cumulative frequency (CF)',def:'The running total of frequencies up to and including a given class, used to locate the median class in grouped data.'},
+  {term:'Geometric mean',def:'The nth root of the product of n values: GM = (x1 times x2 times ... times xn)^(1/n). The correct average for growth rates, ratios, and index numbers that compound multiplicatively.'},
+  {term:'Harmonic mean',def:'The number of values divided by the sum of their reciprocals: HM = n / sum(1/xi). The correct average for rates such as speed when each rate applies to an equal amount of the denominator.'}
 ];
 
 let state={slidesViewed:new Set(),quizScore:null,cardsFlipped:new Set(),casesWorked:new Set(),quizAnswers:{},quizSubmitted:false,currentSlide:1};
@@ -746,8 +835,8 @@ function submitQuiz(){
   state.quizScore=quizCorrect;state.quizSubmitted=true;saveState();
   document.getElementById('quiz-score-display').innerHTML=quizCorrect+'<span class="total"> / '+TOTAL_QUIZ+'</span>';
   const v=document.getElementById('quiz-verdict'),m=document.getElementById('quiz-msg');
-  if(quizCorrect>=9){v.textContent='Excellent';v.className='verdict great';m.textContent='Strong command of central tendency concepts.';}
-  else if(quizCorrect>=7){v.textContent='Good';v.className='verdict good';m.textContent='Solid. Review the explanations on questions you missed.';}
+  if(quizCorrect>=11){v.textContent='Excellent';v.className='verdict great';m.textContent='Strong command of central tendency concepts.';}
+  else if(quizCorrect>=8){v.textContent='Good';v.className='verdict good';m.textContent='Solid. Review the explanations on questions you missed.';}
   else{v.textContent='Keep going';v.className='verdict ok';m.textContent='Revisit the slides on skewness and grouped-data formulas before retaking.';}
   document.getElementById('quiz-result').classList.add('show');updateStats();
 }
