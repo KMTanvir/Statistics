@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 12: Normal Distribution</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;
+  --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#dbeafe;
+  --accent:#4f46e5;--success:#059669;--success-light:#d1fae5;
+  --danger:#dc2626;--danger-light:#fee2e2;
+  --warning:#d97706;--warning-light:#fef3c7;
+  --border:#e2e8f0;
+  --shadow:0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.08),0 4px 10px rgba(0,0,0,.04);
+  --radius:12px;--radius-sm:8px;--transition:.2s cubic-bezier(.4,0,.2,1);
+}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;}
+.app{max-width:1100px;margin:0 auto;padding:24px 20px 80px;}
+header.mod-header{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%);color:#fff;padding:32px 28px;border-radius:var(--radius);margin-bottom:20px;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;}
+header.mod-header::before{content:"";position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:rgba(255,255,255,.08);border-radius:50%;}
+header.mod-header::after{content:"";position:absolute;bottom:-30px;right:80px;width:100px;height:100px;background:rgba(255,255,255,.05);border-radius:50%;}
+.mod-badge{display:inline-block;background:rgba(255,255,255,.2);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:.5px;position:relative;z-index:1;}
+header.mod-header h1{font-size:28px;margin:12px 0 8px;font-weight:700;position:relative;z-index:1;}
+header.mod-header p.mod-sub{font-size:14px;opacity:.88;max-width:640px;position:relative;z-index:1;}
+header.mod-header p.mod-instructor{font-size:13px;opacity:.8;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.2);position:relative;z-index:1;}
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;padding:14px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;}
+.stat{text-align:center;padding:6px;}
+.stat .stat-value{font-size:22px;font-weight:700;color:var(--primary);line-height:1.2;}
+.stat .stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:2px;}
+.tabs{display:flex;gap:4px;background:#fff;padding:6px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;flex-wrap:wrap;}
+.tab-btn{flex:1;min-width:110px;padding:11px 16px;background:transparent;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;transition:all var(--transition);font-family:inherit;}
+.tab-btn:hover{background:var(--bg);color:var(--text);}
+.tab-btn.active{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.28);}
+.tab-content{display:none;animation:fadeIn .28s ease-in-out;}
+.tab-content.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);margin-bottom:16px;}
+.progress-bar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:12px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:3px;transition:width .4s ease;}
+.slide-counter{text-align:center;color:var(--muted);font-size:13px;margin-bottom:14px;font-weight:500;}
+.slide{display:none;min-height:440px;padding:4px;animation:slideIn .3s ease;}
+.slide.active{display:block;}
+@keyframes slideIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+.slide h2{font-size:26px;margin-bottom:6px;color:var(--primary-dark);font-weight:700;line-height:1.25;}
+.slide h3{font-size:18px;margin:20px 0 8px;color:var(--text);font-weight:600;}
+.slide p{margin-bottom:12px;color:#334155;}
+.slide ul,.slide ol{margin:0 0 14px 22px;}
+.slide li{margin-bottom:7px;color:#334155;}
+.slide .slide-sub{color:var(--muted);font-size:15px;margin-bottom:18px;font-style:italic;}
+.obj-list{list-style:none;padding:0;margin:14px 0;}
+.obj-list li{padding:9px 0 9px 32px;position:relative;color:#334155;border-bottom:1px solid var(--border);}
+.obj-list li:last-child{border-bottom:none;}
+.obj-list li::before{content:"";position:absolute;left:0;top:13px;width:18px;height:18px;background:var(--success-light);border-radius:50%;}
+.obj-list li::after{content:"✓";position:absolute;left:3px;top:10px;color:var(--success);font-size:11px;font-weight:700;}
+.example-box{background:var(--primary-light);border-left:4px solid var(--primary);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.example-box strong{color:var(--primary-dark);}
+.tip-box{background:var(--success-light);border-left:4px solid var(--success);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.tip-box strong{color:var(--success);}
+.warn-box{background:var(--warning-light);border-left:4px solid var(--warning);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.warn-box strong{color:var(--warning);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:14px 0;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:14px 0;}
+.def-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;}
+.def-card .def-term{font-weight:700;color:var(--primary-dark);font-size:15px;margin-bottom:6px;}
+.def-card .def-body{font-size:14px;color:#334155;}
+.formula-box{background:#0f172a;color:#e2e8f0;padding:18px 22px;border-radius:var(--radius-sm);margin:14px 0;text-align:center;font-size:16px;overflow-x:auto;}
+.freq-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;}
+.freq-table th{background:var(--primary);color:#fff;padding:9px 12px;text-align:left;font-weight:600;}
+.freq-table th:not(:first-child),.freq-table td:not(:first-child){text-align:right;}
+.freq-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:#334155;}
+.freq-table tr:nth-child(even) td{background:#f8fafc;}
+.freq-table tr.total-row td{font-weight:700;background:var(--primary-light);color:var(--primary-dark);border-top:2px solid var(--primary);}
+.freq-table tr.highlight-row td{background:#fef3c7;}
+.freq-table th:first-child{border-radius:8px 0 0 0;}.freq-table th:last-child{border-radius:0 8px 0 0;}
+.practice{background:#f1f5f9;border:2px dashed #cbd5e1;border-radius:var(--radius-sm);padding:18px;margin:20px 0;}
+.practice h4{color:var(--primary);margin-bottom:10px;font-size:15px;}
+.practice-q{margin-bottom:10px;color:var(--text);font-weight:500;}
+.practice-options{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+.practice-btn{padding:8px 14px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;font-size:14px;transition:all var(--transition);color:var(--text);}
+.practice-btn:hover{border-color:var(--primary);background:var(--primary-light);}
+.practice-btn.correct{background:var(--success-light);border-color:var(--success);color:var(--success);font-weight:600;}
+.practice-btn.wrong{background:var(--danger-light);border-color:var(--danger);color:var(--danger);}
+.practice-btn.disabled{pointer-events:none;opacity:.75;}
+.practice-feedback{margin-top:10px;padding:10px 14px;border-radius:6px;font-size:14px;display:none;}
+.practice-feedback.show{display:block;}
+.practice-feedback.right{background:var(--success-light);color:var(--success);border:1px solid var(--success);}
+.practice-feedback.wrong{background:var(--danger-light);color:var(--danger);border:1px solid var(--danger);}
+.slide-nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border);gap:10px;flex-wrap:wrap;}
+.key-hint{font-size:12px;color:var(--muted);}
+.kbd{display:inline-block;background:#f1f5f9;border:1px solid var(--border);border-bottom-width:2px;border-radius:4px;padding:1px 6px;font-family:monospace;font-size:11px;color:var(--text);}
+.btn{padding:10px 20px;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;transition:all var(--transition);font-family:inherit;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover:not(:disabled){background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,.28);}
+.btn-primary:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover:not(:disabled){background:var(--bg);color:var(--text);}
+.btn-ghost:disabled{opacity:.45;cursor:not-allowed;}
+.quiz-intro{background:#fff;padding:22px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;text-align:center;}
+.quiz-intro h2{color:var(--primary-dark);margin-bottom:8px;}
+.quiz-intro p{color:var(--muted);margin-bottom:14px;}
+.quiz-question{background:#fff;border-radius:var(--radius);padding:22px;margin-bottom:14px;box-shadow:var(--shadow);border:1px solid var(--border);}
+.quiz-question h4{font-size:16px;margin-bottom:14px;color:var(--text);font-weight:600;}
+.q-num{color:var(--primary);font-weight:700;margin-right:6px;}
+.quiz-options{display:grid;gap:8px;}
+.quiz-option{padding:11px 16px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:#fff;transition:all var(--transition);font-size:14px;color:var(--text);text-align:left;font-family:inherit;}
+.quiz-option:hover{border-color:var(--primary);background:var(--primary-light);transform:translateX(2px);}
+.quiz-option.correct{border-color:var(--success);background:var(--success-light);color:var(--success);font-weight:600;}
+.quiz-option.wrong{border-color:var(--danger);background:var(--danger-light);color:var(--danger);}
+.quiz-option.disabled{pointer-events:none;}
+.quiz-explain{display:none;margin-top:10px;padding:10px 14px;background:#f8fafc;border-left:3px solid var(--primary);border-radius:4px;font-size:13px;color:#334155;}
+.quiz-explain.show{display:block;}
+.quiz-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px 20px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);flex-wrap:wrap;}
+.quiz-progress-text{font-size:13px;color:var(--muted);}
+.quiz-result{display:none;padding:30px;background:linear-gradient(135deg,#f0fdf4 0%,#dbeafe 100%);border-radius:var(--radius);text-align:center;margin-top:16px;box-shadow:var(--shadow);}
+.quiz-result.show{display:block;}
+.quiz-result h3{font-size:24px;margin-bottom:10px;color:var(--primary-dark);}
+.quiz-result .score{font-size:48px;font-weight:700;color:var(--primary);margin:14px 0;line-height:1;}
+.quiz-result .score .total{font-size:26px;color:var(--muted);}
+.quiz-result p{color:#334155;margin-bottom:16px;font-size:15px;}
+.verdict{display:inline-block;padding:6px 14px;border-radius:16px;font-weight:600;font-size:14px;margin-bottom:8px;}
+.verdict.great{background:var(--success-light);color:var(--success);}
+.verdict.good{background:var(--primary-light);color:var(--primary-dark);}
+.verdict.ok{background:var(--warning-light);color:var(--warning);}
+.flashcards-header{background:#fff;padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;text-align:center;}
+.flashcards-header h2{color:var(--primary-dark);margin-bottom:6px;}
+.flashcards-header p{color:var(--muted);font-size:14px;}
+.flashcards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+.flashcard{perspective:1000px;height:170px;cursor:pointer;}
+.flashcard-inner{position:relative;width:100%;height:100%;transition:transform .55s;transform-style:preserve-3d;}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+.flashcard-front,.flashcard-back{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:var(--shadow);}
+.flashcard-front{background:linear-gradient(135deg,#fff 0%,#f8fafc 100%);border:2px solid var(--primary-light);color:var(--primary-dark);font-weight:600;font-size:16px;}
+.flashcard-front .fc-hint{font-size:11px;color:var(--muted);font-weight:400;margin-top:8px;font-style:italic;}
+.flashcard-back{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%);color:#fff;transform:rotateY(180deg);font-size:13px;line-height:1.55;}
+.cases-header{background:#fff;padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;}
+.cases-header h2{color:var(--primary-dark);margin-bottom:6px;}
+.cases-header p{color:var(--muted);font-size:14px;}
+.case-card{background:#fff;border-radius:var(--radius);padding:24px;margin-bottom:16px;box-shadow:var(--shadow);border-left:4px solid var(--primary);}
+.case-card h4{font-size:16px;color:var(--primary-dark);font-weight:700;margin-bottom:12px;}
+.case-prompt{color:#334155;font-size:15px;margin-bottom:14px;line-height:1.6;}
+.case-q{font-weight:600;color:var(--text);margin-bottom:12px;font-size:15px;}
+.case-textarea{width:100%;min-height:80px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;resize:vertical;background:#f8fafc;color:var(--text);transition:border-color var(--transition);}
+.case-textarea:focus{outline:none;border-color:var(--primary);background:#fff;}
+.reveal-btns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+.reveal-btn{padding:8px 16px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;transition:all var(--transition);}
+.reveal-btn.miss{color:var(--warning);border-color:var(--warning);}
+.reveal-btn.miss:hover{background:var(--warning-light);}
+.reveal-btn.right{color:var(--success);border-color:var(--success);}
+.reveal-btn.right:hover{background:var(--success-light);}
+.reveal-panel{display:none;margin-top:12px;padding:14px 16px;border-radius:var(--radius-sm);font-size:14px;line-height:1.6;}
+.reveal-panel.show{display:block;}
+.reveal-panel.miss-panel{background:var(--warning-light);border-left:3px solid var(--warning);color:#78350f;}
+.reveal-panel.right-panel{background:var(--success-light);border-left:3px solid var(--success);color:#064e3b;}
+.case-worked-btn{margin-top:10px;padding:6px 14px;background:var(--primary-light);color:var(--primary-dark);border:none;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;}
+.case-worked-btn.done{background:var(--success-light);color:var(--success);}
+.takeaway-list{list-style:none;padding:0;margin:16px 0;}
+.takeaway-list li{padding:12px 16px 12px 48px;position:relative;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:10px;font-size:15px;color:#1e293b;border:1px solid var(--border);}
+.takeaway-list li .t-num{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:24px;height:24px;background:var(--primary);color:#fff;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.reset-btn{position:fixed;bottom:18px;right:18px;background:#fff;border:1px solid var(--border);padding:8px 14px;border-radius:20px;font-size:13px;color:var(--muted);cursor:pointer;box-shadow:var(--shadow);font-family:inherit;transition:all var(--transition);z-index:100;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.cricket-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;}
+.cricket-table th{background:#1e293b;color:#fff;padding:7px 8px;text-align:center;font-weight:600;}
+.cricket-table td{padding:6px 8px;text-align:center;border-bottom:1px solid var(--border);color:#334155;}
+.cricket-table tr:nth-child(even) td{background:#f8fafc;}
+@media(max-width:720px){
+  .app{padding:14px 12px 80px;}
+  header.mod-header{padding:22px 18px;}
+  header.mod-header h1{font-size:22px;}
+  .card{padding:20px 16px;}
+  .two-col,.three-col{grid-template-columns:1fr;}
+  .stats-bar{grid-template-columns:repeat(2,1fr);}
+  .slide h2{font-size:22px;}
+  .freq-table,.cricket-table{font-size:12px;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="mod-header">
+  <span class="mod-badge">Module 12 of 17</span>
+  <h1>Normal Distribution</h1>
+  <p class="mod-sub">The bell curve, the empirical rule, z-scores, and the standard normal table. Why this one shape appears in exam scores, heights, and measurement errors everywhere.</p>
+  <p class="mod-instructor"><strong>K.M. Tanvir</strong> &nbsp;·&nbsp; Statistics for Non-Statisticians</p>
+</header>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-value" id="stat-slides">0%</div><div class="stat-label">Slides Viewed</div></div>
+  <div class="stat"><div class="stat-value" id="stat-quiz">&#8212;</div><div class="stat-label">Quiz Score</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cards">0 / 20</div><div class="stat-label">Cards Flipped</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cases">0 / 4</div><div class="stat-label">Cases Worked</div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('slides',this)">&#128214; Slides</button>
+  <button class="tab-btn" onclick="switchTab('quiz',this)">&#128221; Quiz</button>
+  <button class="tab-btn" onclick="switchTab('flashcards',this)">&#127183; Flashcards</button>
+  <button class="tab-btn" onclick="switchTab('cases',this)">&#127919; Real Cases</button>
+</div>
+
+<!-- ========== SLIDES ========== -->
+<div id="tab-slides" class="tab-content active">
+<div class="card">
+  <div class="progress-bar"><div class="progress-fill" id="slide-progress"></div></div>
+  <div class="slide-counter" id="slide-counter">Slide 1 of 15</div>
+  <!-- S1: objectives -->
+  <div class="slide active" id="slide-1">
+    <h2>Normal Distribution</h2>
+    <p class="slide-sub">Module 12 &nbsp;·&nbsp; By the end of this module, you will be able to:</p>
+    <ul class="obj-list">
+      <li>Describe the key properties of the normal distribution and explain why it appears so often in real data</li>
+      <li>Apply the empirical rule to estimate proportions within 1, 2, and 3 standard deviations of the mean</li>
+      <li>Calculate and interpret a z-score</li>
+      <li>Use the standard normal table to find probabilities and to solve inverse (percentile) problems</li>
+      <li>Apply the normal approximation to the binomial distribution, including the continuity correction</li>
+      <li>Recognize signs that real data does not follow a normal distribution</li>
+    </ul>
+    <div class="tip-box"><strong>A change in kind, not just degree:</strong> every distribution since Module 9 (binomial, negative binomial, Poisson) has been discrete, counting whole numbers of successes or events. The normal distribution is continuous: the variable can take any value along a number line, and probabilities correspond to areas under a curve rather than heights of bars.</div>
+  </div>
+
+  <!-- S2: properties -->
+  <div class="slide" id="slide-2">
+    <h2>Properties of the Normal Distribution</h2>
+    <p>The normal distribution, often called the bell curve, is the single most important continuous distribution in statistics. It is defined completely by two parameters: the mean &mu; and the standard deviation &sigma;.</p>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Symmetric and bell-shaped</div><div class="def-body">The curve is a perfect mirror image around its center, with the highest point at the mean.</div></div>
+      <div class="def-card"><div class="def-term">Mean = median = mode</div><div class="def-body">All three measures of central tendency from Module 3 coincide at the same central value.</div></div>
+    </div>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Total area equals 1</div><div class="def-body">As with any continuous probability distribution, the entire area under the curve represents a total probability of 1, or 100%.</div></div>
+      <div class="def-card"><div class="def-term">Asymptotic tails</div><div class="def-body">The curve approaches, but never quite touches, the horizontal axis, extending infinitely in both directions.</div></div>
+    </div>
+    <div class="tip-box"><strong>Why it shows up so often:</strong> many real-world measurements, such as height, blood pressure, and measurement error, arise from the combined effect of many small, independent influences. This tendency is formalized later in the Central Limit Theorem (Module 14), which explains why averages in particular gravitate toward this exact shape.</div>
+  </div>
+
+  <!-- S3: empirical rule -->
+  <div class="slide" id="slide-3">
+    <h2>The Empirical Rule</h2>
+    <p>For any normal distribution, fixed proportions of the data fall within 1, 2, and 3 standard deviations of the mean. This is known as the empirical rule, or the 68-95-99.7 rule.</p>
+    <div class="formula-box">\[ P(\mu-\sigma < X < \mu+\sigma) \approx 68\%, \quad P(\mu-2\sigma < X < \mu+2\sigma) \approx 95\%, \quad P(\mu-3\sigma < X < \mu+3\sigma) \approx 99.7\% \]</div>
+    <div class="example-box"><strong>Worked example:</strong> the height of adult women in Bangladesh is approximately normal with &mu; = 151 cm and &sigma; = 6 cm.
+    <br>&bull; About 68% fall between 145 cm and 157 cm (&mu; &plusmn; 1&sigma;).
+    <br>&bull; About 95% fall between 139 cm and 163 cm (&mu; &plusmn; 2&sigma;).
+    <br>&bull; About 99.7% fall between 133 cm and 169 cm (&mu; &plusmn; 3&sigma;).</div>
+    <div class="tip-box"><strong>Quick diagnostic use:</strong> a value beyond 3 standard deviations from the mean is rare enough (about 0.3% of cases, split between both tails) that it is often worth a second look, whether as a genuine outlier or a data entry error.</div>
+  </div>
+
+  <!-- S4: z-score -->
+  <div class="slide" id="slide-4">
+    <h2>Standardizing: the Z-Score</h2>
+    <p>A z-score measures how many standard deviations a value lies above or below the mean. It converts any normal distribution into a common scale for comparison.</p>
+    <div class="formula-box">\[ z = \frac{x - \mu}{\sigma} \]</div>
+    <p>A positive z-score means the value lies above the mean; a negative z-score means it lies below the mean. A z-score of 0 means the value equals the mean exactly.</p>
+    <div class="example-box"><strong>Worked example:</strong> a woman is 160 cm tall, in a population with &mu; = 151 cm and &sigma; = 6 cm.
+    <br>z = (160 &minus; 151) / 6 = 9 / 6 = <strong>1.5</strong>.
+    <br>This woman's height is 1.5 standard deviations above the average.</div>
+  </div>
+
+  <!-- S5: standard normal distribution and table -->
+  <div class="slide" id="slide-5">
+    <h2>The Standard Normal Distribution</h2>
+    <p>Every normal distribution, once converted to z-scores, becomes the same standard normal distribution: a normal distribution with &mu; = 0 and &sigma; = 1. This is what makes a single reference table useful for any normal distribution, regardless of its original mean and standard deviation.</p>
+    <div class="example-box"><strong>Reading the standard normal table:</strong> the table gives &Phi;(z), the cumulative probability P(Z &le; z), the area under the curve to the left of a given z-score. For example, &Phi;(1.5) = 0.9332 means 93.32% of the standard normal distribution lies at or below z = 1.5.</div>
+    <div class="tip-box"><strong>Symmetry shortcut:</strong> because the standard normal curve is symmetric around 0, &Phi;(&minus;z) = 1 &minus; &Phi;(z). This means a table of only positive z-values is enough to answer questions about negative z-values as well.</div>
+  </div>
+
+  <!-- S6: probability lookups -->
+  <div class="slide" id="slide-6">
+    <h2>Three Kinds of Probability Questions</h2>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">"Less than" — P(X &lt; x)</div><div class="def-body">Convert to a z-score, then read &Phi;(z) directly from the table.</div></div>
+      <div class="def-card"><div class="def-term">"Greater than" — P(X &gt; x)</div><div class="def-body">Use the complement rule: P(X &gt; x) = 1 &minus; &Phi;(z).</div></div>
+    </div>
+    <div class="def-card" style="margin-top:14px;"><div class="def-term">"Between" two values — P(a &lt; X &lt; b)</div><div class="def-body">Convert both endpoints to z-scores, z<sub>a</sub> and z<sub>b</sub>, then compute &Phi;(z<sub>b</sub>) &minus; &Phi;(z<sub>a</sub>).</div></div>
+    <div class="tip-box"><strong>This mirrors the complement rule</strong> introduced in Module 8 and reused throughout Modules 9 through 11: it remains the fastest route to "greater than" or "at least" questions for the normal distribution too.</div>
+  </div>
+
+  <!-- S7: worked example greater than -->
+  <div class="slide" id="slide-7">
+    <h2>Worked Example: "Greater Than"</h2>
+    <p>Exam scores for a large class follow a normal distribution with &mu; = 70 and &sigma; = 10. What proportion of students scored above 85?</p>
+    <div class="formula-box">\[ z = \frac{85 - 70}{10} = 1.5 \]</div>
+    <div class="example-box">From the standard normal table, &Phi;(1.5) = 0.9332.
+    <br>P(X &gt; 85) = 1 &minus; &Phi;(1.5) = 1 &minus; 0.9332 = <strong>0.0668</strong>, about 6.7% of students scored above 85.</div>
+    <div class="tip-box">Notice this is the same z-score and the same probability as the height example on Slide 4: once standardized, the underlying units (centimeters or exam points) no longer matter to the calculation.</div>
+  </div>
+
+  <!-- S8: worked example between -->
+  <div class="slide" id="slide-8">
+    <h2>Worked Example: "Between"</h2>
+    <p>Returning to the height distribution (&mu; = 151 cm, &sigma; = 6 cm), what proportion of women have heights between 145 cm and 157 cm?</p>
+    <div class="formula-box">\[ z_1 = \frac{145-151}{6} = -1, \qquad z_2 = \frac{157-151}{6} = 1 \]</div>
+    <div class="example-box">&Phi;(1) = 0.8413 and &Phi;(&minus;1) = 1 &minus; 0.8413 = 0.1587.
+    <br>P(145 &lt; X &lt; 157) = &Phi;(1) &minus; &Phi;(&minus;1) = 0.8413 &minus; 0.1587 = <strong>0.6826</strong>, about 68.3%.</div>
+    <div class="tip-box"><strong>Confirming the empirical rule:</strong> 145 cm and 157 cm are exactly &mu; &minus; 1&sigma; and &mu; + 1&sigma;. The exact calculation, 68.3%, matches the approximate 68% from the empirical rule on Slide 3, showing the rule is simply a convenient rounding of the exact standard normal areas.</div>
+  </div>
+
+  <!-- S9: inverse problems -->
+  <div class="slide" id="slide-9">
+    <h2>Inverse Problems: Finding a Value from a Percentile</h2>
+    <p>Sometimes the probability is known and the corresponding value of x is the unknown. This reverses the standard table lookup: find the z-score for the target probability first, then convert back to the original scale.</p>
+    <div class="formula-box">\[ x = \mu + z\sigma \]</div>
+    <div class="example-box"><strong>Worked example:</strong> for the exam scores (&mu;=70, &sigma;=10), what score marks the 90th percentile, the score that 90% of students scored at or below?
+    <br>From the standard normal table, the z-score with &Phi;(z) = 0.90 is z &asymp; 1.2816.
+    <br>x = 70 + (1.2816)(10) = 70 + 12.816 &asymp; <strong>82.8</strong>.
+    <br>A score of about 82.8 marks the 90th percentile of this exam.</div>
+  </div>
+
+  <!-- S10: normal approx to binomial -->
+  <div class="slide" id="slide-10">
+    <h2>The Normal Approximation to the Binomial</h2>
+    <p>Recall from Module 9 that for large n, with np and n(1&minus;p) both reasonably large (a common rule of thumb is at least 5, though 10 is often preferred), the binomial distribution is well approximated by a normal distribution with the same mean and standard deviation.</p>
+    <div class="formula-box">\[ \text{Binomial}(n,p) \approx \text{Normal}(\mu = np, \ \sigma = \sqrt{np(1-p)}) \]</div>
+    <div class="warn-box"><strong>The continuity correction:</strong> the binomial distribution is discrete (whole numbers only) while the normal distribution is continuous, so each whole number x is treated as covering the interval from x &minus; 0.5 to x + 0.5. "P(X &le; 55)" in the binomial becomes "P(X &lt; 55.5)" when approximated by the normal, a small adjustment that meaningfully improves accuracy.</div>
+  </div>
+
+  <!-- S11: worked example normal approx -->
+  <div class="slide" id="slide-11">
+    <h2>Worked Example: Normal Approximation with Continuity Correction</h2>
+    <p>A fair coin (p = 0.5) is flipped 100 times (n = 100). What is the approximate probability of 55 or fewer heads?</p>
+    <div class="formula-box">\[ \mu = np = 50, \qquad \sigma = \sqrt{np(1-p)} = \sqrt{25} = 5 \]</div>
+    <div class="example-box">Applying the continuity correction, P(X &le; 55) becomes P(X &lt; 55.5) in the normal approximation.
+    <br>z = (55.5 &minus; 50) / 5 = 5.5 / 5 = 1.1.
+    <br>&Phi;(1.1) = 0.8643, so P(X &le; 55) &asymp; <strong>0.8643</strong>.</div>
+    <div class="tip-box">This approximate value (0.8643) is very close to the exact binomial probability, illustrating why the normal approximation is so widely used when n is large enough to make direct binomial calculation by hand impractical.</div>
+  </div>
+
+  <!-- S12: when data is not normal -->
+  <div class="slide" id="slide-12">
+    <h2>Recognizing Non-Normal Data</h2>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Skewness</div><div class="def-body">If mean, median, and mode clearly differ (Module 3), or if a histogram has a long tail on one side, the data is skewed, not normal. Income and rare-event counts are commonly right-skewed.</div></div>
+      <div class="def-card"><div class="def-term">Bounded data</div><div class="def-body">Data with a hard floor or ceiling, such as percentages (0 to 100) or counts (0 and above), often cannot be normal, especially when the mean sits close to that boundary.</div></div>
+    </div>
+    <div class="warn-box"><strong>A common mistake:</strong> applying the empirical rule or z-score lookups to data that is visibly skewed or bounded produces probability estimates that can be badly wrong, since both tools assume the symmetric, unbounded shape of the true normal curve.</div>
+    <div class="tip-box"><strong>Practical check:</strong> before relying on normal-based methods, examine a histogram for symmetry, compare the mean and median, and consider whether the variable has a natural boundary that the normal distribution's infinite tails would violate.</div>
+  </div>
+
+  <!-- S13: CLT preview -->
+  <div class="slide" id="slide-13">
+    <h2>Looking Ahead: Why Averages Tend to Be Normal</h2>
+    <p>Even when individual measurements are not normal, something remarkable happens to their averages. If many independent samples are drawn from almost any distribution and their means are calculated, the distribution of those sample means becomes approximately normal as the sample size grows, regardless of the shape of the original data.</p>
+    <div class="tip-box"><strong>This is the Central Limit Theorem</strong>, explored in full in Module 14. It explains why normal-based methods remain useful even for studying sample averages drawn from skewed or unusual populations, and it is the foundation for nearly all of the estimation and hypothesis-testing methods later in this course.</div>
+  </div>
+
+  <!-- S14: anchor recap example -->
+  <div class="slide" id="slide-14">
+    <h2>Bringing It Together: Blood Pressure Screening</h2>
+    <p>A community health program measures systolic blood pressure in a large adult population, finding an approximately normal distribution with &mu; = 120 mmHg and &sigma; = 12 mmHg. The program flags anyone above 140 mmHg for follow-up.</p>
+    <div class="example-box"><strong>What proportion of the population gets flagged?</strong>
+    <br>z = (140 &minus; 120) / 12 = 20/12 &asymp; 1.667.
+    <br>&Phi;(1.667) &asymp; 0.9522, so P(X &gt; 140) &asymp; 1 &minus; 0.9522 = <strong>0.0478</strong>, about 4.8% of the population.</div>
+    <div class="tip-box"><strong>Planning implication:</strong> if the program expects to screen 5,000 people, it should budget follow-up capacity for roughly 5,000 &times; 0.0478 &asymp; 239 individuals, a concrete operational number derived directly from the normal model rather than guesswork.</div>
+  </div>
+
+  <!-- S15: recap -->
+  <div class="slide" id="slide-15">
+    <h2>Module 12 Recap</h2>
+    <ul class="takeaway-list">
+      <li><span class="t-num">1</span>The normal distribution is continuous, symmetric, and bell-shaped, fully described by &mu; and &sigma;.</li>
+      <li><span class="t-num">2</span>The empirical rule gives quick estimates: about 68%, 95%, and 99.7% of data fall within 1, 2, and 3 standard deviations of the mean.</li>
+      <li><span class="t-num">3</span>The z-score, z=(x&minus;&mu;)/&sigma;, converts any normal distribution to the standard normal distribution for table lookups.</li>
+      <li><span class="t-num">4</span>The standard normal table answers "less than," "greater than" (via the complement rule), and "between" probability questions.</li>
+      <li><span class="t-num">5</span>Inverse problems reverse the lookup: find z for a target probability, then solve x=&mu;+z&sigma;.</li>
+      <li><span class="t-num">6</span>The normal distribution approximates the binomial well for large n, using the continuity correction for accuracy.</li>
+      <li><span class="t-num">7</span>Skewed or boundary-limited data violates the assumptions behind the empirical rule and z-score lookups.</li>
+      <li><span class="t-num">8</span>The Central Limit Theorem (Module 14) explains why sample averages tend toward normality even when individual data does not.</li>
+    </ul>
+    <div class="tip-box"><strong>Next module:</strong> Module 13 turns to the exponential distribution, which models the waiting time between events in a Poisson process, completing the close relationship between counts of events (Poisson) and time between them (exponential).</div>
+  </div>
+
+  <div class="slide-nav">
+    <button class="btn btn-ghost" id="prevBtn">&larr; Previous</button>
+    <span class="key-hint">Use <span class="kbd">&larr;</span> <span class="kbd">&rarr;</span> arrow keys to navigate</span>
+    <button class="btn btn-primary" id="nextBtn">Next &rarr;</button>
+  </div>
+</div>
+</div>
+
+<!-- ========== QUIZ ========== -->
+<div id="tab-quiz" class="tab-content">
+<div class="quiz-intro">
+  <h2>&#128221; Module Quiz</h2>
+  <p>15 questions on the empirical rule, z-scores, the standard normal table, inverse percentile problems, and the normal approximation to the binomial.</p>
+  <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
+</div>
+<div id="quiz-questions" style="display:none;">
+  <div class="quiz-question" id="qq-1">
+    <h4><span class="q-num">1.</span>Which of the following is NOT a property of the normal distribution?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(1,this,false)">It is symmetric around the mean</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">Mean, median, and mode are equal</button>
+      <button class="quiz-option" onclick="answerQ(1,this,true)">It is bounded between 0 and 1</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">The total area under the curve equals 1</button>
+    </div>
+    <div class="quiz-explain" id="qe-1">The normal distribution's tails extend infinitely in both directions; it is not bounded between 0 and 1.</div>
+  </div>
+  <div class="quiz-question" id="qq-2">
+    <h4><span class="q-num">2.</span>According to the empirical rule, approximately what percentage of normally distributed data falls within 2 standard deviations of the mean?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(2,this,false)">68%</button>
+      <button class="quiz-option" onclick="answerQ(2,this,true)">95%</button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">99.7%</button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">50%</button>
+    </div>
+    <div class="quiz-explain" id="qe-2">About 95% of data in a normal distribution falls within 2 standard deviations of the mean.</div>
+  </div>
+  <div class="quiz-question" id="qq-3">
+    <h4><span class="q-num">3.</span>A value has z = -2. This means:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(3,this,false)">The value is 2 units above the mean</button>
+      <button class="quiz-option" onclick="answerQ(3,this,true)">The value is 2 standard deviations below the mean</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">The value equals -2</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">The standard deviation is negative</button>
+    </div>
+    <div class="quiz-explain" id="qe-3">A negative z-score indicates the value lies below the mean, specifically by that many standard deviations.</div>
+  </div>
+  <div class="quiz-question" id="qq-4">
+    <h4><span class="q-num">4.</span>Heights are normal with &mu;=151cm, &sigma;=6cm. What is the z-score for a height of 163cm?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(4,this,false)">1.0</button>
+      <button class="quiz-option" onclick="answerQ(4,this,true)">2.0</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">12</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">0.5</button>
+    </div>
+    <div class="quiz-explain" id="qe-4">z = (163-151)/6 = 12/6 = 2.0.</div>
+  </div>
+  <div class="quiz-question" id="qq-5">
+    <h4><span class="q-num">5.</span>If &Phi;(1.5) = 0.9332, what is P(Z &gt; 1.5)?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(5,this,true)">0.0668</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">0.9332</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">1.5</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">0.4332</button>
+    </div>
+    <div class="quiz-explain" id="qe-5">P(Z &gt; 1.5) = 1 - &Phi;(1.5) = 1 - 0.9332 = 0.0668, by the complement rule.</div>
+  </div>
+  <div class="quiz-question" id="qq-6">
+    <h4><span class="q-num">6.</span>Why does a single standard normal table work for any normal distribution, regardless of its original &mu; and &sigma;?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(6,this,true)">Because converting to z-scores standardizes every normal distribution to the same &mu;=0, &sigma;=1 distribution</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">Because all normal distributions have the same &mu; and &sigma; already</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">Because the table only applies to height and weight data</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">Because z-scores eliminate the need for a mean</button>
+    </div>
+    <div class="quiz-explain" id="qe-6">Standardizing via the z-score formula converts any normal distribution to the standard normal distribution (&mu;=0, &sigma;=1), which is what the table tabulates.</div>
+  </div>
+  <div class="quiz-question" id="qq-7">
+    <h4><span class="q-num">7.</span>Exam scores are normal with &mu;=70, &sigma;=10. What proportion of students scored above 85?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(7,this,false)">0.9332</button>
+      <button class="quiz-option" onclick="answerQ(7,this,true)">0.0668</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">1.5</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">0.15</button>
+    </div>
+    <div class="quiz-explain" id="qe-7">z=(85-70)/10=1.5, so P(X&gt;85)=1-&Phi;(1.5)=1-0.9332=0.0668.</div>
+  </div>
+  <div class="quiz-question" id="qq-8">
+    <h4><span class="q-num">8.</span>For heights N(151,6), what is P(145 &lt; X &lt; 157)?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(8,this,false)">0.9332</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">0.1587</button>
+      <button class="quiz-option" onclick="answerQ(8,this,true)">0.6826</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">1.0</button>
+    </div>
+    <div class="quiz-explain" id="qe-8">145 and 157 are &mu;&plusmn;1&sigma;, so P(145&lt;X&lt;157)=&Phi;(1)-&Phi;(-1)=0.8413-0.1587=0.6826, matching the empirical rule's 68%.</div>
+  </div>
+  <div class="quiz-question" id="qq-9">
+    <h4><span class="q-num">9.</span>To find the exam score marking the 90th percentile (&mu;=70, &sigma;=10, z&asymp;1.2816 for the 90th percentile), which formula is used?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(9,this,false)">z = (x-&mu;)/&sigma;</button>
+      <button class="quiz-option" onclick="answerQ(9,this,true)">x = &mu; + z&sigma;</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">x = &mu;/&sigma;</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">x = z/&sigma;</button>
+    </div>
+    <div class="quiz-explain" id="qe-9">Inverse problems use x=&mu;+z&sigma;, solving for x once the target z-score is known: x=70+1.2816(10)&asymp;82.8.</div>
+  </div>
+  <div class="quiz-question" id="qq-10">
+    <h4><span class="q-num">10.</span>The normal approximation to the binomial works well when:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(10,this,false)">n is small and p is close to 0 or 1</button>
+      <button class="quiz-option" onclick="answerQ(10,this,true)">n is large, with np and n(1-p) both reasonably large</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">p always equals 0.5</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">The trials are not independent</button>
+    </div>
+    <div class="quiz-explain" id="qe-10">The approximation is reliable when n is large enough that np and n(1-p) are both reasonably large, commonly at least 5 or 10.</div>
+  </div>
+  <div class="quiz-question" id="qq-11">
+    <h4><span class="q-num">11.</span>The continuity correction adjusts P(X &le; 55) in a discrete binomial to which value before applying the normal approximation?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(11,this,false)">P(X &lt; 54.5)</button>
+      <button class="quiz-option" onclick="answerQ(11,this,true)">P(X &lt; 55.5)</button>
+      <button class="quiz-option" onclick="answerQ(11,this,false)">P(X &lt; 56)</button>
+      <button class="quiz-option" onclick="answerQ(11,this,false)">No adjustment is needed</button>
+    </div>
+    <div class="quiz-explain" id="qe-11">Each discrete value x is treated as covering x&plusmn;0.5, so P(X&le;55) becomes P(X&lt;55.5) for the continuous normal approximation.</div>
+  </div>
+  <div class="quiz-question" id="qq-12">
+    <h4><span class="q-num">12.</span>For n=100 coin flips (p=0.5), what are &mu; and &sigma; for the normal approximation?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(12,this,false)">&mu;=100, &sigma;=50</button>
+      <button class="quiz-option" onclick="answerQ(12,this,true)">&mu;=50, &sigma;=5</button>
+      <button class="quiz-option" onclick="answerQ(12,this,false)">&mu;=50, &sigma;=25</button>
+      <button class="quiz-option" onclick="answerQ(12,this,false)">&mu;=0.5, &sigma;=0.05</button>
+    </div>
+    <div class="quiz-explain" id="qe-12">&mu;=np=50, &sigma;=&radic;(np(1-p))=&radic;25=5.</div>
+  </div>
+  <div class="quiz-question" id="qq-13">
+    <h4><span class="q-num">13.</span>A variable's histogram shows a long right tail, and its mean is noticeably larger than its median. This indicates:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(13,this,false)">The variable is normally distributed</button>
+      <button class="quiz-option" onclick="answerQ(13,this,true)">The variable is right-skewed, and normal-based methods may not apply well</button>
+      <button class="quiz-option" onclick="answerQ(13,this,false)">The standard deviation must be zero</button>
+      <button class="quiz-option" onclick="answerQ(13,this,false)">The empirical rule will be exactly accurate</button>
+    </div>
+    <div class="quiz-explain" id="qe-13">A long right tail with mean exceeding median is a classic sign of right skew, violating the symmetry assumption behind the empirical rule and z-score lookups.</div>
+  </div>
+  <div class="quiz-question" id="qq-14">
+    <h4><span class="q-num">14.</span>Why might it be inappropriate to apply normal-distribution methods directly to a variable bounded between 0 and 100 (such as a percentage) when its mean is close to 95?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(14,this,true)">Because the normal distribution's infinite tails would predict impossible values beyond 100, given how close the mean is to the boundary</button>
+      <button class="quiz-option" onclick="answerQ(14,this,false)">Because percentages cannot have a standard deviation</button>
+      <button class="quiz-option" onclick="answerQ(14,this,false)">Because z-scores cannot be calculated for percentages</button>
+      <button class="quiz-option" onclick="answerQ(14,this,false)">There is no issue; the normal distribution always applies to percentages</button>
+    </div>
+    <div class="quiz-explain" id="qe-14">With the mean near a hard boundary, the symmetric, unbounded normal curve would assign meaningful probability beyond the boundary (above 100), which is impossible for the real variable.</div>
+  </div>
+  <div class="quiz-question" id="qq-15">
+    <h4><span class="q-num">15.</span>The Central Limit Theorem, previewed in this module and covered fully in Module 14, states that:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(15,this,false)">Individual data points always become normally distributed with a large enough sample</button>
+      <button class="quiz-option" onclick="answerQ(15,this,true)">The distribution of sample means tends toward normality as sample size grows, regardless of the original data's shape</button>
+      <button class="quiz-option" onclick="answerQ(15,this,false)">Only data that is already normal can have a normal sampling distribution</button>
+      <button class="quiz-option" onclick="answerQ(15,this,false)">The mean and standard deviation change every time a new sample is drawn from the same population</button>
+    </div>
+    <div class="quiz-explain" id="qe-15">The Central Limit Theorem concerns the distribution of sample means (not individual values), which approaches normality as sample size increases, regardless of the shape of the underlying population.</div>
+  </div>
+  <div class="quiz-footer">
+    <span class="quiz-progress-text" id="quiz-progress">0 of 15 answered</span>
+    <button class="btn btn-primary" onclick="submitQuiz()" id="btn-submit-quiz" disabled>Submit Quiz</button>
+  </div>
+  <div class="quiz-result" id="quiz-result">
+    <h3>Quiz Complete</h3>
+    <div class="score" id="quiz-score-display">0<span class="total"> / 15</span></div>
+    <div class="verdict" id="quiz-verdict"></div>
+    <p id="quiz-msg"></p>
+    <button class="btn btn-primary" onclick="retakeQuiz()">Retake Quiz</button>
+  </div>
+</div>
+</div>
+
+<!-- ========== FLASHCARDS ========== -->
+<div id="tab-flashcards" class="tab-content">
+<div class="flashcards-header">
+  <h2>&#127183; Flashcards</h2>
+  <p>20 key terms from Module 12. Click any card to reveal its definition.</p>
+</div>
+<div class="flashcards-grid" id="fc-grid"></div>
+</div>
+
+<!-- ========== REAL CASES ========== -->
+<div id="tab-cases" class="tab-content">
+<div class="cases-header">
+  <h2>&#127919; Real Cases</h2>
+  <p>Read each scenario, write your interpretation, then reveal what most people miss and what the careful reading looks like.</p>
+</div>
+
+<div class="case-card" id="case-1">
+  <h4>Case 1: Setting a Blood Pressure Screening Threshold</h4>
+  <p class="case-prompt">A health program models systolic blood pressure as normal with &mu;=120 mmHg, &sigma;=12 mmHg, and flags anyone above 140 mmHg for follow-up. A colleague suggests lowering the threshold to 130 mmHg to "catch more at-risk people," without first checking how many more that would flag.</p>
+  <p class="case-q">What should be calculated before deciding whether to lower the threshold?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-1','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-1','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-1" onclick="markCaseWorked(1)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-1">Lowering a threshold to "catch more people" sounds purely beneficial, since it seems to only add coverage without any downside worth quantifying.</div>
+  <div class="reveal-panel right-panel" id="right-case-1">At 140 mmHg, z=(140-120)/12&asymp;1.667, giving P(X&gt;140)&asymp;4.78% flagged. At 130 mmHg, z=(130-120)/12&asymp;0.833, giving P(X&gt;130)&asymp;1-&Phi;(0.833)&asymp;20.2% flagged, more than four times as many people. Before changing the threshold, the program should calculate exactly how many more people the new cutoff would flag and weigh that against available follow-up capacity, rather than adjusting the number on intuition alone.</div>
+</div>
+
+<div class="case-card" id="case-2">
+  <h4>Case 2: Misapplying the Empirical Rule to Income</h4>
+  <p class="case-prompt">An analyst calculates the mean and standard deviation of household income in a district and uses the empirical rule to state that "about 95% of households earn between &mu;-2&sigma; and &mu;+2&sigma;," even though the lower bound calculated this way is a negative income.</p>
+  <p class="case-q">What does the negative lower bound reveal about this application of the empirical rule?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-2','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-2','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-2" onclick="markCaseWorked(2)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-2">Since the empirical rule is a standard, well-known tool, it is tempting to apply it routinely to any numeric variable with a calculated mean and standard deviation.</div>
+  <div class="reveal-panel right-panel" id="right-case-2">A negative lower bound is impossible for income, which is clear evidence that household income is not normally distributed here, almost certainly because income is right-skewed (a long tail of high earners pulls the mean above the median, common income patterns described in Module 3). The empirical rule assumes symmetry and unbounded tails; applying it to a skewed, non-negative variable like income produces nonsensical results and should be a signal to use the actual shape of the income distribution instead.</div>
+</div>
+
+<div class="case-card" id="case-3">
+  <h4>Case 3: A Factory Calibrating Two Machines</h4>
+  <p class="case-prompt">A factory produces steel rods with two machines. Machine A produces rods with &mu;=50.0mm, &sigma;=0.2mm. Machine B produces rods with &mu;=50.0mm, &sigma;=0.5mm. A specification requires rods between 49.5mm and 50.5mm.</p>
+  <p class="case-q">Even though both machines target the same mean, do they perform equally well against the specification?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-3','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-3','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-3" onclick="markCaseWorked(3)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-3">Since both machines are centered exactly on the target of 50.0mm, it is tempting to assume they perform identically against the specification.</div>
+  <div class="reveal-panel right-panel" id="right-case-3">No. For Machine A, z=(50.5-50.0)/0.2=2.5, giving P(49.5&lt;X&lt;50.5)=&Phi;(2.5)-&Phi;(-2.5)&asymp;0.9876, about 98.8% within spec. For Machine B, z=(50.5-50.0)/0.5=1.0, giving P(49.5&lt;X&lt;50.5)=&Phi;(1)-&Phi;(-1)&asymp;0.6826, only about 68.3% within spec. Despite an identical mean, Machine B's larger standard deviation produces far more out-of-spec rods, illustrating why spread, not just central tendency, determines quality outcomes.</div>
+</div>
+
+<div class="case-card" id="case-4">
+  <h4>Case 4: A Survey Result That "Cannot Be Normal"</h4>
+  <p class="case-prompt">A researcher surveys satisfaction ratings on a 1-to-5 scale and finds nearly all respondents answering either 1 or 5, with very few in between. A statistics-savvy colleague proposes applying the empirical rule and z-scores to summarize the spread of these ratings.</p>
+  <p class="case-q">Is the normal distribution an appropriate model here?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-4','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-4','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-4" onclick="markCaseWorked(4)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-4">Since the normal distribution and z-scores are familiar, general-purpose tools, it can seem reasonable to apply them to any dataset with a calculable mean and standard deviation, including this one.</div>
+  <div class="reveal-panel right-panel" id="right-case-4">No. A distribution with most responses clustered at the two extremes (1 and 5) and almost none in the middle is bimodal, the opposite of the single-peaked, symmetric bell shape the normal distribution requires. Calculating a mean and standard deviation here may even produce a value (such as 3) that almost no actual respondent gave, and the empirical rule's 68-95-99.7 percentages would not describe this data's true spread at all. A histogram should always be examined before assuming normality, regardless of how convenient normal-based tools are.</div>
+</div>
+
+</div>
+
+<button class="reset-btn" onclick="resetProgress()">&#8635; Reset Progress</button>
+
+<script>
+const STORAGE_KEY='stats101-module12-progress-v1';
+const TOTAL_SLIDES=15,TOTAL_CARDS=20,TOTAL_CASES=4,TOTAL_QUIZ=15;
+
+const flashcardData=[
+  {term:'Normal distribution',def:'A continuous, symmetric, bell-shaped probability distribution fully described by its mean &mu; and standard deviation &sigma;.'},
+  {term:'Empirical rule (68-95-99.7)',def:'For any normal distribution, approximately 68%, 95%, and 99.7% of data fall within 1, 2, and 3 standard deviations of the mean, respectively.'},
+  {term:'Z-score',def:'A standardized measure of how many standard deviations a value lies from the mean: z = (x-&mu;)/&sigma;.'},
+  {term:'Standard normal distribution',def:'The normal distribution with &mu;=0 and &sigma;=1, to which any normal distribution can be converted via z-scores.'},
+  {term:'Standard normal table',def:'A reference table giving &Phi;(z), the cumulative probability P(Z&le;z), for given z-scores.'},
+  {term:'&Phi;(z), cumulative probability',def:'The area under the standard normal curve to the left of z, representing P(Z&le;z).'},
+  {term:'Symmetry property of Z',def:'&Phi;(-z) = 1 - &Phi;(z), allowing a table of positive z-values to answer questions about negative z-values.'},
+  {term:'Complement rule (normal use)',def:'P(Z &gt; z) = 1 - &Phi;(z), used to compute "greater than" probabilities from cumulative table values.'},
+  {term:'"Between" probability',def:'P(a &lt; X &lt; b) = &Phi;(z_b) - &Phi;(z_a), found by converting both endpoints to z-scores.'},
+  {term:'Inverse normal problem',def:'Finding the value of x corresponding to a given probability, by first finding z from the table, then solving x = &mu; + z&sigma;.'},
+  {term:'Percentile (normal distribution)',def:'The value below which a given percentage of the distribution falls, found via the inverse normal problem.'},
+  {term:'Normal approximation to the binomial',def:'For large n with np and n(1-p) both reasonably large, the binomial distribution is well approximated by a normal distribution with &mu;=np, &sigma;=&radic;(np(1-p)).'},
+  {term:'Continuity correction',def:'The adjustment of &plusmn;0.5 applied to a discrete value when approximating a discrete distribution (like the binomial) with a continuous one (the normal).'},
+  {term:'Skewness (relative to normality)',def:'A lack of symmetry in a distribution, visible as a long tail on one side or a mean noticeably different from the median, that violates normal-distribution assumptions.'},
+  {term:'Bounded data',def:'Data with a hard floor or ceiling (such as percentages or non-negative counts), which can conflict with the normal distribution\'s infinite, unbounded tails.'},
+  {term:'Bimodal distribution',def:'A distribution with two distinct peaks, fundamentally inconsistent with the single-peaked shape of the normal distribution.'},
+  {term:'Central Limit Theorem (preview)',def:'The principle that the distribution of sample means tends toward normality as sample size grows, regardless of the shape of the original population, covered fully in Module 14.'},
+  {term:'Asymptotic tails',def:'The property that the normal curve approaches but never touches the horizontal axis, extending infinitely in both directions.'},
+  {term:'Mean = median = mode (normal)',def:'A defining property of the normal distribution: all three measures of central tendency coincide at the same central value.'},
+  {term:'Outlier flag (3-sigma rule)',def:'A common heuristic that values beyond 3 standard deviations from the mean (about 0.3% of normal data) warrant closer inspection as potential outliers or data errors.'}
+];
+
+let state={slidesViewed:new Set(),quizScore:null,cardsFlipped:new Set(),casesWorked:new Set(),quizAnswers:{},quizSubmitted:false,currentSlide:1};
+
+function loadState(){
+  try{const s=localStorage.getItem(STORAGE_KEY);if(s){const p=JSON.parse(s);state.slidesViewed=new Set(p.slidesViewed||[]);state.quizScore=p.quizScore!==undefined?p.quizScore:null;state.cardsFlipped=new Set(p.cardsFlipped||[]);state.casesWorked=new Set(p.casesWorked||[]);state.quizAnswers=p.quizAnswers||{};state.quizSubmitted=p.quizSubmitted||false;state.currentSlide=p.currentSlide||1;}}catch(e){}
+}
+function saveState(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify({slidesViewed:[...state.slidesViewed],quizScore:state.quizScore,cardsFlipped:[...state.cardsFlipped],casesWorked:[...state.casesWorked],quizAnswers:state.quizAnswers,quizSubmitted:state.quizSubmitted,currentSlide:state.currentSlide}));}catch(e){}
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');btn.classList.add('active');
+}
+
+const prevBtn=document.getElementById('prevBtn');
+const nextBtn=document.getElementById('nextBtn');
+function showSlide(n){
+  if(n<1||n>TOTAL_SLIDES)return;
+  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+  document.getElementById('slide-'+n).classList.add('active');
+  state.currentSlide=n;state.slidesViewed.add(n);saveState();updateSlideUI();updateStats();
+}
+function updateSlideUI(){
+  const n=state.currentSlide;
+  document.getElementById('slide-counter').textContent='Slide '+n+' of '+TOTAL_SLIDES;
+  document.getElementById('slide-progress').style.width=(n/TOTAL_SLIDES*100)+'%';
+  prevBtn.disabled=n===1;
+  nextBtn.textContent=n===TOTAL_SLIDES?'Finish ✓':'Next →';
+}
+prevBtn.addEventListener('click',()=>showSlide(state.currentSlide-1));
+nextBtn.addEventListener('click',()=>{if(state.currentSlide<TOTAL_SLIDES)showSlide(state.currentSlide+1);});
+document.addEventListener('keydown',e=>{
+  const activeTab=document.querySelector('.tab-content.active');
+  if(!activeTab||activeTab.id!=='tab-slides')return;
+  if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
+  if(e.key==='ArrowRight'){e.preventDefault();nextBtn.click();}
+  else if(e.key==='ArrowLeft'){e.preventDefault();prevBtn.click();}
+});
+
+let quizAnswered=0,quizCorrect=0;
+function startQuiz(){document.querySelector('.quiz-intro').style.display='none';document.getElementById('quiz-questions').style.display='block';if(state.quizSubmitted)restoreQuizState();}
+function answerQ(qNum,btn,correct){
+  const qq=document.getElementById('qq-'+qNum);if(qq.classList.contains('answered'))return;
+  qq.classList.add('answered');qq.querySelectorAll('.quiz-option').forEach(o=>o.classList.add('disabled'));
+  btn.classList.add(correct?'correct':'wrong');if(correct)quizCorrect++;
+  document.getElementById('qe-'+qNum).classList.add('show');
+  state.quizAnswers[qNum]=correct;quizAnswered++;
+  document.getElementById('quiz-progress').textContent=quizAnswered+' of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=quizAnswered<TOTAL_QUIZ;saveState();
+}
+function submitQuiz(){
+  state.quizScore=quizCorrect;state.quizSubmitted=true;saveState();
+  document.getElementById('quiz-score-display').innerHTML=quizCorrect+'<span class="total"> / '+TOTAL_QUIZ+'</span>';
+  const v=document.getElementById('quiz-verdict'),m=document.getElementById('quiz-msg');
+  if(quizCorrect>=14){v.textContent='Excellent';v.className='verdict great';m.textContent='Strong command of the normal distribution and its applications.';}
+  else if(quizCorrect>=10){v.textContent='Good';v.className='verdict good';m.textContent='Solid. Review the explanations on questions you missed.';}
+  else{v.textContent='Keep going';v.className='verdict ok';m.textContent='Revisit the slides on z-scores and the standard normal table before retaking.';}
+  document.getElementById('quiz-result').classList.add('show');updateStats();
+}
+function retakeQuiz(){
+  state.quizScore=null;state.quizSubmitted=false;state.quizAnswers={};quizCorrect=0;quizAnswered=0;saveState();
+  document.getElementById('quiz-result').classList.remove('show');
+  document.querySelectorAll('.quiz-question').forEach(q=>{q.classList.remove('answered');q.querySelectorAll('.quiz-option').forEach(o=>o.classList.remove('correct','wrong','disabled'));q.querySelectorAll('.quiz-explain').forEach(e=>e.classList.remove('show'));});
+  document.getElementById('quiz-progress').textContent='0 of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=true;updateStats();
+}
+function restoreQuizState(){
+  Object.entries(state.quizAnswers).forEach(([qNum,correct])=>{
+    const qq=document.getElementById('qq-'+qNum);if(!qq)return;
+    qq.classList.add('answered');qq.querySelectorAll('.quiz-option').forEach(o=>o.classList.add('disabled'));
+    document.getElementById('qe-'+qNum).classList.add('show');quizAnswered++;if(correct)quizCorrect++;
+  });
+  document.getElementById('quiz-progress').textContent=quizAnswered+' of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=quizAnswered<TOTAL_QUIZ;
+  if(state.quizSubmitted)submitQuiz();
+}
+
+function buildFlashcards(){
+  const grid=document.getElementById('fc-grid');
+  flashcardData.forEach((fc,i)=>{
+    const div=document.createElement('div');div.className='flashcard'+(state.cardsFlipped.has(i)?' flipped':'');
+    div.innerHTML='<div class="flashcard-inner"><div class="flashcard-front">'+fc.term+'<span class="fc-hint">Click to reveal definition</span></div><div class="flashcard-back">'+fc.def+'</div></div>';
+    div.addEventListener('click',()=>{div.classList.toggle('flipped');state.cardsFlipped.add(i);saveState();updateStats();});
+    grid.appendChild(div);
+  });
+}
+
+function revealCase(id,type){document.getElementById(type+'-'+id).classList.add('show');}
+function markCaseWorked(n){
+  state.casesWorked.add(n);saveState();
+  const btn=document.getElementById('worked-case-'+n);btn.textContent='Worked';btn.classList.add('done');updateStats();
+}
+
+function updateStats(){
+  document.getElementById('stat-slides').textContent=Math.round(state.slidesViewed.size/TOTAL_SLIDES*100)+'%';
+  document.getElementById('stat-quiz').textContent=state.quizScore!==null?state.quizScore+' / '+TOTAL_QUIZ:'—';
+  document.getElementById('stat-cards').textContent=state.cardsFlipped.size+' / '+TOTAL_CARDS;
+  document.getElementById('stat-cases').textContent=state.casesWorked.size+' / '+TOTAL_CASES;
+}
+function resetProgress(){if(!confirm('Reset all progress for this module?'))return;localStorage.removeItem(STORAGE_KEY);location.reload();}
+
+loadState();buildFlashcards();showSlide(state.currentSlide);updateStats();
+if(state.quizSubmitted){document.querySelector('.quiz-intro').style.display='none';document.getElementById('quiz-questions').style.display='block';restoreQuizState();}
+state.casesWorked.forEach(n=>{const btn=document.getElementById('worked-case-'+n);if(btn){btn.textContent='Worked';btn.classList.add('done');}});
+</script>
+</div>
+</body>
+</html>

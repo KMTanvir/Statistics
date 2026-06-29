@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 16: Hypothesis Testing</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;
+  --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#dbeafe;
+  --accent:#4f46e5;--success:#059669;--success-light:#d1fae5;
+  --danger:#dc2626;--danger-light:#fee2e2;
+  --warning:#d97706;--warning-light:#fef3c7;
+  --border:#e2e8f0;
+  --shadow:0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.08),0 4px 10px rgba(0,0,0,.04);
+  --radius:12px;--radius-sm:8px;--transition:.2s cubic-bezier(.4,0,.2,1);
+}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;}
+.app{max-width:1100px;margin:0 auto;padding:24px 20px 80px;}
+header.mod-header{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%);color:#fff;padding:32px 28px;border-radius:var(--radius);margin-bottom:20px;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;}
+header.mod-header::before{content:"";position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:rgba(255,255,255,.08);border-radius:50%;}
+header.mod-header::after{content:"";position:absolute;bottom:-30px;right:80px;width:100px;height:100px;background:rgba(255,255,255,.05);border-radius:50%;}
+.mod-badge{display:inline-block;background:rgba(255,255,255,.2);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:.5px;position:relative;z-index:1;}
+header.mod-header h1{font-size:28px;margin:12px 0 8px;font-weight:700;position:relative;z-index:1;}
+header.mod-header p.mod-sub{font-size:14px;opacity:.88;max-width:640px;position:relative;z-index:1;}
+header.mod-header p.mod-instructor{font-size:13px;opacity:.8;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.2);position:relative;z-index:1;}
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;padding:14px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;}
+.stat{text-align:center;padding:6px;}
+.stat .stat-value{font-size:22px;font-weight:700;color:var(--primary);line-height:1.2;}
+.stat .stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:2px;}
+.tabs{display:flex;gap:4px;background:#fff;padding:6px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;flex-wrap:wrap;}
+.tab-btn{flex:1;min-width:110px;padding:11px 16px;background:transparent;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;transition:all var(--transition);font-family:inherit;}
+.tab-btn:hover{background:var(--bg);color:var(--text);}
+.tab-btn.active{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.28);}
+.tab-content{display:none;animation:fadeIn .28s ease-in-out;}
+.tab-content.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);margin-bottom:16px;}
+.progress-bar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:12px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:3px;transition:width .4s ease;}
+.slide-counter{text-align:center;color:var(--muted);font-size:13px;margin-bottom:14px;font-weight:500;}
+.slide{display:none;min-height:440px;padding:4px;animation:slideIn .3s ease;}
+.slide.active{display:block;}
+@keyframes slideIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+.slide h2{font-size:26px;margin-bottom:6px;color:var(--primary-dark);font-weight:700;line-height:1.25;}
+.slide h3{font-size:18px;margin:20px 0 8px;color:var(--text);font-weight:600;}
+.slide p{margin-bottom:12px;color:#334155;}
+.slide ul,.slide ol{margin:0 0 14px 22px;}
+.slide li{margin-bottom:7px;color:#334155;}
+.slide .slide-sub{color:var(--muted);font-size:15px;margin-bottom:18px;font-style:italic;}
+.obj-list{list-style:none;padding:0;margin:14px 0;}
+.obj-list li{padding:9px 0 9px 32px;position:relative;color:#334155;border-bottom:1px solid var(--border);}
+.obj-list li:last-child{border-bottom:none;}
+.obj-list li::before{content:"";position:absolute;left:0;top:13px;width:18px;height:18px;background:var(--success-light);border-radius:50%;}
+.obj-list li::after{content:"✓";position:absolute;left:3px;top:10px;color:var(--success);font-size:11px;font-weight:700;}
+.example-box{background:var(--primary-light);border-left:4px solid var(--primary);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.example-box strong{color:var(--primary-dark);}
+.tip-box{background:var(--success-light);border-left:4px solid var(--success);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.tip-box strong{color:var(--success);}
+.warn-box{background:var(--warning-light);border-left:4px solid var(--warning);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.warn-box strong{color:var(--warning);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:14px 0;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:14px 0;}
+.def-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;}
+.def-card .def-term{font-weight:700;color:var(--primary-dark);font-size:15px;margin-bottom:6px;}
+.def-card .def-body{font-size:14px;color:#334155;}
+.formula-box{background:#0f172a;color:#e2e8f0;padding:18px 22px;border-radius:var(--radius-sm);margin:14px 0;text-align:center;font-size:16px;overflow-x:auto;}
+.freq-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;}
+.freq-table th{background:var(--primary);color:#fff;padding:9px 12px;text-align:left;font-weight:600;}
+.freq-table th:not(:first-child),.freq-table td:not(:first-child){text-align:right;}
+.freq-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:#334155;}
+.freq-table tr:nth-child(even) td{background:#f8fafc;}
+.freq-table tr.total-row td{font-weight:700;background:var(--primary-light);color:var(--primary-dark);border-top:2px solid var(--primary);}
+.freq-table tr.highlight-row td{background:#fef3c7;}
+.freq-table th:first-child{border-radius:8px 0 0 0;}.freq-table th:last-child{border-radius:0 8px 0 0;}
+.practice{background:#f1f5f9;border:2px dashed #cbd5e1;border-radius:var(--radius-sm);padding:18px;margin:20px 0;}
+.practice h4{color:var(--primary);margin-bottom:10px;font-size:15px;}
+.practice-q{margin-bottom:10px;color:var(--text);font-weight:500;}
+.practice-options{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+.practice-btn{padding:8px 14px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;font-size:14px;transition:all var(--transition);color:var(--text);}
+.practice-btn:hover{border-color:var(--primary);background:var(--primary-light);}
+.practice-btn.correct{background:var(--success-light);border-color:var(--success);color:var(--success);font-weight:600;}
+.practice-btn.wrong{background:var(--danger-light);border-color:var(--danger);color:var(--danger);}
+.practice-btn.disabled{pointer-events:none;opacity:.75;}
+.practice-feedback{margin-top:10px;padding:10px 14px;border-radius:6px;font-size:14px;display:none;}
+.practice-feedback.show{display:block;}
+.practice-feedback.right{background:var(--success-light);color:var(--success);border:1px solid var(--success);}
+.practice-feedback.wrong{background:var(--danger-light);color:var(--danger);border:1px solid var(--danger);}
+.slide-nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border);gap:10px;flex-wrap:wrap;}
+.key-hint{font-size:12px;color:var(--muted);}
+.kbd{display:inline-block;background:#f1f5f9;border:1px solid var(--border);border-bottom-width:2px;border-radius:4px;padding:1px 6px;font-family:monospace;font-size:11px;color:var(--text);}
+.btn{padding:10px 20px;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;transition:all var(--transition);font-family:inherit;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover:not(:disabled){background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,.28);}
+.btn-primary:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover:not(:disabled){background:var(--bg);color:var(--text);}
+.btn-ghost:disabled{opacity:.45;cursor:not-allowed;}
+.quiz-intro{background:#fff;padding:22px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;text-align:center;}
+.quiz-intro h2{color:var(--primary-dark);margin-bottom:8px;}
+.quiz-intro p{color:var(--muted);margin-bottom:14px;}
+.quiz-question{background:#fff;border-radius:var(--radius);padding:22px;margin-bottom:14px;box-shadow:var(--shadow);border:1px solid var(--border);}
+.quiz-question h4{font-size:16px;margin-bottom:14px;color:var(--text);font-weight:600;}
+.q-num{color:var(--primary);font-weight:700;margin-right:6px;}
+.quiz-options{display:grid;gap:8px;}
+.quiz-option{padding:11px 16px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:#fff;transition:all var(--transition);font-size:14px;color:var(--text);text-align:left;font-family:inherit;}
+.quiz-option:hover{border-color:var(--primary);background:var(--primary-light);transform:translateX(2px);}
+.quiz-option.correct{border-color:var(--success);background:var(--success-light);color:var(--success);font-weight:600;}
+.quiz-option.wrong{border-color:var(--danger);background:var(--danger-light);color:var(--danger);}
+.quiz-option.disabled{pointer-events:none;}
+.quiz-explain{display:none;margin-top:10px;padding:10px 14px;background:#f8fafc;border-left:3px solid var(--primary);border-radius:4px;font-size:13px;color:#334155;}
+.quiz-explain.show{display:block;}
+.quiz-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px 20px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);flex-wrap:wrap;}
+.quiz-progress-text{font-size:13px;color:var(--muted);}
+.quiz-result{display:none;padding:30px;background:linear-gradient(135deg,#f0fdf4 0%,#dbeafe 100%);border-radius:var(--radius);text-align:center;margin-top:16px;box-shadow:var(--shadow);}
+.quiz-result.show{display:block;}
+.quiz-result h3{font-size:24px;margin-bottom:10px;color:var(--primary-dark);}
+.quiz-result .score{font-size:48px;font-weight:700;color:var(--primary);margin:14px 0;line-height:1;}
+.quiz-result .score .total{font-size:26px;color:var(--muted);}
+.quiz-result p{color:#334155;margin-bottom:16px;font-size:15px;}
+.verdict{display:inline-block;padding:6px 14px;border-radius:16px;font-weight:600;font-size:14px;margin-bottom:8px;}
+.verdict.great{background:var(--success-light);color:var(--success);}
+.verdict.good{background:var(--primary-light);color:var(--primary-dark);}
+.verdict.ok{background:var(--warning-light);color:var(--warning);}
+.flashcards-header{background:#fff;padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;text-align:center;}
+.flashcards-header h2{color:var(--primary-dark);margin-bottom:6px;}
+.flashcards-header p{color:var(--muted);font-size:14px;}
+.flashcards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+.flashcard{perspective:1000px;height:170px;cursor:pointer;}
+.flashcard-inner{position:relative;width:100%;height:100%;transition:transform .55s;transform-style:preserve-3d;}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+.flashcard-front,.flashcard-back{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:var(--shadow);}
+.flashcard-front{background:linear-gradient(135deg,#fff 0%,#f8fafc 100%);border:2px solid var(--primary-light);color:var(--primary-dark);font-weight:600;font-size:16px;}
+.flashcard-front .fc-hint{font-size:11px;color:var(--muted);font-weight:400;margin-top:8px;font-style:italic;}
+.flashcard-back{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%);color:#fff;transform:rotateY(180deg);font-size:13px;line-height:1.55;}
+.cases-header{background:#fff;padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;}
+.cases-header h2{color:var(--primary-dark);margin-bottom:6px;}
+.cases-header p{color:var(--muted);font-size:14px;}
+.case-card{background:#fff;border-radius:var(--radius);padding:24px;margin-bottom:16px;box-shadow:var(--shadow);border-left:4px solid var(--primary);}
+.case-card h4{font-size:16px;color:var(--primary-dark);font-weight:700;margin-bottom:12px;}
+.case-prompt{color:#334155;font-size:15px;margin-bottom:14px;line-height:1.6;}
+.case-q{font-weight:600;color:var(--text);margin-bottom:12px;font-size:15px;}
+.case-textarea{width:100%;min-height:80px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;resize:vertical;background:#f8fafc;color:var(--text);transition:border-color var(--transition);}
+.case-textarea:focus{outline:none;border-color:var(--primary);background:#fff;}
+.reveal-btns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+.reveal-btn{padding:8px 16px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;transition:all var(--transition);}
+.reveal-btn.miss{color:var(--warning);border-color:var(--warning);}
+.reveal-btn.miss:hover{background:var(--warning-light);}
+.reveal-btn.right{color:var(--success);border-color:var(--success);}
+.reveal-btn.right:hover{background:var(--success-light);}
+.reveal-panel{display:none;margin-top:12px;padding:14px 16px;border-radius:var(--radius-sm);font-size:14px;line-height:1.6;}
+.reveal-panel.show{display:block;}
+.reveal-panel.miss-panel{background:var(--warning-light);border-left:3px solid var(--warning);color:#78350f;}
+.reveal-panel.right-panel{background:var(--success-light);border-left:3px solid var(--success);color:#064e3b;}
+.case-worked-btn{margin-top:10px;padding:6px 14px;background:var(--primary-light);color:var(--primary-dark);border:none;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;}
+.case-worked-btn.done{background:var(--success-light);color:var(--success);}
+.takeaway-list{list-style:none;padding:0;margin:16px 0;}
+.takeaway-list li{padding:12px 16px 12px 48px;position:relative;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:10px;font-size:15px;color:#1e293b;border:1px solid var(--border);}
+.takeaway-list li .t-num{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:24px;height:24px;background:var(--primary);color:#fff;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.reset-btn{position:fixed;bottom:18px;right:18px;background:#fff;border:1px solid var(--border);padding:8px 14px;border-radius:20px;font-size:13px;color:var(--muted);cursor:pointer;box-shadow:var(--shadow);font-family:inherit;transition:all var(--transition);z-index:100;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.cricket-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;}
+.cricket-table th{background:#1e293b;color:#fff;padding:7px 8px;text-align:center;font-weight:600;}
+.cricket-table td{padding:6px 8px;text-align:center;border-bottom:1px solid var(--border);color:#334155;}
+.cricket-table tr:nth-child(even) td{background:#f8fafc;}
+@media(max-width:720px){
+  .app{padding:14px 12px 80px;}
+  header.mod-header{padding:22px 18px;}
+  header.mod-header h1{font-size:22px;}
+  .card{padding:20px 16px;}
+  .two-col,.three-col{grid-template-columns:1fr;}
+  .stats-bar{grid-template-columns:repeat(2,1fr);}
+  .slide h2{font-size:22px;}
+  .freq-table,.cricket-table{font-size:12px;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="mod-header">
+  <span class="mod-badge">Module 16 of 17</span>
+  <h1>Hypothesis Testing</h1>
+  <p class="mod-sub">Null and alternative hypotheses, test statistics, p-values, and Type I and Type II errors. How scientists decide whether a result is real or just noise.</p>
+  <p class="mod-instructor"><strong>K.M. Tanvir</strong> &nbsp;·&nbsp; Statistics for Non-Statisticians</p>
+</header>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-value" id="stat-slides">0%</div><div class="stat-label">Slides Viewed</div></div>
+  <div class="stat"><div class="stat-value" id="stat-quiz">&#8212;</div><div class="stat-label">Quiz Score</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cards">0 / 20</div><div class="stat-label">Cards Flipped</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cases">0 / 4</div><div class="stat-label">Cases Worked</div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('slides',this)">&#128214; Slides</button>
+  <button class="tab-btn" onclick="switchTab('quiz',this)">&#128221; Quiz</button>
+  <button class="tab-btn" onclick="switchTab('flashcards',this)">&#127183; Flashcards</button>
+  <button class="tab-btn" onclick="switchTab('cases',this)">&#127919; Real Cases</button>
+</div>
+
+<!-- ========== SLIDES ========== -->
+<div id="tab-slides" class="tab-content active">
+<div class="card">
+  <div class="progress-bar"><div class="progress-fill" id="slide-progress"></div></div>
+  <div class="slide-counter" id="slide-counter">Slide 1 of 17</div>
+  <!-- S1: objectives -->
+  <div class="slide active" id="slide-1">
+    <h2>Hypothesis Testing</h2>
+    <p class="slide-sub">Module 16 &nbsp;·&nbsp; By the end of this module, you will be able to:</p>
+    <ul class="obj-list">
+      <li>State the null and alternative hypotheses for a given research question</li>
+      <li>Distinguish one-tailed and two-tailed tests</li>
+      <li>Calculate a test statistic and interpret a p-value correctly</li>
+      <li>Apply a significance level to reach a decision about the null hypothesis</li>
+      <li>Explain Type I and Type II errors, and the concept of statistical power</li>
+      <li>Conduct z-tests and t-tests for means and proportions, and connect the results to confidence intervals</li>
+    </ul>
+    <div class="tip-box"><strong>From estimation to decision:</strong> Module 15 asked "what is the plausible range for this parameter?" This module asks a sharper question: "does the evidence support or contradict a specific claim about that parameter?" Both rely on the same sampling distribution machinery from Module 14.</div>
+  </div>
+
+  <!-- S2: logic of hypothesis testing -->
+  <div class="slide" id="slide-2">
+    <h2>The Logic of Hypothesis Testing: A Courtroom Analogy</h2>
+    <p>Hypothesis testing follows the same logical structure as a criminal trial. A defendant is presumed innocent until evidence proves guilt beyond reasonable doubt; the court never directly proves innocence.</p>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Presumption (null hypothesis)</div><div class="def-body">"Innocent" or "no effect" is assumed true unless the evidence strongly contradicts it.</div></div>
+      <div class="def-card"><div class="def-term">Claim being tested (alternative hypothesis)</div><div class="def-body">"Guilty" or "there is an effect," the claim that requires convincing evidence to accept.</div></div>
+    </div>
+    <div class="tip-box">Just as a "not guilty" verdict does not prove innocence, only that guilt was not proven, failing to reject a null hypothesis does not prove the null hypothesis is true. It only means the evidence was not strong enough to reject it.</div>
+  </div>
+
+  <!-- S3: null and alternative -->
+  <div class="slide" id="slide-3">
+    <h2>Null and Alternative Hypotheses</h2>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Null hypothesis (H<sub>0</sub>)</div><div class="def-body">A statement of no effect, no difference, or no change, treated as the default assumption to be tested against the data.</div></div>
+      <div class="def-card"><div class="def-term">Alternative hypothesis (H<sub>1</sub> or H<sub>a</sub>)</div><div class="def-body">The claim of interest, stating that there is an effect, a difference, or a change.</div></div>
+    </div>
+    <div class="example-box"><strong>Example:</strong> a fertilizer company claims its new product increases average rice yield above the historical average of &mu;=4.2 tons per hectare.
+    <br>H<sub>0</sub>: &mu; = 4.2 &nbsp;&nbsp;&nbsp;&nbsp; H<sub>1</sub>: &mu; &gt; 4.2</div>
+    <div class="tip-box">The null hypothesis always contains the equality; the alternative hypothesis expresses the direction or existence of a difference that the researcher suspects or hopes to demonstrate.</div>
+  </div>
+
+  <!-- S4: one-tailed vs two-tailed -->
+  <div class="slide" id="slide-4">
+    <h2>One-Tailed and Two-Tailed Tests</h2>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">One-tailed test</div><div class="def-body">The alternative hypothesis specifies a direction: H<sub>1</sub>: &mu; &gt; 4.2 or H<sub>1</sub>: &mu; &lt; 4.2. Evidence in only one direction can lead to rejecting H<sub>0</sub>.</div></div>
+      <div class="def-card"><div class="def-term">Two-tailed test</div><div class="def-body">The alternative hypothesis states only that a difference exists, in either direction: H<sub>1</sub>: &mu; &ne; 4.2. Evidence far enough in either direction can lead to rejecting H<sub>0</sub>.</div></div>
+    </div>
+    <div class="warn-box"><strong>Choose the direction before seeing the data:</strong> the choice between one-tailed and two-tailed must be based on the research question itself, decided in advance. Choosing the direction after looking at the sample result, to make a result appear significant, undermines the validity of the test.</div>
+  </div>
+
+  <!-- S5: test statistic concept -->
+  <div class="slide" id="slide-5">
+    <h2>The Test Statistic</h2>
+    <p>A test statistic measures how far the sample result is from what the null hypothesis predicts, expressed in standard error units. It plays the same standardizing role as the z-score in Module 12, applied here to a hypothesis rather than a single value.</p>
+    <div class="formula-box">\[ z = \frac{\bar{x} - \mu_0}{\sigma / \sqrt{n}} \]</div>
+    <p>Here &mu;<sub>0</sub> is the value specified by the null hypothesis. A test statistic far from zero (in either direction, or in the direction specified by a one-tailed test) suggests the sample result is unlikely under H<sub>0</sub>.</p>
+  </div>
+
+  <!-- S6: worked example z-test -->
+  <div class="slide" id="slide-6">
+    <h2>Worked Example: A One-Tailed z-Test</h2>
+    <p>Returning to the fertilizer example: H<sub>0</sub>: &mu;=4.2, H<sub>1</sub>: &mu;&gt;4.2. A trial on n=49 plots using the new fertilizer produces a sample mean yield of x&#772;=4.35 tons/hectare, with known &sigma;=0.7 tons/hectare.</p>
+    <div class="formula-box">\[ z = \frac{4.35 - 4.2}{0.7/\sqrt{49}} = \frac{0.15}{0.1} = 1.5 \]</div>
+    <div class="example-box">The sample mean yield is 1.5 standard errors above the value claimed under H<sub>0</sub>. Whether this is convincing evidence depends on the p-value, introduced next.</div>
+  </div>
+
+  <!-- S7: p-value definition -->
+  <div class="slide" id="slide-7">
+    <h2>The P-Value</h2>
+    <p>The p-value is the probability of obtaining a test statistic at least as extreme as the one observed, assuming the null hypothesis is true.</p>
+    <div class="example-box"><strong>Continuing the fertilizer example (one-tailed, H<sub>1</sub>: &mu;&gt;4.2):</strong>
+    <br>p-value = P(Z &ge; 1.5) = 1 - &Phi;(1.5) = 1 - 0.9332 = 0.0668.</div>
+    <div class="tip-box"><strong>What this number means:</strong> if the true average yield really were 4.2 tons/hectare (H<sub>0</sub> true), a sample mean as high as 4.35 or higher would occur about 6.7% of the time purely from random sampling variability. A small p-value means the observed result would be unusual if H<sub>0</sub> were true, casting doubt on H<sub>0</sub>.</div>
+  </div>
+
+  <!-- S8: significance level and decision rule -->
+  <div class="slide" id="slide-8">
+    <h2>The Significance Level and Decision Rule</h2>
+    <p>Before collecting data, a significance level &alpha; is chosen, the threshold p-value below which the null hypothesis will be rejected. Common choices are &alpha;=0.05 or &alpha;=0.01.</p>
+    <div class="formula-box">\[ \text{If } p\text{-value} \leq \alpha\text{, reject } H_0\text{.} \qquad \text{If } p\text{-value} > \alpha\text{, fail to reject } H_0\text{.} \]</div>
+    <div class="example-box"><strong>Fertilizer example, with &alpha;=0.05:</strong> the p-value of 0.0668 exceeds 0.05, so the decision is to fail to reject H<sub>0</sub>. The trial does not provide strong enough evidence, at the 5% significance level, to conclude the new fertilizer increases average yield.</div>
+    <div class="warn-box">"Fail to reject H<sub>0</sub>" is not the same as "H<sub>0</sub> is proven true." It means the evidence was not strong enough to overturn the default assumption, echoing the courtroom analogy from Slide 2.</div>
+  </div>
+
+  <!-- S9: two-tailed example -->
+  <div class="slide" id="slide-9">
+    <h2>Worked Example: A Two-Tailed Test</h2>
+    <p>A quality control process expects bags of rice to average &mu;=25 kg. A factory manager suspects the filling machine may be miscalibrated in either direction: H<sub>0</sub>: &mu;=25, H<sub>1</sub>: &mu;&ne;25. A sample of n=36 bags gives x&#772;=24.7 kg, &sigma;=0.9 kg.</p>
+    <div class="formula-box">\[ z = \frac{24.7-25}{0.9/\sqrt{36}} = \frac{-0.3}{0.15} = -2.0 \]</div>
+    <div class="example-box">For a two-tailed test, the p-value doubles the one-tailed area: p-value = 2 &times; P(Z &le; -2.0) = 2(0.0228) = 0.0456.</div>
+    <div class="tip-box">With &alpha;=0.05, since 0.0456 &le; 0.05, the decision is to reject H<sub>0</sub>: there is statistically significant evidence the filling machine's average is not 25 kg.</div>
+  </div>
+
+  <!-- S10: t-test for a mean -->
+  <div class="slide" id="slide-10">
+    <h2>The t-Test: When &sigma; Is Unknown</h2>
+    <p>Exactly as in Module 15's confidence intervals, when &sigma; is unknown and estimated by the sample standard deviation s, the test statistic follows a t-distribution with n-1 degrees of freedom instead of the standard normal distribution.</p>
+    <div class="formula-box">\[ t = \frac{\bar{x} - \mu_0}{s/\sqrt{n}} \]</div>
+    <div class="example-box"><strong>Worked example:</strong> a nutritionist claims average daily salt intake in a community exceeds the recommended 5 g/day. A sample of n=20 finds x&#772;=5.6 g, s=1.2 g. With H<sub>0</sub>: &mu;=5, H<sub>1</sub>: &mu;&gt;5:
+    <br>t = (5.6-5)/(1.2/&radic;20) = 0.6/0.268 &asymp; 2.236, with 19 degrees of freedom. Comparing to a t-table or computed p-value (p&asymp;0.019) leads to rejecting H<sub>0</sub> at &alpha;=0.05.</div>
+  </div>
+
+  <!-- S11: z-test for a proportion -->
+  <div class="slide" id="slide-11">
+    <h2>The z-Test for a Proportion</h2>
+    <p>To test a claim about a population proportion, the test statistic compares the sample proportion to the hypothesized value p<sub>0</sub>, using the standard error implied by H<sub>0</sub> itself.</p>
+    <div class="formula-box">\[ z = \frac{\hat{p}-p_0}{\sqrt{p_0(1-p_0)/n}} \]</div>
+    <div class="example-box"><strong>Worked example:</strong> a public health campaign aims to raise handwashing compliance above a historical 60% baseline. H<sub>0</sub>: p=0.60, H<sub>1</sub>: p&gt;0.60. A post-campaign survey of n=400 finds p&#770;=0.655.
+    <br>z = (0.655-0.60)/&radic;(0.60(0.40)/400) = 0.055/0.0245 &asymp; 2.245. p-value = P(Z&ge;2.245)&asymp;0.0124, leading to rejecting H<sub>0</sub> at &alpha;=0.05: the campaign appears to have raised compliance.</div>
+  </div>
+
+  <!-- S12: Type I and Type II errors -->
+  <div class="slide" id="slide-12">
+    <h2>Type I and Type II Errors</h2>
+    <p>Every hypothesis test decision carries a risk of error, since decisions are made from sample data rather than complete knowledge of the population.</p>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Type I error</div><div class="def-body">Rejecting H<sub>0</sub> when it is actually true (a "false positive"). The probability of this error is exactly &alpha;, the significance level chosen in advance.</div></div>
+      <div class="def-card"><div class="def-term">Type II error</div><div class="def-body">Failing to reject H<sub>0</sub> when it is actually false (a "false negative"). Its probability is denoted &beta;.</div></div>
+    </div>
+    <div class="warn-box"><strong>The courtroom parallel:</strong> Type I error is convicting an innocent defendant; Type II error is acquitting a guilty one. Lowering &alpha; reduces the chance of wrongful conviction but, all else equal, increases the chance of letting a guilty defendant go free.</div>
+  </div>
+
+  <!-- S13: trade-off and power -->
+  <div class="slide" id="slide-13">
+    <h2>The Trade-Off Between Errors, and Statistical Power</h2>
+    <p>For a fixed sample size, decreasing &alpha; (to lower the Type I error risk) increases &beta; (the Type II error risk), and vice versa. The only way to reduce both simultaneously is to increase the sample size.</p>
+    <div class="formula-box">\[ \text{Power} = 1 - \beta \]</div>
+    <p>Power is the probability of correctly rejecting H<sub>0</sub> when it is actually false, the test's ability to detect a real effect when one truly exists.</p>
+    <div class="tip-box"><strong>Practical implication:</strong> a study with low power (a small sample facing a small true effect) may fail to detect a real difference, not because the effect does not exist, but because the test lacked the sensitivity to find it. Researchers calculate required sample size in advance partly to ensure adequate power.</div>
+  </div>
+
+  <!-- S14: link to confidence intervals -->
+  <div class="slide" id="slide-14">
+    <h2>The Connection to Confidence Intervals</h2>
+    <p>Hypothesis tests and confidence intervals, both introduced from the same sampling distribution foundation, are two views of the same evidence and are mathematically linked.</p>
+    <div class="example-box"><strong>The rule:</strong> a two-tailed hypothesis test at significance level &alpha; rejects H<sub>0</sub>: &mu;=&mu;<sub>0</sub> if and only if &mu;<sub>0</sub> falls outside the corresponding (1-&alpha;) confidence interval for &mu;.</div>
+    <div class="tip-box"><strong>Checking the rice bag example:</strong> the 95% CI for the filling machine's mean would be 24.7 &plusmn; 1.96(0.15) = (24.41, 24.99). Since the hypothesized value 25 falls just outside this interval, the two-tailed test at &alpha;=0.05 rejects H<sub>0</sub>: &mu;=25, exactly matching the earlier decision on Slide 9.</div>
+  </div>
+
+  <!-- S15: anchor case -->
+  <div class="slide" id="slide-15">
+    <h2>Anchor Case: Testing a New Teaching Method</h2>
+    <p>A university department pilots a new teaching method, hoping it raises average exam scores above the historical mean of &mu;=68 with &sigma;=9. H<sub>0</sub>: &mu;=68, H<sub>1</sub>: &mu;&gt;68. A pilot cohort of n=81 students taught with the new method scores x&#772;=70.1.</p>
+  <div class="formula-box">\[ z = \frac{70.1-68}{9/\sqrt{81}} = \frac{2.1}{1.0} = 2.1 \]</div>
+  <div class="example-box">p-value = P(Z&ge;2.1) = 1-&Phi;(2.1) &asymp; 1-0.9821 = 0.0179. At &alpha;=0.05, since 0.0179&le;0.05, the department rejects H<sub>0</sub>, concluding the pilot's improvement is unlikely to be due to chance alone.</div>
+  <div class="tip-box"><strong>Statistical significance is not the whole story:</strong> a 2.1-point increase being statistically significant does not automatically mean it is large enough to justify the cost and disruption of department-wide adoption, a separate question of practical significance.</div>
+  </div>
+
+  <!-- S16: common pitfalls -->
+  <div class="slide" id="slide-16">
+    <h2>Common Pitfalls</h2>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">"The p-value is the probability H<sub>0</sub> is true"</div><div class="def-body">Incorrect. The p-value is calculated assuming H<sub>0</sub> is true; it is the probability of the observed (or more extreme) data given H<sub>0</sub>, not the probability of H<sub>0</sub> itself.</div></div>
+      <div class="def-card"><div class="def-term">"A small p-value proves a large, important effect"</div><div class="def-body">Incorrect. With a large enough sample size, even a tiny, practically meaningless difference can produce a small p-value. Statistical significance and practical importance are different questions.</div></div>
+    </div>
+    <div class="warn-box"><strong>Multiple testing:</strong> running many hypothesis tests on the same data and reporting only the ones with small p-values (sometimes called "p-hacking") inflates the true Type I error rate well above the stated &alpha;, since chance alone guarantees some tests will appear significant when nothing real is happening.</div>
+  </div>
+
+  <!-- S17: recap -->
+  <div class="slide" id="slide-17">
+    <h2>Module 16 Recap</h2>
+    <ul class="takeaway-list">
+      <li><span class="t-num">1</span>A null hypothesis states no effect or no difference; the alternative hypothesis states the claim of interest.</li>
+      <li><span class="t-num">2</span>One-tailed tests detect a specified direction of difference; two-tailed tests detect any difference.</li>
+      <li><span class="t-num">3</span>The test statistic measures how far the sample result is from the null hypothesis's claim, in standard error units.</li>
+      <li><span class="t-num">4</span>The p-value is the probability of a result at least as extreme as observed, assuming H<sub>0</sub> is true; it is compared to &alpha; to reach a decision.</li>
+      <li><span class="t-num">5</span>Type I error (false positive, probability &alpha;) and Type II error (false negative, probability &beta;) trade off against each other; power=1-&beta;.</li>
+      <li><span class="t-num">6</span>A two-tailed test's conclusion matches whether the hypothesized value falls inside or outside the corresponding confidence interval.</li>
+      <li><span class="t-num">7</span>Statistical significance does not guarantee practical importance, and multiple testing without correction inflates false-positive risk.</li>
+    </ul>
+    <div class="tip-box"><strong>Next module:</strong> Module 17 extends hypothesis testing to comparisons across three or more groups at once, using analysis of variance (ANOVA) and the F-test.</div>
+  </div>
+
+  <div class="slide-nav">
+    <button class="btn btn-ghost" id="prevBtn">&larr; Previous</button>
+    <span class="key-hint">Use <span class="kbd">&larr;</span> <span class="kbd">&rarr;</span> arrow keys to navigate</span>
+    <button class="btn btn-primary" id="nextBtn">Next &rarr;</button>
+  </div>
+</div>
+</div>
+
+<!-- ========== QUIZ ========== -->
+<div id="tab-quiz" class="tab-content">
+<div class="quiz-intro">
+  <h2>&#128221; Module Quiz</h2>
+  <p>17 questions on hypotheses, test statistics, p-values, significance levels, and Type I/II errors.</p>
+  <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
+</div>
+<div id="quiz-questions" style="display:none;">
+  <div class="quiz-question" id="qq-1">
+    <h4><span class="q-num">1.</span>The null hypothesis (H<sub>0</sub>) typically represents:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(1,this,false)">The claim the researcher hopes to demonstrate</button>
+      <button class="quiz-option" onclick="answerQ(1,this,true)">A statement of no effect, no difference, or no change, assumed true by default</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">The p-value of the test</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">The significance level</button>
+    </div>
+    <div class="quiz-explain" id="qe-1">H<sub>0</sub> is the default assumption of no effect or no difference, analogous to the presumption of innocence in a trial.</div>
+  </div>
+  <div class="quiz-question" id="qq-2">
+    <h4><span class="q-num">2.</span>A two-tailed alternative hypothesis is written as:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(2,this,false)">H<sub>1</sub>: &mu; &gt; &mu;<sub>0</sub></button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">H<sub>1</sub>: &mu; &lt; &mu;<sub>0</sub></button>
+      <button class="quiz-option" onclick="answerQ(2,this,true)">H<sub>1</sub>: &mu; &ne; &mu;<sub>0</sub></button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">H<sub>1</sub>: &mu; = &mu;<sub>0</sub></button>
+    </div>
+    <div class="quiz-explain" id="qe-2">A two-tailed test's alternative hypothesis states only that a difference exists, in either direction.</div>
+  </div>
+  <div class="quiz-question" id="qq-3">
+    <h4><span class="q-num">3.</span>The direction of a one-tailed test (greater than or less than) should be decided:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(3,this,false)">After looking at which direction the sample data points</button>
+      <button class="quiz-option" onclick="answerQ(3,this,true)">Before collecting the data, based on the research question</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">Only after calculating the p-value</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">It does not matter when it is decided</button>
+    </div>
+    <div class="quiz-explain" id="qe-3">Choosing the direction based on the observed data, rather than the research question decided in advance, undermines the validity of the test.</div>
+  </div>
+  <div class="quiz-question" id="qq-4">
+    <h4><span class="q-num">4.</span>With H<sub>0</sub>: &mu;=4.2, x&#772;=4.35, &sigma;=0.7, n=49, the z test statistic is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(4,this,false)">0.15</button>
+      <button class="quiz-option" onclick="answerQ(4,this,true)">1.5</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">0.1</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">7.0</button>
+    </div>
+    <div class="quiz-explain" id="qe-4">z=(4.35-4.2)/(0.7/&radic;49)=0.15/0.1=1.5.</div>
+  </div>
+  <div class="quiz-question" id="qq-5">
+    <h4><span class="q-num">5.</span>The p-value is best defined as:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(5,this,false)">The probability that the null hypothesis is true</button>
+      <button class="quiz-option" onclick="answerQ(5,this,true)">The probability of obtaining a result at least as extreme as observed, assuming H<sub>0</sub> is true</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">The probability of a Type II error</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">The significance level chosen by the researcher</button>
+    </div>
+    <div class="quiz-explain" id="qe-5">The p-value is computed under the assumption that H<sub>0</sub> is true; it does not represent the probability that H<sub>0</sub> itself is true.</div>
+  </div>
+  <div class="quiz-question" id="qq-6">
+    <h4><span class="q-num">6.</span>For z=1.5 in a one-tailed test with H<sub>1</sub>: &mu;&gt;&mu;<sub>0</sub>, the p-value is calculated as:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(6,this,false)">&Phi;(1.5) = 0.9332</button>
+      <button class="quiz-option" onclick="answerQ(6,this,true)">1 - &Phi;(1.5) = 0.0668</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">2 &times; (1 - &Phi;(1.5)) = 0.1336</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">1.5</button>
+    </div>
+    <div class="quiz-explain" id="qe-6">For a right-tailed test, the p-value is the upper-tail area: P(Z&ge;1.5)=1-&Phi;(1.5)=0.0668.</div>
+  </div>
+  <div class="quiz-question" id="qq-7">
+    <h4><span class="q-num">7.</span>If the p-value is 0.0668 and &alpha;=0.05, the correct decision is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(7,this,false)">Reject H<sub>0</sub></button>
+      <button class="quiz-option" onclick="answerQ(7,this,true)">Fail to reject H<sub>0</sub></button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">Accept H<sub>1</sub> as proven</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">No decision can be made</button>
+    </div>
+    <div class="quiz-explain" id="qe-7">Since 0.0668 &gt; 0.05, the p-value does not fall below &alpha;, so the decision is to fail to reject H<sub>0</sub>.</div>
+  </div>
+  <div class="quiz-question" id="qq-8">
+    <h4><span class="q-num">8.</span>For a two-tailed test with test statistic z=-2.0, the p-value is calculated as:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(8,this,false)">P(Z&le;-2.0) = 0.0228</button>
+      <button class="quiz-option" onclick="answerQ(8,this,true)">2 &times; P(Z&le;-2.0) = 0.0456</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">P(Z&ge;-2.0) = 0.9772</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">-2.0</button>
+    </div>
+    <div class="quiz-explain" id="qe-8">A two-tailed p-value doubles the one-sided tail area: 2 &times; 0.0228 = 0.0456.</div>
+  </div>
+  <div class="quiz-question" id="qq-9">
+    <h4><span class="q-num">9.</span>When &sigma; is unknown and estimated by s, the appropriate test statistic and distribution are:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(9,this,false)">z, using the standard normal distribution</button>
+      <button class="quiz-option" onclick="answerQ(9,this,true)">t, using the t-distribution with n-1 degrees of freedom</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">F, using the F-distribution</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">No test statistic can be calculated</button>
+    </div>
+    <div class="quiz-explain" id="qe-9">Just as with confidence intervals (Module 15), the t-distribution with n-1 degrees of freedom is used when &sigma; is estimated by s.</div>
+  </div>
+  <div class="quiz-question" id="qq-10">
+    <h4><span class="q-num">10.</span>The standard error used in a z-test for a proportion is based on:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(10,this,false)">&radic;(p&#770;(1-p&#770;)/n), using the sample proportion</button>
+      <button class="quiz-option" onclick="answerQ(10,this,true)">&radic;(p<sub>0</sub>(1-p<sub>0</sub>)/n), using the hypothesized proportion</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">&sigma;/&radic;n</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">s/&radic;n</button>
+    </div>
+    <div class="quiz-explain" id="qe-10">The hypothesis test for a proportion uses the standard error implied by H<sub>0</sub>, based on p<sub>0</sub>, unlike the confidence interval which uses p&#770;.</div>
+  </div>
+  <div class="quiz-question" id="qq-11">
+    <h4><span class="q-num">11.</span>A Type I error occurs when:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(11,this,true)">H<sub>0</sub> is rejected, but H<sub>0</sub> is actually true</button>
+      <button class="quiz-option" onclick="answerQ(11,this,false)">H<sub>0</sub> is not rejected, but H<sub>0</sub> is actually false</button>
+      <button class="quiz-option" onclick="answerQ(11,this,false)">H<sub>0</sub> is rejected, and H<sub>0</sub> is actually false</button>
+      <button class="quiz-option" onclick="answerQ(11,this,false)">The sample size is too small</button>
+    </div>
+    <div class="quiz-explain" id="qe-11">A Type I error is a false positive: rejecting a true null hypothesis. Its probability equals &alpha;.</div>
+  </div>
+  <div class="quiz-question" id="qq-12">
+    <h4><span class="q-num">12.</span>A Type II error occurs when:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(12,this,false)">H<sub>0</sub> is rejected, but H<sub>0</sub> is actually true</button>
+      <button class="quiz-option" onclick="answerQ(12,this,true)">H<sub>0</sub> is not rejected, but H<sub>0</sub> is actually false</button>
+      <button class="quiz-option" onclick="answerQ(12,this,false)">H<sub>0</sub> is correctly rejected</button>
+      <button class="quiz-option" onclick="answerQ(12,this,false)">The alternative hypothesis is stated incorrectly</button>
+    </div>
+    <div class="quiz-explain" id="qe-12">A Type II error is a false negative: failing to reject a false null hypothesis. Its probability is denoted &beta;.</div>
+  </div>
+  <div class="quiz-question" id="qq-13">
+    <h4><span class="q-num">13.</span>Statistical power is defined as:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(13,this,false)">&alpha;</button>
+      <button class="quiz-option" onclick="answerQ(13,this,false)">&beta;</button>
+      <button class="quiz-option" onclick="answerQ(13,this,true)">1 - &beta;</button>
+      <button class="quiz-option" onclick="answerQ(13,this,false)">1 - &alpha;</button>
+    </div>
+    <div class="quiz-explain" id="qe-13">Power = 1-&beta;, the probability of correctly rejecting H<sub>0</sub> when it is actually false.</div>
+  </div>
+  <div class="quiz-question" id="qq-14">
+    <h4><span class="q-num">14.</span>For a fixed sample size, decreasing &alpha; (to reduce Type I error risk) typically:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(14,this,false)">Also decreases &beta;</button>
+      <button class="quiz-option" onclick="answerQ(14,this,true)">Increases &beta;, the Type II error risk</button>
+      <button class="quiz-option" onclick="answerQ(14,this,false)">Has no effect on &beta;</button>
+      <button class="quiz-option" onclick="answerQ(14,this,false)">Eliminates both error types</button>
+    </div>
+    <div class="quiz-explain" id="qe-14">For a fixed sample size, &alpha; and &beta; trade off against each other; reducing one tends to increase the other unless sample size is also increased.</div>
+  </div>
+  <div class="quiz-question" id="qq-15">
+    <h4><span class="q-num">15.</span>A two-tailed hypothesis test at significance level &alpha; rejects H<sub>0</sub>: &mu;=&mu;<sub>0</sub> if and only if:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(15,this,true)">&mu;<sub>0</sub> falls outside the corresponding (1-&alpha;) confidence interval for &mu;</button>
+      <button class="quiz-option" onclick="answerQ(15,this,false)">&mu;<sub>0</sub> falls inside the corresponding (1-&alpha;) confidence interval for &mu;</button>
+      <button class="quiz-option" onclick="answerQ(15,this,false)">The sample size is greater than 30</button>
+      <button class="quiz-option" onclick="answerQ(15,this,false)">The p-value is greater than &alpha;</button>
+    </div>
+    <div class="quiz-explain" id="qe-15">Hypothesis tests and confidence intervals are linked: rejecting H<sub>0</sub> corresponds exactly to the hypothesized value falling outside the matching confidence interval.</div>
+  </div>
+  <div class="quiz-question" id="qq-16">
+    <h4><span class="q-num">16.</span>A very large sample finds a tiny, practically meaningless difference to be statistically significant (p&lt;0.001). This illustrates that:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(16,this,true)">Statistical significance does not guarantee practical importance</button>
+      <button class="quiz-option" onclick="answerQ(16,this,false)">The test must have been calculated incorrectly</button>
+      <button class="quiz-option" onclick="answerQ(16,this,false)">A small p-value always indicates a large, important effect</button>
+      <button class="quiz-option" onclick="answerQ(16,this,false)">Large samples cannot produce small p-values</button>
+    </div>
+    <div class="quiz-explain" id="qe-16">With a large enough sample, even a trivially small effect can yield a small p-value; statistical significance and practical importance are separate considerations.</div>
+  </div>
+  <div class="quiz-question" id="qq-17">
+    <h4><span class="q-num">17.</span>Running many hypothesis tests on the same data and reporting only the significant ones (without correction) leads to:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(17,this,false)">A lower true Type I error rate than stated</button>
+      <button class="quiz-option" onclick="answerQ(17,this,true)">An inflated true Type I error rate, well above the stated &alpha;</button>
+      <button class="quiz-option" onclick="answerQ(17,this,false)">No change to the error rate</button>
+      <button class="quiz-option" onclick="answerQ(17,this,false)">Automatically valid conclusions</button>
+    </div>
+    <div class="quiz-explain" id="qe-17">Multiple testing without correction (sometimes called p-hacking) inflates the true Type I error rate, since chance alone guarantees some tests will appear significant.</div>
+  </div>
+  <div class="quiz-footer">
+    <span class="quiz-progress-text" id="quiz-progress">0 of 17 answered</span>
+    <button class="btn btn-primary" onclick="submitQuiz()" id="btn-submit-quiz" disabled>Submit Quiz</button>
+  </div>
+  <div class="quiz-result" id="quiz-result">
+    <h3>Quiz Complete</h3>
+    <div class="score" id="quiz-score-display">0<span class="total"> / 17</span></div>
+    <div class="verdict" id="quiz-verdict"></div>
+    <p id="quiz-msg"></p>
+    <button class="btn btn-primary" onclick="retakeQuiz()">Retake Quiz</button>
+  </div>
+</div>
+</div>
+
+<!-- ========== FLASHCARDS ========== -->
+<div id="tab-flashcards" class="tab-content">
+  <h2>&#127183; Key Terms</h2>
+  <p class="slide-sub">Click any card to flip it.</p>
+  <div class="flashcards-grid" id="fc-grid"></div>
+</div>
+
+<!-- ========== REAL CASES ========== -->
+<div id="tab-cases" class="tab-content">
+  <h2>&#128202; Real Cases</h2>
+  <p class="slide-sub">Work through each scenario, then reveal the analysis.</p>
+
+  <div class="case-card">
+    <div class="case-prompt"><strong>Case 1: "The p-value Was 0.04, So There's a 96% Chance We're Right"</strong></div>
+    <div class="case-q">A graduate student reports a hypothesis test result with p=0.04 and tells their supervisor, "there is a 96% chance our hypothesis is correct." Is this statement a valid interpretation of the p-value?</div>
+    <textarea class="case-textarea" placeholder="Write your reasoning here..."></textarea>
+    <div class="reveal-btns">
+      <button class="btn btn-ghost" onclick="revealCase('case-1','miss')">I'm not sure</button>
+      <button class="btn btn-primary" onclick="revealCase('case-1','right')">I have an answer</button>
+    </div>
+    <div class="reveal-panel miss-panel" id="case-1-miss">No problem, this is one of the most common misunderstandings in statistics. The reveal panel explains the correct interpretation.</div>
+    <div class="reveal-panel right-panel" id="case-1-right">The statement is incorrect. A p-value of 0.04 means: if H<sub>0</sub> were true, a result this extreme or more so would occur about 4% of the time. It says nothing about the probability that H<sub>1</sub> (or H<sub>0</sub>) is correct. The p-value is a statement about the data given the hypothesis, not a statement about the hypothesis given the data. The correct phrasing is something like: "the evidence is strong enough to reject H<sub>0</sub> at the 5% significance level."</div>
+    <button class="btn btn-mark" onclick="markCaseWorked(1)">Mark as worked</button>
+  </div>
+
+  <div class="case-card">
+    <div class="case-prompt"><strong>Case 2: Choosing One-Tailed After Seeing the Data</strong></div>
+    <div class="case-q">A researcher runs a two-tailed test and gets p=0.08, which is not significant at &alpha;=0.05. Noticing the sample mean was above the hypothesized value, the researcher switches to a one-tailed test (H<sub>1</sub>: &mu;&gt;&mu;<sub>0</sub>), which gives p=0.04, now significant. Is this a valid analysis?</div>
+    <textarea class="case-textarea" placeholder="Write your reasoning here..."></textarea>
+    <div class="reveal-btns">
+      <button class="btn btn-ghost" onclick="revealCase('case-2','miss')">I'm not sure</button>
+      <button class="btn btn-primary" onclick="revealCase('case-2','right')">I have an answer</button>
+    </div>
+    <div class="reveal-panel miss-panel" id="case-2-miss">Think about when the test's direction was chosen, before or after seeing which way the data leaned.</div>
+    <div class="reveal-panel right-panel" id="case-2-right">This is not valid. The choice of one-tailed versus two-tailed, and the direction of a one-tailed test, must be fixed before examining the data, based on the research question. Switching to a one-tailed test only after seeing that the result leans in a convenient direction inflates the true Type I error rate beyond the stated &alpha;, since the researcher is effectively given two chances to find significance.</div>
+    <button class="btn btn-mark" onclick="markCaseWorked(2)">Mark as worked</button>
+  </div>
+
+  <div class="case-card">
+    <div class="case-prompt"><strong>Case 3: A Microloan Program's Impact Test</strong></div>
+    <div class="case-q">A microfinance institution claims its loan program raises average monthly household income above the regional baseline of 9,000 taka. A survey of n=64 client households finds x&#772;=9,300 taka, with &sigma;=1,200 taka assumed known from prior regional surveys. Using H<sub>0</sub>: &mu;=9,000, H<sub>1</sub>: &mu;&gt;9,000 and &alpha;=0.05, what does the institution conclude?</div>
+    <textarea class="case-textarea" placeholder="Calculate z, find the p-value, and state the decision..."></textarea>
+    <div class="reveal-btns">
+      <button class="btn btn-ghost" onclick="revealCase('case-3','miss')">I'm not sure</button>
+      <button class="btn btn-primary" onclick="revealCase('case-3','right')">I have an answer</button>
+    </div>
+    <div class="reveal-panel miss-panel" id="case-3-miss">Standard error = &sigma;/&radic;n = 1200/8 = 150. From there, compute z=(x&#772;-&mu;<sub>0</sub>)/SE.</div>
+    <div class="reveal-panel right-panel" id="case-3-right">SE = 1200/&radic;64 = 1200/8 = 150. z = (9300-9000)/150 = 300/150 = 2.0. p-value = P(Z&ge;2.0) = 1-0.9772 = 0.0228. Since 0.0228&le;0.05, the institution rejects H<sub>0</sub>: the survey provides statistically significant evidence that average household income exceeds the 9,000 taka baseline. As always, this conclusion describes the surveyed clients and does not by itself establish that the loan program caused the increase, since other factors could also explain it.</div>
+    <button class="btn btn-mark" onclick="markCaseWorked(3)">Mark as worked</button>
+  </div>
+
+  <div class="case-card">
+    <div class="case-prompt"><strong>Case 4: Twenty Tests, One "Significant" Result</strong></div>
+    <div class="case-q">A research team tests twenty different unrelated dietary factors against a single health outcome, each at &alpha;=0.05, with no true effect actually present for any of them. One of the twenty tests comes back significant (p&lt;0.05), and the team prepares to publish it as a major finding. What is the concern?</div>
+    <textarea class="case-textarea" placeholder="Write your reasoning here..."></textarea>
+    <div class="reveal-btns">
+      <button class="btn btn-ghost" onclick="revealCase('case-4','miss')">I'm not sure</button>
+      <button class="btn btn-primary" onclick="revealCase('case-4','right')">I have an answer</button>
+    </div>
+    <div class="reveal-panel miss-panel" id="case-4-miss">Each individual test has a 5% false-positive chance under &alpha;=0.05. With twenty independent tests run on factors with no real effect, how many false positives would be expected purely by chance?</div>
+    <div class="reveal-panel right-panel" id="case-4-right">With &alpha;=0.05 and twenty independent tests where no true effect exists anywhere, roughly one false positive (20 &times; 0.05 = 1) is expected purely by chance. The single "significant" result is very likely exactly that: a false positive produced by running many tests, not a genuine dietary effect. This is the multiple testing problem; publishing the one significant result while ignoring the other nineteen, without correcting for the number of tests performed, would be a textbook case of p-hacking.</div>
+    <button class="btn btn-mark" onclick="markCaseWorked(4)">Mark as worked</button>
+  </div>
+</div>
+
+<script>
+const flashcardData = [
+  {term:"Null Hypothesis (H0)", def:"A statement of no effect, no difference, or no change, assumed true by default unless the evidence strongly contradicts it."},
+  {term:"Alternative Hypothesis (H1)", def:"The claim of interest, stating that an effect, a difference, or a change exists."},
+  {term:"One-Tailed Test", def:"A test whose alternative hypothesis specifies a direction (greater than or less than); evidence in only one direction can lead to rejecting H0."},
+  {term:"Two-Tailed Test", def:"A test whose alternative hypothesis states only that a difference exists, without specifying a direction."},
+  {term:"Test Statistic", def:"A standardized measure of how far the sample result is from the value claimed under H0, expressed in standard error units."},
+  {term:"P-Value", def:"The probability of obtaining a result at least as extreme as the one observed, assuming the null hypothesis is true."},
+  {term:"Significance Level (alpha)", def:"A threshold, chosen before data collection, below which the p-value leads to rejecting the null hypothesis. Common values are 0.05 and 0.01."},
+  {term:"Decision Rule", def:"Reject H0 if the p-value is less than or equal to alpha; otherwise, fail to reject H0."},
+  {term:"Fail to Reject H0", def:"The conclusion reached when evidence is not strong enough to overturn the null hypothesis; it does not prove H0 is true."},
+  {term:"Type I Error", def:"Rejecting a true null hypothesis, a false positive. Its probability equals the significance level alpha."},
+  {term:"Type II Error", def:"Failing to reject a false null hypothesis, a false negative. Its probability is denoted beta."},
+  {term:"Statistical Power", def:"The probability of correctly rejecting a false null hypothesis, equal to 1 minus beta."},
+  {term:"Alpha-Beta Trade-Off", def:"For a fixed sample size, decreasing alpha tends to increase beta, and vice versa; increasing sample size can reduce both."},
+  {term:"Z-Test for a Mean", def:"A hypothesis test for a population mean using the standard normal distribution, appropriate when the population standard deviation is known."},
+  {term:"T-Test for a Mean", def:"A hypothesis test for a population mean using the t-distribution with n-1 degrees of freedom, appropriate when the population standard deviation is unknown and estimated by s."},
+  {term:"Z-Test for a Proportion", def:"A hypothesis test for a population proportion, using a standard error based on the hypothesized proportion p0 rather than the sample proportion."},
+  {term:"Hypothesis Test and CI Link", def:"A two-tailed test at level alpha rejects H0: mu=mu0 exactly when mu0 falls outside the corresponding (1-alpha) confidence interval."},
+  {term:"Statistical vs Practical Significance", def:"A statistically significant result (small p-value) does not necessarily reflect a difference large enough to matter in practice, especially with large samples."},
+  {term:"Multiple Testing Problem", def:"Running many hypothesis tests on the same data and reporting only significant results inflates the true Type I error rate above the stated alpha."},
+  {term:"Courtroom Analogy", def:"H0 plays the role of the presumption of innocence; a Type I error is convicting an innocent defendant, and a Type II error is acquitting a guilty one."}
+];
+
+function buildFlashcards(){
+  const grid=document.getElementById('fc-grid');
+  grid.innerHTML='';
+  flashcardData.forEach((card,i)=>{
+    const el=document.createElement('div');
+    el.className='flashcard';
+    el.innerHTML=`<div class="flashcard-inner">
+      <div class="flashcard-front"><span class="fc-term">${card.term}</span></div>
+      <div class="flashcard-back"><span class="fc-def">${card.def}</span></div>
+    </div>`;
+    el.addEventListener('click',()=>{
+      el.classList.toggle('flipped');
+      state.cardsFlipped.add(i);
+      updateStats();
+      saveState();
+    });
+    grid.appendChild(el);
+  });
+}
+
+const STORAGE_KEY='stats101-module16-progress-v1';
+const TOTAL_SLIDES=17;
+const TOTAL_CARDS=20;
+const TOTAL_CASES=4;
+const TOTAL_QUIZ=17;
+
+let state={
+  slidesViewed:new Set(),
+  quizScore:null,
+  cardsFlipped:new Set(),
+  casesWorked:new Set(),
+  quizAnswers:{},
+  quizSubmitted:false,
+  currentSlide:1
+};
+
+function saveState(){
+  const data={
+    slidesViewed:[...state.slidesViewed],
+    quizScore:state.quizScore,
+    cardsFlipped:[...state.cardsFlipped],
+    casesWorked:[...state.casesWorked],
+    quizAnswers:state.quizAnswers,
+    quizSubmitted:state.quizSubmitted,
+    currentSlide:state.currentSlide
+  };
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+}
+
+function loadState(){
+  const raw=localStorage.getItem(STORAGE_KEY);
+  if(!raw)return;
+  try{
+    const data=JSON.parse(raw);
+    state.slidesViewed=new Set(data.slidesViewed||[]);
+    state.quizScore=data.quizScore!==undefined?data.quizScore:null;
+    state.cardsFlipped=new Set(data.cardsFlipped||[]);
+    state.casesWorked=new Set(data.casesWorked||[]);
+    state.quizAnswers=data.quizAnswers||{};
+    state.quizSubmitted=data.quizSubmitted||false;
+    state.currentSlide=data.currentSlide||1;
+  }catch(e){}
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function showSlide(n){
+  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+  document.getElementById('slide-'+n).classList.add('active');
+  state.currentSlide=n;
+  state.slidesViewed.add(n);
+  updateSlideUI();
+  updateStats();
+  saveState();
+}
+
+function updateSlideUI(){
+  document.getElementById('slide-counter').textContent=`Slide ${state.currentSlide} of ${TOTAL_SLIDES}`;
+  document.getElementById('prevBtn').disabled=state.currentSlide===1;
+  document.getElementById('nextBtn').textContent=state.currentSlide===TOTAL_SLIDES?'Finish':'Next →';
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  loadState();
+  buildFlashcards();
+  showSlide(state.currentSlide||1);
+  restoreQuizState();
+  restoreCardsAndCases();
+  updateStats();
+
+  document.getElementById('prevBtn').addEventListener('click',()=>{
+    if(state.currentSlide>1)showSlide(state.currentSlide-1);
+  });
+  document.getElementById('nextBtn').addEventListener('click',()=>{
+    if(state.currentSlide<TOTAL_SLIDES)showSlide(state.currentSlide+1);
+  });
+  document.addEventListener('keydown',(e)=>{
+    if(e.key==='ArrowRight'&&state.currentSlide<TOTAL_SLIDES)showSlide(state.currentSlide+1);
+    if(e.key==='ArrowLeft'&&state.currentSlide>1)showSlide(state.currentSlide-1);
+  });
+});
+
+function restoreCardsAndCases(){
+  state.casesWorked.forEach(n=>{
+    const btn=document.querySelector(`.case-card:nth-of-type(${n}) .btn-mark`);
+    if(btn){btn.textContent='Worked ✓';btn.disabled=true;}
+  });
+}
+
+function startQuiz(){
+  document.querySelector('.quiz-intro').style.display='none';
+  document.getElementById('quiz-questions').style.display='block';
+}
+
+function answerQ(qNum,btn,correct){
+  if(state.quizSubmitted)return;
+  const container=document.getElementById('qq-'+qNum);
+  container.querySelectorAll('.quiz-option').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  state.quizAnswers[qNum]={correct:correct};
+  updateQuizProgress();
+  saveState();
+}
+
+function updateQuizProgress(){
+  const answered=Object.keys(state.quizAnswers).length;
+  document.getElementById('quiz-progress').textContent=`${answered} of ${TOTAL_QUIZ} answered`;
+  document.getElementById('btn-submit-quiz').disabled=answered<TOTAL_QUIZ;
+}
+
+function submitQuiz(){
+  let score=0;
+  for(let i=1;i<=TOTAL_QUIZ;i++){
+    const ans=state.quizAnswers[i];
+    const container=document.getElementById('qq-'+i);
+    container.querySelectorAll('.quiz-option').forEach(b=>b.classList.add('disabled'));
+    container.classList.add('answered');
+    document.getElementById('qe-'+i).style.display='block';
+    if(ans&&ans.correct)score++;
+  }
+  state.quizScore=score;
+  state.quizSubmitted=true;
+  saveState();
+  showQuizResult();
+}
+
+function showQuizResult(){
+  document.getElementById('quiz-result').style.display='block';
+  document.getElementById('quiz-score-display').innerHTML=`${state.quizScore}<span class="total"> / ${TOTAL_QUIZ}</span>`;
+  const pct=state.quizScore/TOTAL_QUIZ;
+  const verdict=document.getElementById('quiz-verdict');
+  const msg=document.getElementById('quiz-msg');
+  if(pct>=0.8){verdict.textContent='Strong Grasp';msg.textContent='You have a solid handle on hypothesis testing logic.';}
+  else if(pct>=0.6){verdict.textContent='Good Progress';msg.textContent='Review the missed items, especially around p-values and error types.';}
+  else{verdict.textContent='Needs Review';msg.textContent='Revisit the slides on p-values, significance levels, and Type I/II errors before moving on.';}
+  document.getElementById('btn-submit-quiz').style.display='none';
+}
+
+function retakeQuiz(){
+  state.quizAnswers={};
+  state.quizSubmitted=false;
+  state.quizScore=null;
+  saveState();
+  document.querySelectorAll('.quiz-question').forEach(q=>{
+    q.classList.remove('answered');
+    q.querySelectorAll('.quiz-option').forEach(b=>{b.classList.remove('selected','disabled');});
+  });
+  document.querySelectorAll('.quiz-explain').forEach(e=>e.style.display='none');
+  document.getElementById('quiz-result').style.display='none';
+  document.getElementById('btn-submit-quiz').style.display='inline-block';
+  updateQuizProgress();
+}
+
+function restoreQuizState(){
+  if(Object.keys(state.quizAnswers).length>0){
+    document.querySelector('.quiz-intro').style.display='none';
+    document.getElementById('quiz-questions').style.display='block';
+    updateQuizProgress();
+  }
+  if(state.quizSubmitted){
+    for(let i=1;i<=TOTAL_QUIZ;i++){
+      const ans=state.quizAnswers[i];
+      const container=document.getElementById('qq-'+i);
+      if(!container)continue;
+      container.querySelectorAll('.quiz-option').forEach(b=>b.classList.add('disabled'));
+      container.classList.add('answered');
+      document.getElementById('qe-'+i).style.display='block';
+    }
+    showQuizResult();
+  }
+}
+
+function revealCase(id,type){
+  document.getElementById(id+'-miss').style.display=type==='miss'?'block':'none';
+  document.getElementById(id+'-right').style.display=type==='right'?'block':'none';
+}
+
+function markCaseWorked(n){
+  state.casesWorked.add(n);
+  const btn=document.querySelector(`.case-card:nth-of-type(${n}) .btn-mark`);
+  if(btn){btn.textContent='Worked ✓';btn.disabled=true;}
+  updateStats();
+  saveState();
+}
+
+function updateStats(){
+  document.getElementById('stat-slides').textContent=`${state.slidesViewed.size} / ${TOTAL_SLIDES}`;
+  document.getElementById('stat-quiz').textContent=state.quizScore!==null?`${state.quizScore} / ${TOTAL_QUIZ}`:`0 / ${TOTAL_QUIZ}`;
+  document.getElementById('stat-cards').textContent=`${state.cardsFlipped.size} / ${TOTAL_CARDS}`;
+  document.getElementById('stat-cases').textContent=`${state.casesWorked.size} / ${TOTAL_CASES}`;
+}
+
+function resetProgress(){
+  if(!confirm('Reset all progress for this module?'))return;
+  localStorage.removeItem(STORAGE_KEY);
+  state={slidesViewed:new Set(),quizScore:null,cardsFlipped:new Set(),casesWorked:new Set(),quizAnswers:{},quizSubmitted:false,currentSlide:1};
+  location.reload();
+}
+</script>
+</div>
+</body>
+</html>

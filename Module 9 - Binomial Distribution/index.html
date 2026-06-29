@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 9: Binomial Distribution</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;
+  --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#dbeafe;
+  --accent:#4f46e5;--success:#059669;--success-light:#d1fae5;
+  --danger:#dc2626;--danger-light:#fee2e2;
+  --warning:#d97706;--warning-light:#fef3c7;
+  --border:#e2e8f0;
+  --shadow:0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.08),0 4px 10px rgba(0,0,0,.04);
+  --radius:12px;--radius-sm:8px;--transition:.2s cubic-bezier(.4,0,.2,1);
+}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;}
+.app{max-width:1100px;margin:0 auto;padding:24px 20px 80px;}
+header.mod-header{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%);color:#fff;padding:32px 28px;border-radius:var(--radius);margin-bottom:20px;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;}
+header.mod-header::before{content:"";position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:rgba(255,255,255,.08);border-radius:50%;}
+header.mod-header::after{content:"";position:absolute;bottom:-30px;right:80px;width:100px;height:100px;background:rgba(255,255,255,.05);border-radius:50%;}
+.mod-badge{display:inline-block;background:rgba(255,255,255,.2);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:.5px;position:relative;z-index:1;}
+header.mod-header h1{font-size:28px;margin:12px 0 8px;font-weight:700;position:relative;z-index:1;}
+header.mod-header p.mod-sub{font-size:14px;opacity:.88;max-width:640px;position:relative;z-index:1;}
+header.mod-header p.mod-instructor{font-size:13px;opacity:.8;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.2);position:relative;z-index:1;}
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;padding:14px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;}
+.stat{text-align:center;padding:6px;}
+.stat .stat-value{font-size:22px;font-weight:700;color:var(--primary);line-height:1.2;}
+.stat .stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:2px;}
+.tabs{display:flex;gap:4px;background:#fff;padding:6px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;flex-wrap:wrap;}
+.tab-btn{flex:1;min-width:110px;padding:11px 16px;background:transparent;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;transition:all var(--transition);font-family:inherit;}
+.tab-btn:hover{background:var(--bg);color:var(--text);}
+.tab-btn.active{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.28);}
+.tab-content{display:none;animation:fadeIn .28s ease-in-out;}
+.tab-content.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);margin-bottom:16px;}
+.progress-bar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:12px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:3px;transition:width .4s ease;}
+.slide-counter{text-align:center;color:var(--muted);font-size:13px;margin-bottom:14px;font-weight:500;}
+.slide{display:none;min-height:440px;padding:4px;animation:slideIn .3s ease;}
+.slide.active{display:block;}
+@keyframes slideIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+.slide h2{font-size:26px;margin-bottom:6px;color:var(--primary-dark);font-weight:700;line-height:1.25;}
+.slide h3{font-size:18px;margin:20px 0 8px;color:var(--text);font-weight:600;}
+.slide p{margin-bottom:12px;color:#334155;}
+.slide ul,.slide ol{margin:0 0 14px 22px;}
+.slide li{margin-bottom:7px;color:#334155;}
+.slide .slide-sub{color:var(--muted);font-size:15px;margin-bottom:18px;font-style:italic;}
+.obj-list{list-style:none;padding:0;margin:14px 0;}
+.obj-list li{padding:9px 0 9px 32px;position:relative;color:#334155;border-bottom:1px solid var(--border);}
+.obj-list li:last-child{border-bottom:none;}
+.obj-list li::before{content:"";position:absolute;left:0;top:13px;width:18px;height:18px;background:var(--success-light);border-radius:50%;}
+.obj-list li::after{content:"✓";position:absolute;left:3px;top:10px;color:var(--success);font-size:11px;font-weight:700;}
+.example-box{background:var(--primary-light);border-left:4px solid var(--primary);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.example-box strong{color:var(--primary-dark);}
+.tip-box{background:var(--success-light);border-left:4px solid var(--success);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.tip-box strong{color:var(--success);}
+.warn-box{background:var(--warning-light);border-left:4px solid var(--warning);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.warn-box strong{color:var(--warning);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:14px 0;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:14px 0;}
+.def-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;}
+.def-card .def-term{font-weight:700;color:var(--primary-dark);font-size:15px;margin-bottom:6px;}
+.def-card .def-body{font-size:14px;color:#334155;}
+.formula-box{background:#0f172a;color:#e2e8f0;padding:18px 22px;border-radius:var(--radius-sm);margin:14px 0;text-align:center;font-size:16px;overflow-x:auto;}
+.freq-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;}
+.freq-table th{background:var(--primary);color:#fff;padding:9px 12px;text-align:left;font-weight:600;}
+.freq-table th:not(:first-child),.freq-table td:not(:first-child){text-align:right;}
+.freq-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:#334155;}
+.freq-table tr:nth-child(even) td{background:#f8fafc;}
+.freq-table tr.total-row td{font-weight:700;background:var(--primary-light);color:var(--primary-dark);border-top:2px solid var(--primary);}
+.freq-table tr.highlight-row td{background:#fef3c7;}
+.freq-table th:first-child{border-radius:8px 0 0 0;}.freq-table th:last-child{border-radius:0 8px 0 0;}
+.practice{background:#f1f5f9;border:2px dashed #cbd5e1;border-radius:var(--radius-sm);padding:18px;margin:20px 0;}
+.practice h4{color:var(--primary);margin-bottom:10px;font-size:15px;}
+.practice-q{margin-bottom:10px;color:var(--text);font-weight:500;}
+.practice-options{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+.practice-btn{padding:8px 14px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;font-size:14px;transition:all var(--transition);color:var(--text);}
+.practice-btn:hover{border-color:var(--primary);background:var(--primary-light);}
+.practice-btn.correct{background:var(--success-light);border-color:var(--success);color:var(--success);font-weight:600;}
+.practice-btn.wrong{background:var(--danger-light);border-color:var(--danger);color:var(--danger);}
+.practice-btn.disabled{pointer-events:none;opacity:.75;}
+.practice-feedback{margin-top:10px;padding:10px 14px;border-radius:6px;font-size:14px;display:none;}
+.practice-feedback.show{display:block;}
+.practice-feedback.right{background:var(--success-light);color:var(--success);border:1px solid var(--success);}
+.practice-feedback.wrong{background:var(--danger-light);color:var(--danger);border:1px solid var(--danger);}
+.slide-nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border);gap:10px;flex-wrap:wrap;}
+.key-hint{font-size:12px;color:var(--muted);}
+.kbd{display:inline-block;background:#f1f5f9;border:1px solid var(--border);border-bottom-width:2px;border-radius:4px;padding:1px 6px;font-family:monospace;font-size:11px;color:var(--text);}
+.btn{padding:10px 20px;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;transition:all var(--transition);font-family:inherit;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover:not(:disabled){background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,.28);}
+.btn-primary:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover:not(:disabled){background:var(--bg);color:var(--text);}
+.btn-ghost:disabled{opacity:.45;cursor:not-allowed;}
+.quiz-intro{background:#fff;padding:22px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;text-align:center;}
+.quiz-intro h2{color:var(--primary-dark);margin-bottom:8px;}
+.quiz-intro p{color:var(--muted);margin-bottom:14px;}
+.quiz-question{background:#fff;border-radius:var(--radius);padding:22px;margin-bottom:14px;box-shadow:var(--shadow);border:1px solid var(--border);}
+.quiz-question h4{font-size:16px;margin-bottom:14px;color:var(--text);font-weight:600;}
+.q-num{color:var(--primary);font-weight:700;margin-right:6px;}
+.quiz-options{display:grid;gap:8px;}
+.quiz-option{padding:11px 16px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:#fff;transition:all var(--transition);font-size:14px;color:var(--text);text-align:left;font-family:inherit;}
+.quiz-option:hover{border-color:var(--primary);background:var(--primary-light);transform:translateX(2px);}
+.quiz-option.correct{border-color:var(--success);background:var(--success-light);color:var(--success);font-weight:600;}
+.quiz-option.wrong{border-color:var(--danger);background:var(--danger-light);color:var(--danger);}
+.quiz-option.disabled{pointer-events:none;}
+.quiz-explain{display:none;margin-top:10px;padding:10px 14px;background:#f8fafc;border-left:3px solid var(--primary);border-radius:4px;font-size:13px;color:#334155;}
+.quiz-explain.show{display:block;}
+.quiz-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px 20px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);flex-wrap:wrap;}
+.quiz-progress-text{font-size:13px;color:var(--muted);}
+.quiz-result{display:none;padding:30px;background:linear-gradient(135deg,#f0fdf4 0%,#dbeafe 100%);border-radius:var(--radius);text-align:center;margin-top:16px;box-shadow:var(--shadow);}
+.quiz-result.show{display:block;}
+.quiz-result h3{font-size:24px;margin-bottom:10px;color:var(--primary-dark);}
+.quiz-result .score{font-size:48px;font-weight:700;color:var(--primary);margin:14px 0;line-height:1;}
+.quiz-result .score .total{font-size:26px;color:var(--muted);}
+.quiz-result p{color:#334155;margin-bottom:16px;font-size:15px;}
+.verdict{display:inline-block;padding:6px 14px;border-radius:16px;font-weight:600;font-size:14px;margin-bottom:8px;}
+.verdict.great{background:var(--success-light);color:var(--success);}
+.verdict.good{background:var(--primary-light);color:var(--primary-dark);}
+.verdict.ok{background:var(--warning-light);color:var(--warning);}
+.flashcards-header{background:#fff;padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;text-align:center;}
+.flashcards-header h2{color:var(--primary-dark);margin-bottom:6px;}
+.flashcards-header p{color:var(--muted);font-size:14px;}
+.flashcards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+.flashcard{perspective:1000px;height:170px;cursor:pointer;}
+.flashcard-inner{position:relative;width:100%;height:100%;transition:transform .55s;transform-style:preserve-3d;}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+.flashcard-front,.flashcard-back{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:var(--shadow);}
+.flashcard-front{background:linear-gradient(135deg,#fff 0%,#f8fafc 100%);border:2px solid var(--primary-light);color:var(--primary-dark);font-weight:600;font-size:16px;}
+.flashcard-front .fc-hint{font-size:11px;color:var(--muted);font-weight:400;margin-top:8px;font-style:italic;}
+.flashcard-back{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%);color:#fff;transform:rotateY(180deg);font-size:13px;line-height:1.55;}
+.cases-header{background:#fff;padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;}
+.cases-header h2{color:var(--primary-dark);margin-bottom:6px;}
+.cases-header p{color:var(--muted);font-size:14px;}
+.case-card{background:#fff;border-radius:var(--radius);padding:24px;margin-bottom:16px;box-shadow:var(--shadow);border-left:4px solid var(--primary);}
+.case-card h4{font-size:16px;color:var(--primary-dark);font-weight:700;margin-bottom:12px;}
+.case-prompt{color:#334155;font-size:15px;margin-bottom:14px;line-height:1.6;}
+.case-q{font-weight:600;color:var(--text);margin-bottom:12px;font-size:15px;}
+.case-textarea{width:100%;min-height:80px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;resize:vertical;background:#f8fafc;color:var(--text);transition:border-color var(--transition);}
+.case-textarea:focus{outline:none;border-color:var(--primary);background:#fff;}
+.reveal-btns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+.reveal-btn{padding:8px 16px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;transition:all var(--transition);}
+.reveal-btn.miss{color:var(--warning);border-color:var(--warning);}
+.reveal-btn.miss:hover{background:var(--warning-light);}
+.reveal-btn.right{color:var(--success);border-color:var(--success);}
+.reveal-btn.right:hover{background:var(--success-light);}
+.reveal-panel{display:none;margin-top:12px;padding:14px 16px;border-radius:var(--radius-sm);font-size:14px;line-height:1.6;}
+.reveal-panel.show{display:block;}
+.reveal-panel.miss-panel{background:var(--warning-light);border-left:3px solid var(--warning);color:#78350f;}
+.reveal-panel.right-panel{background:var(--success-light);border-left:3px solid var(--success);color:#064e3b;}
+.case-worked-btn{margin-top:10px;padding:6px 14px;background:var(--primary-light);color:var(--primary-dark);border:none;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;}
+.case-worked-btn.done{background:var(--success-light);color:var(--success);}
+.takeaway-list{list-style:none;padding:0;margin:16px 0;}
+.takeaway-list li{padding:12px 16px 12px 48px;position:relative;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:10px;font-size:15px;color:#1e293b;border:1px solid var(--border);}
+.takeaway-list li .t-num{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:24px;height:24px;background:var(--primary);color:#fff;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.reset-btn{position:fixed;bottom:18px;right:18px;background:#fff;border:1px solid var(--border);padding:8px 14px;border-radius:20px;font-size:13px;color:var(--muted);cursor:pointer;box-shadow:var(--shadow);font-family:inherit;transition:all var(--transition);z-index:100;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.cricket-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;}
+.cricket-table th{background:#1e293b;color:#fff;padding:7px 8px;text-align:center;font-weight:600;}
+.cricket-table td{padding:6px 8px;text-align:center;border-bottom:1px solid var(--border);color:#334155;}
+.cricket-table tr:nth-child(even) td{background:#f8fafc;}
+@media(max-width:720px){
+  .app{padding:14px 12px 80px;}
+  header.mod-header{padding:22px 18px;}
+  header.mod-header h1{font-size:22px;}
+  .card{padding:20px 16px;}
+  .two-col,.three-col{grid-template-columns:1fr;}
+  .stats-bar{grid-template-columns:repeat(2,1fr);}
+  .slide h2{font-size:22px;}
+  .freq-table,.cricket-table{font-size:12px;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="mod-header">
+  <span class="mod-badge">Module 9 of 17</span>
+  <h1>Binomial Distribution</h1>
+  <p class="mod-sub">Bernoulli trials, the binomial model, mean and variance. Counting successes when every outcome is either yes or no, and nothing in between.</p>
+  <p class="mod-instructor"><strong>K.M. Tanvir</strong> &nbsp;·&nbsp; Statistics for Non-Statisticians</p>
+</header>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-value" id="stat-slides">0%</div><div class="stat-label">Slides Viewed</div></div>
+  <div class="stat"><div class="stat-value" id="stat-quiz">&#8212;</div><div class="stat-label">Quiz Score</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cards">0 / 20</div><div class="stat-label">Cards Flipped</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cases">0 / 4</div><div class="stat-label">Cases Worked</div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('slides',this)">&#128214; Slides</button>
+  <button class="tab-btn" onclick="switchTab('quiz',this)">&#128221; Quiz</button>
+  <button class="tab-btn" onclick="switchTab('flashcards',this)">&#127183; Flashcards</button>
+  <button class="tab-btn" onclick="switchTab('cases',this)">&#127919; Real Cases</button>
+</div>
+
+<!-- ========== SLIDES ========== -->
+<div id="tab-slides" class="tab-content active">
+<div class="card">
+  <div class="progress-bar"><div class="progress-fill" id="slide-progress"></div></div>
+  <div class="slide-counter" id="slide-counter">Slide 1 of 13</div>
+  <!-- S1: objectives -->
+  <div class="slide active" id="slide-1">
+    <h2>Binomial Distribution</h2>
+    <p class="slide-sub">Module 9 &nbsp;·&nbsp; By the end of this module, you will be able to:</p>
+    <ul class="obj-list">
+      <li>Recognize a Bernoulli trial and identify whether a process meets the conditions of a binomial experiment</li>
+      <li>Calculate a binomial probability using the binomial formula and combinations</li>
+      <li>Calculate cumulative binomial probabilities, including "at least" and "at most" questions</li>
+      <li>Calculate and interpret the mean and variance of a binomial distribution</li>
+      <li>Describe how the shape of a binomial distribution changes with n and p</li>
+      <li>Recognize situations where the binomial conditions are violated and the model should not be used</li>
+    </ul>
+    <div class="tip-box"><strong>Continuing from Module 8:</strong> elementary probability gave the rules for combining probabilities of individual events. The binomial distribution applies those same rules, especially the multiplication rule for independent events, to a very common situation: repeating the same yes/no experiment a fixed number of times and counting how many times "yes" occurs.</div>
+  </div>
+
+  <!-- S2: bernoulli trial -->
+  <div class="slide" id="slide-2">
+    <h2>The Bernoulli Trial</h2>
+    <p>A <strong>Bernoulli trial</strong> is a single random experiment with exactly two possible outcomes, conventionally labeled "success" and "failure." Success does not need to mean something good, it simply means the outcome being counted.</p>
+    <div class="formula-box">\[ P(\text{success}) = p, \qquad P(\text{failure}) = 1 - p = q \]</div>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Examples of success/failure</div><div class="def-body">A mobile banking transaction completes or fails. A loan is repaid on time or defaults. A vaccinated patient does or does not develop a side effect. A manufactured item passes or fails inspection.</div></div>
+      <div class="def-card"><div class="def-term">p stays constant</div><div class="def-body">In a Bernoulli trial, p is the fixed probability of success for that one trial, determined by the nature of the process being studied, such as a known historical default rate.</div></div>
+    </div>
+    <div class="tip-box"><strong>Why this matters:</strong> the binomial distribution is nothing more than the sum of several independent, identical Bernoulli trials, counting how many resulted in success.</div>
+  </div>
+
+  <!-- S3: conditions for binomial experiment -->
+  <div class="slide" id="slide-3">
+    <h2>Conditions for a Binomial Experiment</h2>
+    <p>Not every repeated yes/no process is binomial. Four conditions, often remembered with the mnemonic <strong>BINS</strong>, must all hold:</p>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">B &mdash; Binary outcomes</div><div class="def-body">Each trial results in exactly one of two outcomes: success or failure.</div></div>
+      <div class="def-card"><div class="def-term">I &mdash; Independent trials</div><div class="def-body">The outcome of one trial does not affect the probability of success on any other trial.</div></div>
+    </div>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">N &mdash; Number of trials fixed</div><div class="def-body">The number of trials, n, is set in advance, not determined by when a success first occurs.</div></div>
+      <div class="def-card"><div class="def-term">S &mdash; Same probability of success</div><div class="def-body">The probability of success, p, is identical on every trial.</div></div>
+    </div>
+    <div class="warn-box"><strong>A frequent violation:</strong> drawing several items without replacement from a small population (such as 4 defective items among 20 in a box, sampled 5 at a time) changes the composition of the remaining pool after each draw. This makes the trials dependent and the probability of success shift from draw to draw, so the binomial model does not strictly apply. With a very large population relative to the sample, this effect becomes small enough to ignore in practice.</div>
+  </div>
+
+  <!-- S4: binomial formula -->
+  <div class="slide" id="slide-4">
+    <h2>The Binomial Probability Formula</h2>
+    <p>For a binomial experiment with n independent trials, each with success probability p, the probability of observing exactly x successes is:</p>
+    <div class="formula-box">\[ P(X = x) = \binom{n}{x} p^{x} (1-p)^{n-x}, \qquad x = 0, 1, 2, \dots, n \]</div>
+    <p>The term \(\binom{n}{x}\), read "n choose x," counts how many different sequences of n trials contain exactly x successes:</p>
+    <div class="formula-box">\[ \binom{n}{x} = \frac{n!}{x!\,(n-x)!} \]</div>
+    <div class="example-box"><strong>Why all three pieces are needed:</strong> \(p^x\) accounts for the probability of the x successes happening; \((1-p)^{n-x}\) accounts for the probability of the remaining failures; \(\binom{n}{x}\) accounts for the number of different orders in which those x successes could occur among the n trials.</div>
+  </div>
+
+  <!-- S5: worked example single probability -->
+  <div class="slide" id="slide-5">
+    <h2>Worked Example: Exactly x Successes</h2>
+    <p>A microfinance institution's records show that 8% of newly disbursed loans default within the first year (p = 0.08). Among a newly disbursed batch of 10 loans (n = 10), what is the probability that exactly 2 default?</p>
+    <div class="formula-box">\[ P(X = 2) = \binom{10}{2} (0.08)^2 (0.92)^8 \]</div>
+    <table class="freq-table">
+      <thead><tr><th>Component</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>\(\binom{10}{2} = \frac{10!}{2!\,8!}\)</td><td>45</td></tr>
+        <tr><td>\((0.08)^2\)</td><td>0.0064</td></tr>
+        <tr><td>\((0.92)^8\)</td><td>0.5132</td></tr>
+      </tbody>
+    </table>
+    <div class="example-box">P(X = 2) = 45 &times; 0.0064 &times; 0.5132 &asymp; <strong>0.1478</strong>, about a 14.8% chance that exactly 2 of the 10 loans default.</div>
+    <div class="tip-box"><strong>This loan example is used throughout this module.</strong> Keep n = 10 and p = 0.08 in mind; later slides build on it to compute cumulative probabilities, the mean, and the variance.</div>
+  </div>
+
+  <!-- S6: probability distribution and histogram -->
+  <div class="slide" id="slide-6">
+    <h2>The Full Binomial Probability Distribution</h2>
+    <p>Repeating the formula for every possible value of x from 0 to n produces the complete probability distribution. For the loan example (n = 10, p = 0.08):</p>
+    <table class="freq-table">
+      <thead><tr><th>x (defaults)</th><th>P(X = x)</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>0.4344</td></tr>
+        <tr class="highlight-row"><td>1</td><td>0.3777</td></tr>
+        <tr><td>2</td><td>0.1478</td></tr>
+        <tr><td>3</td><td>0.0343</td></tr>
+        <tr><td>4</td><td>0.0052</td></tr>
+        <tr><td>5 or more</td><td>0.0006</td></tr>
+        <tr class="total-row"><td>Total</td><td>1.0000</td></tr>
+      </tbody>
+    </table>
+    <svg viewBox="0 0 460 170" style="width:100%;max-width:460px;display:block;margin:10px auto;">
+      <line x1="40" y1="140" x2="440" y2="140" stroke="#94a3b8" stroke-width="1"/>
+      <rect x="50"  y="20"  width="48" height="120" fill="#2563eb"/>
+      <rect x="110" y="48"  width="48" height="92"  fill="#2563eb" opacity="0.85"/>
+      <rect x="170" y="105" width="48" height="35"  fill="#2563eb" opacity="0.65"/>
+      <rect x="230" y="132" width="48" height="8"   fill="#2563eb" opacity="0.45"/>
+      <rect x="290" y="138" width="48" height="2"   fill="#2563eb" opacity="0.3"/>
+      <text x="74" y="155" font-size="11" text-anchor="middle" fill="#1e293b">x=0</text>
+      <text x="134" y="155" font-size="11" text-anchor="middle" fill="#1e293b">x=1</text>
+      <text x="194" y="155" font-size="11" text-anchor="middle" fill="#1e293b">x=2</text>
+      <text x="254" y="155" font-size="11" text-anchor="middle" fill="#1e293b">x=3</text>
+      <text x="314" y="155" font-size="11" text-anchor="middle" fill="#1e293b">x=4</text>
+    </svg>
+    <p>Because p = 0.08 is small, the distribution is strongly right-skewed: zero or one defaults is by far the most likely outcome, and the probability falls off quickly as x increases.</p>
+  </div>
+
+  <!-- S7: cumulative probabilities -->
+  <div class="slide" id="slide-7">
+    <h2>Cumulative Binomial Probabilities</h2>
+    <p>Many real questions ask about a range of outcomes rather than one exact value: "at least," "at most," or "more than." These are answered by summing the relevant individual probabilities.</p>
+    <div class="formula-box">\[ P(X \le k) = \sum_{x=0}^{k} P(X = x), \qquad P(X \ge k) = 1 - P(X \le k-1) \]</div>
+    <div class="example-box"><strong>"At most 1 default":</strong> P(X &le; 1) = P(X=0) + P(X=1) = 0.4344 + 0.3777 = <strong>0.8121</strong>.
+    <br><br><strong>"At least 1 default":</strong> P(X &ge; 1) = 1 &minus; P(X=0) = 1 &minus; 0.4344 = <strong>0.5656</strong>.
+    <br><br><strong>"More than 2 defaults":</strong> P(X &gt; 2) = 1 &minus; P(X &le; 2) = 1 &minus; (0.4344+0.3777+0.1478) = 1 &minus; 0.9599 = <strong>0.0401</strong>.</div>
+    <div class="tip-box"><strong>The complement trick from Module 8 returns here:</strong> "at least 1" is almost always easiest to compute as 1 minus "exactly 0," since there is only one way to have zero successes but potentially many ways to have one or more.</div>
+  </div>
+
+  <!-- S8: mean and variance -->
+  <div class="slide" id="slide-8">
+    <h2>Mean and Variance of the Binomial Distribution</h2>
+    <p>Unlike most distributions, the binomial mean and variance have remarkably simple formulas, requiring no summation over the full distribution:</p>
+    <div class="formula-box">\[ \mu = E(X) = np, \qquad \sigma^2 = Var(X) = np(1-p), \qquad \sigma = \sqrt{np(1-p)} \]</div>
+    <div class="example-box"><strong>Loan example (n = 10, p = 0.08):</strong>
+    <br>&mu; = 10 &times; 0.08 = <strong>0.8</strong> expected defaults per batch of 10 loans.
+    <br>&sigma;&sup2; = 10 &times; 0.08 &times; 0.92 = <strong>0.736</strong>.
+    <br>&sigma; = &radic;0.736 &asymp; <strong>0.858</strong> defaults.</div>
+    <div class="tip-box"><strong>Interpreting &mu; = 0.8:</strong> this does not mean any single batch will have exactly 0.8 defaults, which is impossible. It means that if many such batches of 10 loans were disbursed, the long-run average number of defaults per batch would be 0.8, consistent with the full distribution in Slide 6 where 0 or 1 default dominates.</div>
+  </div>
+
+  <!-- S9: shape of the distribution -->
+  <div class="slide" id="slide-9">
+    <h2>How the Shape Changes with p and n</h2>
+    <p>The shape of a binomial distribution depends entirely on p and n.</p>
+    <div class="three-col">
+      <div class="def-card"><div class="def-term">p &lt; 0.5</div><div class="def-body">Right-skewed: low values of x are most likely, with a long tail toward larger x. This describes the loan default example, where p = 0.08.</div></div>
+      <div class="def-card"><div class="def-term">p = 0.5</div><div class="def-body">Perfectly symmetric, regardless of n. A fair coin flipped n times is the classic example.</div></div>
+      <div class="def-card"><div class="def-term">p &gt; 0.5</div><div class="def-body">Left-skewed: high values of x are most likely, with a long tail toward smaller x.</div></div>
+    </div>
+    <div class="tip-box"><strong>A connection to look ahead to:</strong> as n grows large, regardless of p (as long as np and n(1&minus;p) are both reasonably large, a common rule of thumb being at least 5 each), the binomial distribution becomes closely approximated by the normal distribution covered in Module 12. This is one of the most widely used approximations in applied statistics.</div>
+  </div>
+
+  <!-- S10: second worked example -->
+  <div class="slide" id="slide-10">
+    <h2>Worked Example: Quality Control</h2>
+    <p>A ceramics workshop's records show that 5% of fired pieces come out of the kiln with a visible defect (p = 0.05). A buyer randomly inspects 20 pieces from a shipment (n = 20). What is the probability that at most 1 piece is defective?</p>
+    <div class="formula-box">\[ P(X \le 1) = P(X=0) + P(X=1) = \binom{20}{0}(0.05)^0(0.95)^{20} + \binom{20}{1}(0.05)^1(0.95)^{19} \]</div>
+    <table class="freq-table">
+      <thead><tr><th>Term</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>P(X = 0) = (0.95)<sup>20</sup></td><td>0.3585</td></tr>
+        <tr><td>P(X = 1) = 20 &times; 0.05 &times; (0.95)<sup>19</sup></td><td>0.3774</td></tr>
+      </tbody>
+    </table>
+    <div class="example-box">P(X &le; 1) = 0.3585 + 0.3774 = <strong>0.7359</strong>, about a 73.6% chance the buyer's sample contains at most one defective piece, and therefore about a 26.4% chance of finding two or more.</div>
+    <p>Mean defectives per inspected batch: &mu; = np = 20 &times; 0.05 = <strong>1.0</strong>. Variance: &sigma;&sup2; = 20 &times; 0.05 &times; 0.95 = <strong>0.95</strong>.</p>
+  </div>
+
+  <!-- S11: when binomial conditions fail -->
+  <div class="slide" id="slide-11">
+    <h2>When the Binomial Model Does Not Apply</h2>
+    <p>Applying the binomial formula when its conditions are not met produces a number that looks precise but answers the wrong question.</p>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Trials are not independent</div><div class="def-body">Example: sampling 5 fish for a disease test from a pond of only 30 fish, without replacement. Each draw changes the remaining population's disease rate, violating independence.</div></div>
+      <div class="def-card"><div class="def-term">p is not constant</div><div class="def-body">Example: the probability a customer complaint is resolved on first contact may depend on time of day or agent experience, so a single p does not describe every trial.</div></div>
+    </div>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">n is not fixed in advance</div><div class="def-body">Example: continuing to test patients "until 3 positive cases are found" fixes the number of successes, not the number of trials. This is the negative binomial setting (Module 10), not the binomial.</div></div>
+      <div class="def-card"><div class="def-term">More than two outcomes</div><div class="def-body">Example: classifying a manufactured part as passing, needing minor rework, or being scrapped has three categories, not two, and requires a multinomial model instead.</div></div>
+    </div>
+    <div class="warn-box"><strong>The practical fix for small populations:</strong> when sampling without replacement from a population that is large relative to the sample (commonly, sample is less than 5&ndash;10% of the population), the dependence between draws becomes negligible and the binomial model remains a reasonable approximation.</div>
+  </div>
+
+  <!-- S12: anchor case -->
+  <div class="slide" id="slide-12">
+    <h2>Anchor Case: Vaccine Side Effect Monitoring</h2>
+    <p>A health directorate monitors a vaccine known from clinical trials to cause a mild fever in 12% of recipients (p = 0.12). At a rural vaccination camp, 15 people are vaccinated on a given day (n = 15), and recipients respond independently of one another.</p>
+    <div class="example-box"><strong>Question 1: probability that exactly 2 people develop a fever.</strong>
+    <br>P(X=2) = C(15,2)(0.12)<sup>2</sup>(0.88)<sup>13</sup> = 105 &times; 0.0144 &times; 0.1845 &asymp; <strong>0.279</strong>.</div>
+    <div class="example-box"><strong>Question 2: probability that at least 3 people develop a fever, which would trigger an internal review under the directorate's protocol.</strong>
+    <br>P(X=0) = (0.88)<sup>15</sup> &asymp; 0.1470. P(X=1) = 15(0.12)(0.88)<sup>14</sup> &asymp; 0.3006. P(X=2) &asymp; 0.279 (above).
+    <br>P(X &le; 2) &asymp; 0.1470+0.3006+0.279 = 0.7266. P(X &ge; 3) = 1 &minus; 0.7266 = <strong>0.2734</strong>, roughly a 27% chance the review threshold is triggered on any given camp day, purely from expected variability, not necessarily a sign that anything is wrong with this particular batch of vaccine.</div>
+    <div class="tip-box"><strong>Why this matters for policy:</strong> setting a review threshold without understanding the binomial variability built into small samples risks two costly errors: triggering unnecessary investigations into perfectly normal vaccine batches, or, conversely, setting the threshold so high that a genuinely elevated side-effect rate goes unnoticed.</div>
+  </div>
+
+  <!-- S13: recap -->
+  <div class="slide" id="slide-13">
+    <h2>Module 9 Recap</h2>
+    <ul class="takeaway-list">
+      <li><span class="t-num">1</span>A Bernoulli trial has exactly two outcomes, success with probability p and failure with probability 1&minus;p.</li>
+      <li><span class="t-num">2</span>A binomial experiment requires fixed n, independent trials, constant p, and binary outcomes on every trial (BINS).</li>
+      <li><span class="t-num">3</span>The binomial formula, P(X=x) = C(n,x) p^x (1&minus;p)^(n&minus;x), gives the probability of exactly x successes in n trials.</li>
+      <li><span class="t-num">4</span>Cumulative questions ("at least," "at most") are answered by summing individual probabilities, often most easily via the complement.</li>
+      <li><span class="t-num">5</span>The mean and variance have simple closed forms: &mu; = np and &sigma;&sup2; = np(1&minus;p), requiring no summation.</li>
+      <li><span class="t-num">6</span>The distribution is right-skewed when p &lt; 0.5, symmetric when p = 0.5, and left-skewed when p &gt; 0.5.</li>
+      <li><span class="t-num">7</span>Violating independence, a constant p, or a fixed n produces a number that looks like a valid probability but answers the wrong question.</li>
+    </ul>
+    <div class="tip-box"><strong>Next module:</strong> Module 10 turns to the negative binomial distribution, which answers a closely related but different question: not how many successes occur in a fixed number of trials, but how many trials are needed to reach a fixed number of successes.</div>
+  </div>
+
+  <div class="slide-nav">
+    <button class="btn btn-ghost" id="prevBtn">&larr; Previous</button>
+    <span class="key-hint">Use <span class="kbd">&larr;</span> <span class="kbd">&rarr;</span> arrow keys to navigate</span>
+    <button class="btn btn-primary" id="nextBtn">Next &rarr;</button>
+  </div>
+</div>
+</div>
+
+<!-- ========== QUIZ ========== -->
+<div id="tab-quiz" class="tab-content">
+<div class="quiz-intro">
+  <h2>&#128221; Module Quiz</h2>
+  <p>14 questions on Bernoulli trials, the binomial formula, cumulative probabilities, mean, variance, and shape.</p>
+  <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
+</div>
+<div id="quiz-questions" style="display:none;">
+  <div class="quiz-question" id="qq-1">
+    <h4><span class="q-num">1.</span>A Bernoulli trial is best described as:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(1,this,false)">Any random experiment with any number of outcomes</button>
+      <button class="quiz-option" onclick="answerQ(1,this,true)">A single random experiment with exactly two possible outcomes</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">A sequence of 10 or more trials</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">An experiment where p must equal 0.5</button>
+    </div>
+    <div class="quiz-explain" id="qe-1">A Bernoulli trial has exactly two outcomes, conventionally called success and failure, with fixed probabilities p and 1-p.</div>
+  </div>
+  <div class="quiz-question" id="qq-2">
+    <h4><span class="q-num">2.</span>Which of the following is NOT one of the four conditions (BINS) required for a binomial experiment?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(2,this,false)">A fixed number of trials</button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">Independent trials</button>
+      <button class="quiz-option" onclick="answerQ(2,this,true)">The probability of success must equal 0.5</button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">The same probability of success on every trial</button>
+    </div>
+    <div class="quiz-explain" id="qe-2">p can be any value between 0 and 1; it does not need to equal 0.5. The four required conditions are binary outcomes, independence, a fixed number of trials, and a constant p.</div>
+  </div>
+  <div class="quiz-question" id="qq-3">
+    <h4><span class="q-num">3.</span>In the binomial formula P(X=x) = C(n,x) p^x (1-p)^(n-x), the term C(n,x) accounts for:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(3,this,false)">The probability of any single success</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">The probability of any single failure</button>
+      <button class="quiz-option" onclick="answerQ(3,this,true)">The number of different orders in which x successes can occur among n trials</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">The mean of the distribution</button>
+    </div>
+    <div class="quiz-explain" id="qe-3">C(n,x), the number of combinations, counts how many distinct sequences of n trials contain exactly x successes.</div>
+  </div>
+  <div class="quiz-question" id="qq-4">
+    <h4><span class="q-num">4.</span>For a binomial experiment with n=10 and p=0.08, P(X=2) was computed as 45 &times; (0.08)^2 &times; (0.92)^8. What does the 45 represent?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(4,this,true)">C(10,2), the number of ways to choose which 2 of the 10 trials are successes</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">The mean of the distribution</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">The variance of the distribution</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">10 multiplied by 0.08</button>
+    </div>
+    <div class="quiz-explain" id="qe-4">C(10,2) = 10!/(2!8!) = 45, the number of distinct ways 2 successes can be arranged among 10 trials.</div>
+  </div>
+  <div class="quiz-question" id="qq-5">
+    <h4><span class="q-num">5.</span>If P(X=0) = 0.4344 for a binomial distribution, then P(X &ge; 1) equals:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(5,this,false)">0.4344</button>
+      <button class="quiz-option" onclick="answerQ(5,this,true)">0.5656</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">1.4344</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">Cannot be determined</button>
+    </div>
+    <div class="quiz-explain" id="qe-5">P(X &ge; 1) = 1 - P(X=0) = 1 - 0.4344 = 0.5656, using the complement rule from Module 8.</div>
+  </div>
+  <div class="quiz-question" id="qq-6">
+    <h4><span class="q-num">6.</span>The mean of a binomial distribution is calculated as:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(6,this,false)">np(1-p)</button>
+      <button class="quiz-option" onclick="answerQ(6,this,true)">np</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">n/p</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">p/n</button>
+    </div>
+    <div class="quiz-explain" id="qe-6">The binomial mean is simply the number of trials times the probability of success: &mu; = np.</div>
+  </div>
+  <div class="quiz-question" id="qq-7">
+    <h4><span class="q-num">7.</span>The variance of a binomial distribution is calculated as:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(7,this,true)">np(1-p)</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">np</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">n(1-p)</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">p(1-p)</button>
+    </div>
+    <div class="quiz-explain" id="qe-7">The binomial variance is &sigma;&sup2; = np(1-p), combining the number of trials with both the success and failure probabilities.</div>
+  </div>
+  <div class="quiz-question" id="qq-8">
+    <h4><span class="q-num">8.</span>For n=20 and p=0.05, the mean number of defective items is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(8,this,false)">0.05</button>
+      <button class="quiz-option" onclick="answerQ(8,this,true)">1.0</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">5.0</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">20.0</button>
+    </div>
+    <div class="quiz-explain" id="qe-8">&mu; = np = 20 &times; 0.05 = 1.0 expected defective items.</div>
+  </div>
+  <div class="quiz-question" id="qq-9">
+    <h4><span class="q-num">9.</span>A binomial distribution with p = 0.5 will always be:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(9,this,false)">Right-skewed</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">Left-skewed</button>
+      <button class="quiz-option" onclick="answerQ(9,this,true)">Symmetric</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">Bimodal</button>
+    </div>
+    <div class="quiz-explain" id="qe-9">When p = 0.5, success and failure are equally likely, making the binomial distribution perfectly symmetric regardless of n.</div>
+  </div>
+  <div class="quiz-question" id="qq-10">
+    <h4><span class="q-num">10.</span>A binomial distribution with a small p (such as p = 0.08) will be:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(10,this,true)">Right-skewed</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">Left-skewed</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">Symmetric</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">Uniform</button>
+    </div>
+    <div class="quiz-explain" id="qe-10">When success is rare, low values of x dominate and the distribution has a long tail toward higher x, making it right-skewed.</div>
+  </div>
+  <div class="quiz-question" id="qq-11">
+    <h4><span class="q-num">11.</span>A researcher samples 5 fish without replacement from a pond containing only 30 fish to test for a disease. Why does this violate a key binomial condition?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(11,this,false)">The number of trials is not fixed</button>
+      <button class="quiz-option" onclick="answerQ(11,this,true)">Each draw changes the remaining population's disease rate, so the trials are not independent</button>
+      <button class="quiz-option" onclick="answerQ(11,this,false)">There are more than two possible outcomes</button>
+      <button class="quiz-option" onclick="answerQ(11,this,false)">It does not violate any condition</button>
+    </div>
+    <div class="quiz-explain" id="qe-11">Sampling without replacement from a small population means each draw alters the probability of success on subsequent draws, violating the independence requirement.</div>
+  </div>
+  <div class="quiz-question" id="qq-12">
+    <h4><span class="q-num">12.</span>A quality inspector tests items "until 3 defective items are found," stopping whenever that happens. This scenario is NOT binomial because:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(12,this,true)">The number of trials is not fixed in advance; instead, the number of successes is fixed</button>
+      <button class="quiz-option" onclick="answerQ(12,this,false)">The probability of success is not constant</button>
+      <button class="quiz-option" onclick="answerQ(12,this,false)">There are more than two outcomes per trial</button>
+      <button class="quiz-option" onclick="answerQ(12,this,false)">The trials are not independent</button>
+    </div>
+    <div class="quiz-explain" id="qe-12">Fixing the number of successes and letting the number of trials vary is the negative binomial setting, covered in Module 10, not the binomial setting.</div>
+  </div>
+  <div class="quiz-question" id="qq-13">
+    <h4><span class="q-num">13.</span>As n becomes large (with np and n(1-p) both reasonably large), the binomial distribution becomes well approximated by:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(13,this,false)">The exponential distribution</button>
+      <button class="quiz-option" onclick="answerQ(13,this,true)">The normal distribution</button>
+      <button class="quiz-option" onclick="answerQ(13,this,false)">The geometric mean</button>
+      <button class="quiz-option" onclick="answerQ(13,this,false)">The mode</button>
+    </div>
+    <div class="quiz-explain" id="qe-13">For large n with np and n(1-p) both reasonably large (a common rule of thumb is at least 5 each), the binomial distribution is closely approximated by the normal distribution, covered in Module 12.</div>
+  </div>
+  <div class="quiz-question" id="qq-14">
+    <h4><span class="q-num">14.</span>A vaccination camp vaccinates 15 people with an independent 12% chance of mild fever each. Why might a fixed review threshold of "3 or more fevers" sometimes trigger a review even when the vaccine is performing normally?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(14,this,true)">Binomial variability means that even at the expected rate, some camp days will naturally produce 3 or more fevers by chance</button>
+      <button class="quiz-option" onclick="answerQ(14,this,false)">The binomial formula guarantees exactly np fevers every single day</button>
+      <button class="quiz-option" onclick="answerQ(14,this,false)">A review is only triggered if the vaccine batch is defective</button>
+      <button class="quiz-option" onclick="answerQ(14,this,false)">15 people is too large a sample for the binomial model to apply</button>
+    </div>
+    <div class="quiz-explain" id="qe-14">The binomial distribution has genuine variability around its mean; with n=15 and p=0.12, P(X &ge; 3) is roughly 27%, meaning such a result happens fairly often by ordinary chance alone, not necessarily indicating a problem with the vaccine batch.</div>
+  </div>
+  <div class="quiz-footer">
+    <span class="quiz-progress-text" id="quiz-progress">0 of 14 answered</span>
+    <button class="btn btn-primary" onclick="submitQuiz()" id="btn-submit-quiz" disabled>Submit Quiz</button>
+  </div>
+  <div class="quiz-result" id="quiz-result">
+    <h3>Quiz Complete</h3>
+    <div class="score" id="quiz-score-display">0<span class="total"> / 14</span></div>
+    <div class="verdict" id="quiz-verdict"></div>
+    <p id="quiz-msg"></p>
+    <button class="btn btn-primary" onclick="retakeQuiz()">Retake Quiz</button>
+  </div>
+</div>
+</div>
+
+<!-- ========== FLASHCARDS ========== -->
+<div id="tab-flashcards" class="tab-content">
+<div class="flashcards-header">
+  <h2>&#127183; Flashcards</h2>
+  <p>20 key terms from Module 9. Click any card to reveal its definition.</p>
+</div>
+<div class="flashcards-grid" id="fc-grid"></div>
+</div>
+
+<!-- ========== REAL CASES ========== -->
+<div id="tab-cases" class="tab-content">
+<div class="cases-header">
+  <h2>&#127919; Real Cases</h2>
+  <p>Read each scenario, write your interpretation, then reveal what most people miss and what the careful reading looks like.</p>
+</div>
+
+<div class="case-card" id="case-1">
+  <h4>Case 1: Overbooking a Flight</h4>
+  <p class="case-prompt">An airline knows from years of data that 6% of passengers who book a domestic flight fail to show up (p = 0.06), and no-shows are effectively independent of one another. The airline sells 100 tickets for a 95-seat flight, reasoning that the expected number of no-shows, &mu; = 100 &times; 0.06 = 6, comfortably covers the 5-seat overbooking margin.</p>
+  <p class="case-q">Is relying on the mean of 6 no-shows alone a safe basis for this overbooking decision?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-1','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-1','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-1" onclick="markCaseWorked(1)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-1">Since the expected number of no-shows (6) exceeds the overbooking margin (5), it is tempting to conclude the airline is safely covered on average.</div>
+  <div class="reveal-panel right-panel" id="right-case-1">The mean describes the long-run average, not the outcome of any single flight. With n=100 and p=0.06, &sigma; = &radic;(100&times;0.06&times;0.94) &asymp; 2.37, so the actual number of no-shows varies substantially flight to flight. There is a real, calculable probability that fewer than 5 passengers fail to show, which would mean more passengers arrive than there are seats, resulting in involuntary bumping. A responsible overbooking policy should calculate P(no-shows &lt; 5) explicitly from the binomial distribution, not rely on the mean alone, and weigh that probability against the cost of bumping a passenger.</div>
+</div>
+
+<div class="case-card" id="case-2">
+  <h4>Case 2: A Misapplied "Binomial" Survey</h4>
+  <p class="case-prompt">A market research firm surveys 200 randomly selected households in a city of 5 million about whether they have heard of a new mobile banking app, sampling without replacement. An analyst calculates a binomial probability for the number of households that have heard of the app, using p = 0.30 from prior market data.</p>
+  <p class="case-q">Is treating this as a binomial experiment a reasonable approximation, or a serious error?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-2','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-2','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-2" onclick="markCaseWorked(2)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-2">Sampling without replacement technically violates strict independence, leading some to reflexively reject the binomial model here as invalid.</div>
+  <div class="reveal-panel right-panel" id="right-case-2">This is a reasonable approximation, not an error. The sample (200) is a tiny fraction (0.004%) of the population (5 million), so removing surveyed households from the population has a negligible effect on the probability of the next household having heard of the app. The common rule of thumb, that the sample should be less than 5 to 10% of the population, is comfortably satisfied here. This is the opposite situation to the pond-of-30-fish example: when the population is large relative to the sample, the binomial model remains a very good approximation despite sampling without replacement.</div>
+</div>
+
+<div class="case-card" id="case-3">
+  <h4>Case 3: Setting a Defect-Rate Alarm</h4>
+  <p class="case-prompt">A factory production manager sets a rule: "if more than 3 defective items appear in a daily sample of 25, stop the line and inspect the machinery." Historical data shows the normal defect rate is 8% (p = 0.08) under healthy operating conditions.</p>
+  <p class="case-q">Before adopting this rule, what should the manager calculate, and why?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-3','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-3','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-3" onclick="markCaseWorked(3)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-3">"More than 3 out of 25" sounds intuitively like a meaningfully elevated defect rate (more than 12%), so the threshold can feel self-evidently reasonable without further calculation.</div>
+  <div class="reveal-panel right-panel" id="right-case-3">The manager should calculate P(X &gt; 3) under the normal binomial model with n=25, p=0.08, before adopting the rule. With &mu; = np = 2.0, getting more than 3 defects by ordinary random variation alone is not as rare as intuition suggests; the binomial distribution has a calculable, often non-trivial, probability of producing 4 or more defects purely by chance even when the process is perfectly healthy. Without this calculation, the factory risks frequent unnecessary line stoppages (a high false-alarm rate) or, if the threshold is set too loosely, missing genuine equipment problems. The threshold should be chosen based on an acceptable false-alarm probability, not intuition about what "sounds like too many."</div>
+</div>
+
+<div class="case-card" id="case-4">
+  <h4>Case 4: Waiting for the Third Success</h4>
+  <p class="case-prompt">A clinical trial coordinator recruits patients one at a time and plans to "keep enrolling patients until exactly 5 patients respond positively to the treatment," then stop enrollment. An assistant proposes using the binomial formula to calculate the probability distribution of the number of patients enrolled.</p>
+  <p class="case-q">Is the binomial distribution the correct tool for this question?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-4','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-4','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-4" onclick="markCaseWorked(4)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-4">Since each patient's response is still a binary success/failure outcome with a roughly constant probability, it is easy to assume the binomial formula automatically applies to any question involving such outcomes.</div>
+  <div class="reveal-panel right-panel" id="right-case-4">No, this is not a binomial question. In the binomial setting, the number of trials (n) is fixed in advance and the number of successes is what varies randomly. Here, the situation is reversed: the number of successes is fixed at 5, and the number of trials (patients enrolled) is what varies randomly and is unknown in advance. This is exactly the setting for the negative binomial distribution, covered in Module 10, which answers "how many trials are needed to reach a fixed number of successes," not the binomial question of "how many successes occur in a fixed number of trials."</div>
+</div>
+
+</div>
+
+<button class="reset-btn" onclick="resetProgress()">&#8635; Reset Progress</button>
+
+<script>
+const STORAGE_KEY='stats101-module9-progress-v1';
+const TOTAL_SLIDES=13,TOTAL_CARDS=20,TOTAL_CASES=4,TOTAL_QUIZ=14;
+
+const flashcardData=[
+  {term:'Bernoulli trial',def:'A single random experiment with exactly two possible outcomes, success (probability p) and failure (probability 1-p).'},
+  {term:'Binomial experiment',def:'A sequence of n independent Bernoulli trials, each with the same probability of success p, where the total number of successes is counted.'},
+  {term:'BINS conditions',def:'The four requirements for a binomial experiment: Binary outcomes, Independent trials, fixed Number of trials, and Same probability of success on every trial.'},
+  {term:'Success / failure',def:'The two possible outcomes of a Bernoulli trial. "Success" simply labels the outcome being counted; it need not represent something positive in real terms.'},
+  {term:'Binomial probability formula',def:'P(X=x) = C(n,x) p^x (1-p)^(n-x), giving the probability of exactly x successes in n independent trials.'},
+  {term:'Combination, C(n,x)',def:'The number of distinct ways to choose x successes among n trials, calculated as n! / (x!(n-x)!).'},
+  {term:'Cumulative binomial probability',def:'The probability that X falls within a range of values, such as P(X &le; k) or P(X &ge; k), found by summing individual binomial probabilities.'},
+  {term:'Binomial mean',def:'&mu; = np, the expected (long-run average) number of successes across n independent trials with success probability p.'},
+  {term:'Binomial variance',def:'&sigma;&sup2; = np(1-p), measuring the spread of the number of successes around the mean.'},
+  {term:'Binomial standard deviation',def:'&sigma; = &radic;(np(1-p)), the square root of the binomial variance, expressed in the same units as the count of successes.'},
+  {term:'Right-skewed binomial',def:'The shape of a binomial distribution when p &lt; 0.5: low values of x are most likely, with a long tail toward larger x.'},
+  {term:'Left-skewed binomial',def:'The shape of a binomial distribution when p &gt; 0.5: high values of x are most likely, with a long tail toward smaller x.'},
+  {term:'Symmetric binomial',def:'The shape of a binomial distribution when p = 0.5, identical regardless of n.'},
+  {term:'Independence (trials)',def:'The requirement that the outcome of one trial does not affect the probability of success on any other trial.'},
+  {term:'Sampling without replacement',def:'Drawing items from a population without returning them, which can violate the independence condition unless the population is large relative to the sample.'},
+  {term:'Large-population approximation',def:'The practical rule that the binomial model remains a good approximation for sampling without replacement when the sample is less than about 5-10% of the population.'},
+  {term:'Normal approximation to the binomial',def:'For large n with np and n(1-p) both reasonably large, the binomial distribution is closely approximated by the normal distribution.'},
+  {term:'Negative binomial distribution',def:'The related distribution that arises when the number of successes is fixed in advance and the number of trials needed to reach it is the random quantity, the reverse of the binomial setting.'},
+  {term:'Complement rule (binomial use)',def:'Computing P(X &ge; 1) as 1 - P(X=0), often far easier than summing every other possible value directly.'},
+  {term:'Fixed number of trials (n)',def:'The requirement that the total number of trials in a binomial experiment is set in advance, not determined by when a target number of successes is reached.'}
+];
+
+let state={slidesViewed:new Set(),quizScore:null,cardsFlipped:new Set(),casesWorked:new Set(),quizAnswers:{},quizSubmitted:false,currentSlide:1};
+
+function loadState(){
+  try{const s=localStorage.getItem(STORAGE_KEY);if(s){const p=JSON.parse(s);state.slidesViewed=new Set(p.slidesViewed||[]);state.quizScore=p.quizScore!==undefined?p.quizScore:null;state.cardsFlipped=new Set(p.cardsFlipped||[]);state.casesWorked=new Set(p.casesWorked||[]);state.quizAnswers=p.quizAnswers||{};state.quizSubmitted=p.quizSubmitted||false;state.currentSlide=p.currentSlide||1;}}catch(e){}
+}
+function saveState(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify({slidesViewed:[...state.slidesViewed],quizScore:state.quizScore,cardsFlipped:[...state.cardsFlipped],casesWorked:[...state.casesWorked],quizAnswers:state.quizAnswers,quizSubmitted:state.quizSubmitted,currentSlide:state.currentSlide}));}catch(e){}
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');btn.classList.add('active');
+}
+
+const prevBtn=document.getElementById('prevBtn');
+const nextBtn=document.getElementById('nextBtn');
+function showSlide(n){
+  if(n<1||n>TOTAL_SLIDES)return;
+  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+  document.getElementById('slide-'+n).classList.add('active');
+  state.currentSlide=n;state.slidesViewed.add(n);saveState();updateSlideUI();updateStats();
+}
+function updateSlideUI(){
+  const n=state.currentSlide;
+  document.getElementById('slide-counter').textContent='Slide '+n+' of '+TOTAL_SLIDES;
+  document.getElementById('slide-progress').style.width=(n/TOTAL_SLIDES*100)+'%';
+  prevBtn.disabled=n===1;
+  nextBtn.textContent=n===TOTAL_SLIDES?'Finish ✓':'Next →';
+}
+prevBtn.addEventListener('click',()=>showSlide(state.currentSlide-1));
+nextBtn.addEventListener('click',()=>{if(state.currentSlide<TOTAL_SLIDES)showSlide(state.currentSlide+1);});
+document.addEventListener('keydown',e=>{
+  const activeTab=document.querySelector('.tab-content.active');
+  if(!activeTab||activeTab.id!=='tab-slides')return;
+  if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
+  if(e.key==='ArrowRight'){e.preventDefault();nextBtn.click();}
+  else if(e.key==='ArrowLeft'){e.preventDefault();prevBtn.click();}
+});
+
+let quizAnswered=0,quizCorrect=0;
+function startQuiz(){document.querySelector('.quiz-intro').style.display='none';document.getElementById('quiz-questions').style.display='block';if(state.quizSubmitted)restoreQuizState();}
+function answerQ(qNum,btn,correct){
+  const qq=document.getElementById('qq-'+qNum);if(qq.classList.contains('answered'))return;
+  qq.classList.add('answered');qq.querySelectorAll('.quiz-option').forEach(o=>o.classList.add('disabled'));
+  btn.classList.add(correct?'correct':'wrong');if(correct)quizCorrect++;
+  document.getElementById('qe-'+qNum).classList.add('show');
+  state.quizAnswers[qNum]=correct;quizAnswered++;
+  document.getElementById('quiz-progress').textContent=quizAnswered+' of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=quizAnswered<TOTAL_QUIZ;saveState();
+}
+function submitQuiz(){
+  state.quizScore=quizCorrect;state.quizSubmitted=true;saveState();
+  document.getElementById('quiz-score-display').innerHTML=quizCorrect+'<span class="total"> / '+TOTAL_QUIZ+'</span>';
+  const v=document.getElementById('quiz-verdict'),m=document.getElementById('quiz-msg');
+  if(quizCorrect>=13){v.textContent='Excellent';v.className='verdict great';m.textContent='Strong command of the binomial model and its conditions.';}
+  else if(quizCorrect>=9){v.textContent='Good';v.className='verdict good';m.textContent='Solid. Review the explanations on questions you missed.';}
+  else{v.textContent='Keep going';v.className='verdict ok';m.textContent='Revisit the slides on the binomial conditions and the mean/variance formulas before retaking.';}
+  document.getElementById('quiz-result').classList.add('show');updateStats();
+}
+function retakeQuiz(){
+  state.quizScore=null;state.quizSubmitted=false;state.quizAnswers={};quizCorrect=0;quizAnswered=0;saveState();
+  document.getElementById('quiz-result').classList.remove('show');
+  document.querySelectorAll('.quiz-question').forEach(q=>{q.classList.remove('answered');q.querySelectorAll('.quiz-option').forEach(o=>o.classList.remove('correct','wrong','disabled'));q.querySelectorAll('.quiz-explain').forEach(e=>e.classList.remove('show'));});
+  document.getElementById('quiz-progress').textContent='0 of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=true;updateStats();
+}
+function restoreQuizState(){
+  Object.entries(state.quizAnswers).forEach(([qNum,correct])=>{
+    const qq=document.getElementById('qq-'+qNum);if(!qq)return;
+    qq.classList.add('answered');qq.querySelectorAll('.quiz-option').forEach(o=>o.classList.add('disabled'));
+    document.getElementById('qe-'+qNum).classList.add('show');quizAnswered++;if(correct)quizCorrect++;
+  });
+  document.getElementById('quiz-progress').textContent=quizAnswered+' of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=quizAnswered<TOTAL_QUIZ;
+  if(state.quizSubmitted)submitQuiz();
+}
+
+function buildFlashcards(){
+  const grid=document.getElementById('fc-grid');
+  flashcardData.forEach((fc,i)=>{
+    const div=document.createElement('div');div.className='flashcard'+(state.cardsFlipped.has(i)?' flipped':'');
+    div.innerHTML='<div class="flashcard-inner"><div class="flashcard-front">'+fc.term+'<span class="fc-hint">Click to reveal definition</span></div><div class="flashcard-back">'+fc.def+'</div></div>';
+    div.addEventListener('click',()=>{div.classList.toggle('flipped');state.cardsFlipped.add(i);saveState();updateStats();});
+    grid.appendChild(div);
+  });
+}
+
+function revealCase(id,type){document.getElementById(type+'-'+id).classList.add('show');}
+function markCaseWorked(n){
+  state.casesWorked.add(n);saveState();
+  const btn=document.getElementById('worked-case-'+n);btn.textContent='Worked';btn.classList.add('done');updateStats();
+}
+
+function updateStats(){
+  document.getElementById('stat-slides').textContent=Math.round(state.slidesViewed.size/TOTAL_SLIDES*100)+'%';
+  document.getElementById('stat-quiz').textContent=state.quizScore!==null?state.quizScore+' / '+TOTAL_QUIZ:'—';
+  document.getElementById('stat-cards').textContent=state.cardsFlipped.size+' / '+TOTAL_CARDS;
+  document.getElementById('stat-cases').textContent=state.casesWorked.size+' / '+TOTAL_CASES;
+}
+function resetProgress(){if(!confirm('Reset all progress for this module?'))return;localStorage.removeItem(STORAGE_KEY);location.reload();}
+
+loadState();buildFlashcards();showSlide(state.currentSlide);updateStats();
+if(state.quizSubmitted){document.querySelector('.quiz-intro').style.display='none';document.getElementById('quiz-questions').style.display='block';restoreQuizState();}
+state.casesWorked.forEach(n=>{const btn=document.getElementById('worked-case-'+n);if(btn){btn.textContent='Worked';btn.classList.add('done');}});
+</script>
+</div>
+</body>
+</html>

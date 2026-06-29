@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 14: Sampling Distributions and the Central Limit Theorem</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;
+  --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#dbeafe;
+  --accent:#4f46e5;--success:#059669;--success-light:#d1fae5;
+  --danger:#dc2626;--danger-light:#fee2e2;
+  --warning:#d97706;--warning-light:#fef3c7;
+  --border:#e2e8f0;
+  --shadow:0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.08),0 4px 10px rgba(0,0,0,.04);
+  --radius:12px;--radius-sm:8px;--transition:.2s cubic-bezier(.4,0,.2,1);
+}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;}
+.app{max-width:1100px;margin:0 auto;padding:24px 20px 80px;}
+header.mod-header{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%);color:#fff;padding:32px 28px;border-radius:var(--radius);margin-bottom:20px;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;}
+header.mod-header::before{content:"";position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:rgba(255,255,255,.08);border-radius:50%;}
+header.mod-header::after{content:"";position:absolute;bottom:-30px;right:80px;width:100px;height:100px;background:rgba(255,255,255,.05);border-radius:50%;}
+.mod-badge{display:inline-block;background:rgba(255,255,255,.2);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:.5px;position:relative;z-index:1;}
+header.mod-header h1{font-size:28px;margin:12px 0 8px;font-weight:700;position:relative;z-index:1;}
+header.mod-header p.mod-sub{font-size:14px;opacity:.88;max-width:640px;position:relative;z-index:1;}
+header.mod-header p.mod-instructor{font-size:13px;opacity:.8;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.2);position:relative;z-index:1;}
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;padding:14px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;}
+.stat{text-align:center;padding:6px;}
+.stat .stat-value{font-size:22px;font-weight:700;color:var(--primary);line-height:1.2;}
+.stat .stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:2px;}
+.tabs{display:flex;gap:4px;background:#fff;padding:6px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;flex-wrap:wrap;}
+.tab-btn{flex:1;min-width:110px;padding:11px 16px;background:transparent;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;transition:all var(--transition);font-family:inherit;}
+.tab-btn:hover{background:var(--bg);color:var(--text);}
+.tab-btn.active{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.28);}
+.tab-content{display:none;animation:fadeIn .28s ease-in-out;}
+.tab-content.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);margin-bottom:16px;}
+.progress-bar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:12px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:3px;transition:width .4s ease;}
+.slide-counter{text-align:center;color:var(--muted);font-size:13px;margin-bottom:14px;font-weight:500;}
+.slide{display:none;min-height:440px;padding:4px;animation:slideIn .3s ease;}
+.slide.active{display:block;}
+@keyframes slideIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+.slide h2{font-size:26px;margin-bottom:6px;color:var(--primary-dark);font-weight:700;line-height:1.25;}
+.slide h3{font-size:18px;margin:20px 0 8px;color:var(--text);font-weight:600;}
+.slide p{margin-bottom:12px;color:#334155;}
+.slide ul,.slide ol{margin:0 0 14px 22px;}
+.slide li{margin-bottom:7px;color:#334155;}
+.slide .slide-sub{color:var(--muted);font-size:15px;margin-bottom:18px;font-style:italic;}
+.obj-list{list-style:none;padding:0;margin:14px 0;}
+.obj-list li{padding:9px 0 9px 32px;position:relative;color:#334155;border-bottom:1px solid var(--border);}
+.obj-list li:last-child{border-bottom:none;}
+.obj-list li::before{content:"";position:absolute;left:0;top:13px;width:18px;height:18px;background:var(--success-light);border-radius:50%;}
+.obj-list li::after{content:"✓";position:absolute;left:3px;top:10px;color:var(--success);font-size:11px;font-weight:700;}
+.example-box{background:var(--primary-light);border-left:4px solid var(--primary);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.example-box strong{color:var(--primary-dark);}
+.tip-box{background:var(--success-light);border-left:4px solid var(--success);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.tip-box strong{color:var(--success);}
+.warn-box{background:var(--warning-light);border-left:4px solid var(--warning);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.warn-box strong{color:var(--warning);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:14px 0;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:14px 0;}
+.def-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;}
+.def-card .def-term{font-weight:700;color:var(--primary-dark);font-size:15px;margin-bottom:6px;}
+.def-card .def-body{font-size:14px;color:#334155;}
+.formula-box{background:#0f172a;color:#e2e8f0;padding:18px 22px;border-radius:var(--radius-sm);margin:14px 0;text-align:center;font-size:16px;overflow-x:auto;}
+.freq-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;}
+.freq-table th{background:var(--primary);color:#fff;padding:9px 12px;text-align:left;font-weight:600;}
+.freq-table th:not(:first-child),.freq-table td:not(:first-child){text-align:right;}
+.freq-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:#334155;}
+.freq-table tr:nth-child(even) td{background:#f8fafc;}
+.freq-table tr.total-row td{font-weight:700;background:var(--primary-light);color:var(--primary-dark);border-top:2px solid var(--primary);}
+.freq-table tr.highlight-row td{background:#fef3c7;}
+.freq-table th:first-child{border-radius:8px 0 0 0;}.freq-table th:last-child{border-radius:0 8px 0 0;}
+.practice{background:#f1f5f9;border:2px dashed #cbd5e1;border-radius:var(--radius-sm);padding:18px;margin:20px 0;}
+.practice h4{color:var(--primary);margin-bottom:10px;font-size:15px;}
+.practice-q{margin-bottom:10px;color:var(--text);font-weight:500;}
+.practice-options{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+.practice-btn{padding:8px 14px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;font-size:14px;transition:all var(--transition);color:var(--text);}
+.practice-btn:hover{border-color:var(--primary);background:var(--primary-light);}
+.practice-btn.correct{background:var(--success-light);border-color:var(--success);color:var(--success);font-weight:600;}
+.practice-btn.wrong{background:var(--danger-light);border-color:var(--danger);color:var(--danger);}
+.practice-btn.disabled{pointer-events:none;opacity:.75;}
+.practice-feedback{margin-top:10px;padding:10px 14px;border-radius:6px;font-size:14px;display:none;}
+.practice-feedback.show{display:block;}
+.practice-feedback.right{background:var(--success-light);color:var(--success);border:1px solid var(--success);}
+.practice-feedback.wrong{background:var(--danger-light);color:var(--danger);border:1px solid var(--danger);}
+.slide-nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border);gap:10px;flex-wrap:wrap;}
+.key-hint{font-size:12px;color:var(--muted);}
+.kbd{display:inline-block;background:#f1f5f9;border:1px solid var(--border);border-bottom-width:2px;border-radius:4px;padding:1px 6px;font-family:monospace;font-size:11px;color:var(--text);}
+.btn{padding:10px 20px;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;transition:all var(--transition);font-family:inherit;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover:not(:disabled){background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,.28);}
+.btn-primary:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover:not(:disabled){background:var(--bg);color:var(--text);}
+.btn-ghost:disabled{opacity:.45;cursor:not-allowed;}
+.quiz-intro{background:#fff;padding:22px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;text-align:center;}
+.quiz-intro h2{color:var(--primary-dark);margin-bottom:8px;}
+.quiz-intro p{color:var(--muted);margin-bottom:14px;}
+.quiz-question{background:#fff;border-radius:var(--radius);padding:22px;margin-bottom:14px;box-shadow:var(--shadow);border:1px solid var(--border);}
+.quiz-question h4{font-size:16px;margin-bottom:14px;color:var(--text);font-weight:600;}
+.q-num{color:var(--primary);font-weight:700;margin-right:6px;}
+.quiz-options{display:grid;gap:8px;}
+.quiz-option{padding:11px 16px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:#fff;transition:all var(--transition);font-size:14px;color:var(--text);text-align:left;font-family:inherit;}
+.quiz-option:hover{border-color:var(--primary);background:var(--primary-light);transform:translateX(2px);}
+.quiz-option.correct{border-color:var(--success);background:var(--success-light);color:var(--success);font-weight:600;}
+.quiz-option.wrong{border-color:var(--danger);background:var(--danger-light);color:var(--danger);}
+.quiz-option.disabled{pointer-events:none;}
+.quiz-explain{display:none;margin-top:10px;padding:10px 14px;background:#f8fafc;border-left:3px solid var(--primary);border-radius:4px;font-size:13px;color:#334155;}
+.quiz-explain.show{display:block;}
+.quiz-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px 20px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);flex-wrap:wrap;}
+.quiz-progress-text{font-size:13px;color:var(--muted);}
+.quiz-result{display:none;padding:30px;background:linear-gradient(135deg,#f0fdf4 0%,#dbeafe 100%);border-radius:var(--radius);text-align:center;margin-top:16px;box-shadow:var(--shadow);}
+.quiz-result.show{display:block;}
+.quiz-result h3{font-size:24px;margin-bottom:10px;color:var(--primary-dark);}
+.quiz-result .score{font-size:48px;font-weight:700;color:var(--primary);margin:14px 0;line-height:1;}
+.quiz-result .score .total{font-size:26px;color:var(--muted);}
+.quiz-result p{color:#334155;margin-bottom:16px;font-size:15px;}
+.verdict{display:inline-block;padding:6px 14px;border-radius:16px;font-weight:600;font-size:14px;margin-bottom:8px;}
+.verdict.great{background:var(--success-light);color:var(--success);}
+.verdict.good{background:var(--primary-light);color:var(--primary-dark);}
+.verdict.ok{background:var(--warning-light);color:var(--warning);}
+.flashcards-header{background:#fff;padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;text-align:center;}
+.flashcards-header h2{color:var(--primary-dark);margin-bottom:6px;}
+.flashcards-header p{color:var(--muted);font-size:14px;}
+.flashcards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+.flashcard{perspective:1000px;height:170px;cursor:pointer;}
+.flashcard-inner{position:relative;width:100%;height:100%;transition:transform .55s;transform-style:preserve-3d;}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+.flashcard-front,.flashcard-back{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:var(--shadow);}
+.flashcard-front{background:linear-gradient(135deg,#fff 0%,#f8fafc 100%);border:2px solid var(--primary-light);color:var(--primary-dark);font-weight:600;font-size:16px;}
+.flashcard-front .fc-hint{font-size:11px;color:var(--muted);font-weight:400;margin-top:8px;font-style:italic;}
+.flashcard-back{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%);color:#fff;transform:rotateY(180deg);font-size:13px;line-height:1.55;}
+.cases-header{background:#fff;padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;}
+.cases-header h2{color:var(--primary-dark);margin-bottom:6px;}
+.cases-header p{color:var(--muted);font-size:14px;}
+.case-card{background:#fff;border-radius:var(--radius);padding:24px;margin-bottom:16px;box-shadow:var(--shadow);border-left:4px solid var(--primary);}
+.case-card h4{font-size:16px;color:var(--primary-dark);font-weight:700;margin-bottom:12px;}
+.case-prompt{color:#334155;font-size:15px;margin-bottom:14px;line-height:1.6;}
+.case-q{font-weight:600;color:var(--text);margin-bottom:12px;font-size:15px;}
+.case-textarea{width:100%;min-height:80px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;resize:vertical;background:#f8fafc;color:var(--text);transition:border-color var(--transition);}
+.case-textarea:focus{outline:none;border-color:var(--primary);background:#fff;}
+.reveal-btns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+.reveal-btn{padding:8px 16px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;transition:all var(--transition);}
+.reveal-btn.miss{color:var(--warning);border-color:var(--warning);}
+.reveal-btn.miss:hover{background:var(--warning-light);}
+.reveal-btn.right{color:var(--success);border-color:var(--success);}
+.reveal-btn.right:hover{background:var(--success-light);}
+.reveal-panel{display:none;margin-top:12px;padding:14px 16px;border-radius:var(--radius-sm);font-size:14px;line-height:1.6;}
+.reveal-panel.show{display:block;}
+.reveal-panel.miss-panel{background:var(--warning-light);border-left:3px solid var(--warning);color:#78350f;}
+.reveal-panel.right-panel{background:var(--success-light);border-left:3px solid var(--success);color:#064e3b;}
+.case-worked-btn{margin-top:10px;padding:6px 14px;background:var(--primary-light);color:var(--primary-dark);border:none;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;}
+.case-worked-btn.done{background:var(--success-light);color:var(--success);}
+.takeaway-list{list-style:none;padding:0;margin:16px 0;}
+.takeaway-list li{padding:12px 16px 12px 48px;position:relative;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:10px;font-size:15px;color:#1e293b;border:1px solid var(--border);}
+.takeaway-list li .t-num{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:24px;height:24px;background:var(--primary);color:#fff;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.reset-btn{position:fixed;bottom:18px;right:18px;background:#fff;border:1px solid var(--border);padding:8px 14px;border-radius:20px;font-size:13px;color:var(--muted);cursor:pointer;box-shadow:var(--shadow);font-family:inherit;transition:all var(--transition);z-index:100;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.cricket-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;}
+.cricket-table th{background:#1e293b;color:#fff;padding:7px 8px;text-align:center;font-weight:600;}
+.cricket-table td{padding:6px 8px;text-align:center;border-bottom:1px solid var(--border);color:#334155;}
+.cricket-table tr:nth-child(even) td{background:#f8fafc;}
+@media(max-width:720px){
+  .app{padding:14px 12px 80px;}
+  header.mod-header{padding:22px 18px;}
+  header.mod-header h1{font-size:22px;}
+  .card{padding:20px 16px;}
+  .two-col,.three-col{grid-template-columns:1fr;}
+  .stats-bar{grid-template-columns:repeat(2,1fr);}
+  .slide h2{font-size:22px;}
+  .freq-table,.cricket-table{font-size:12px;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="mod-header">
+  <span class="mod-badge">Module 14 of 17</span>
+  <h1>Sampling Distributions and the Central Limit Theorem</h1>
+  <p class="mod-sub">Why sample means vary, what standard error means, and the remarkable fact that averages become normal no matter what the original data looked like.</p>
+  <p class="mod-instructor"><strong>K.M. Tanvir</strong> &nbsp;·&nbsp; Statistics for Non-Statisticians</p>
+</header>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-value" id="stat-slides">0%</div><div class="stat-label">Slides Viewed</div></div>
+  <div class="stat"><div class="stat-value" id="stat-quiz">&#8212;</div><div class="stat-label">Quiz Score</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cards">0 / 20</div><div class="stat-label">Cards Flipped</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cases">0 / 4</div><div class="stat-label">Cases Worked</div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('slides',this)">&#128214; Slides</button>
+  <button class="tab-btn" onclick="switchTab('quiz',this)">&#128221; Quiz</button>
+  <button class="tab-btn" onclick="switchTab('flashcards',this)">&#127183; Flashcards</button>
+  <button class="tab-btn" onclick="switchTab('cases',this)">&#127919; Real Cases</button>
+</div>
+
+<!-- ========== SLIDES ========== -->
+<div id="tab-slides" class="tab-content active">
+<div class="card">
+  <div class="progress-bar"><div class="progress-fill" id="slide-progress"></div></div>
+  <div class="slide-counter" id="slide-counter">Slide 1 of 15</div>
+  <!-- S1: objectives -->
+  <div class="slide active" id="slide-1">
+    <h2>Sampling Distributions and the Central Limit Theorem</h2>
+    <p class="slide-sub">Module 14 &nbsp;·&nbsp; By the end of this module, you will be able to:</p>
+    <ul class="obj-list">
+      <li>Explain the difference between a population distribution and a sampling distribution</li>
+      <li>Describe the sampling distribution of the sample mean and calculate its standard error</li>
+      <li>State the Central Limit Theorem and identify when it applies</li>
+      <li>Explain how sample size affects the spread of the sampling distribution</li>
+      <li>Apply the Central Limit Theorem to compute probabilities about sample means and sample proportions</li>
+      <li>Recognize the practical importance of this theorem for the inference methods covered in later modules</li>
+    </ul>
+    <div class="tip-box"><strong>Why this module matters:</strong> nearly every statistical method from Module 15 onward, confidence intervals, hypothesis tests, regression inference, rests on the ideas introduced here. This is the conceptual bridge between probability theory (Modules 8 through 13) and statistical inference (Modules 15 through 17).</div>
+  </div>
+
+  <!-- S2: population vs sample distribution -->
+  <div class="slide" id="slide-2">
+    <h2>Three Distinct Distributions</h2>
+    <p>Before this module, "distribution" referred to how individual data values are spread out. This module introduces a second, distinct kind of distribution, one that describes a summary statistic rather than individual values.</p>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Population distribution</div><div class="def-body">The distribution of individual values across an entire population, with parameters &mu; and &sigma;.</div></div>
+      <div class="def-card"><div class="def-term">Sample distribution</div><div class="def-body">The distribution of individual values within one particular sample of size n, summarized by the sample mean x&#772; and sample standard deviation s.</div></div>
+    </div>
+    <div class="def-card" style="margin-top:14px;"><div class="def-term">Sampling distribution (the new idea)</div><div class="def-body">The distribution of a statistic, such as the sample mean x&#772;, across all possible samples of size n that could be drawn from the population.</div></div>
+    <div class="warn-box"><strong>The most common confusion in this module:</strong> the sampling distribution is not about one sample's data values. It is about how the sample mean itself would vary if the sampling process were repeated many times.</div>
+  </div>
+
+  <!-- S3: building intuition - repeated sampling -->
+  <div class="slide" id="slide-3">
+    <h2>Building Intuition: Repeated Sampling</h2>
+    <p>Imagine a population of rice farmers in a district with a true mean landholding of &mu;=1.2 hectares and &sigma;=0.6 hectares. Suppose 1,000 different researchers each independently survey a random sample of 30 farmers and calculate the sample mean landholding.</p>
+    <div class="example-box"><strong>What happens across those 1,000 sample means?</strong>
+    <br>&bull; They will not all equal 1.2 hectares exactly, sample means vary from sample to sample.
+    <br>&bull; Most will cluster fairly close to 1.2 hectares.
+    <br>&bull; A few, by chance, will land further away.
+    <br>&bull; If plotted as a histogram, the 1,000 sample means form a distribution of their own: the sampling distribution of the mean.</div>
+    <div class="tip-box">In practice, only one sample is ever actually collected. The sampling distribution is a theoretical construct describing what would happen across all possible samples, which allows conclusions to be drawn from just the one sample in hand.</div>
+  </div>
+
+  <!-- S4: mean of sampling distribution -->
+  <div class="slide" id="slide-4">
+    <h2>The Center of the Sampling Distribution</h2>
+    <p>A remarkable and useful fact: the mean of the sampling distribution of x&#772; equals the population mean &mu;, regardless of sample size.</p>
+    <div class="formula-box">\[ \mu_{\bar{x}} = \mu \]</div>
+    <p>This property is called unbiasedness: the sample mean does not systematically overestimate or underestimate the population mean. On average, across many repeated samples, the sample means center exactly on the true population value.</p>
+    <div class="tip-box">Unbiasedness is about the long-run average across repeated sampling, not about any single sample. Any individual sample mean can still land above or below &mu;.</div>
+  </div>
+
+  <!-- S5: standard error -->
+  <div class="slide" id="slide-5">
+    <h2>The Standard Error</h2>
+    <p>The spread of the sampling distribution of x&#772; is measured by its standard deviation, given a special name: the standard error of the mean.</p>
+    <div class="formula-box">\[ \sigma_{\bar{x}} = \frac{\sigma}{\sqrt{n}} \]</div>
+    <p>Here &sigma; is the population standard deviation of individual values, and n is the sample size. The standard error measures how much sample means are expected to vary from sample to sample, which is conceptually distinct from &sigma;, which measures how much individual values vary within the population.</p>
+    <div class="warn-box"><strong>A frequent terminology mix-up:</strong> "standard deviation" (of individual values, &sigma;) and "standard error" (of the sample mean, &sigma;/&radic;n) are not interchangeable terms. The standard error is always smaller than &sigma; for any sample size greater than 1.</div>
+  </div>
+
+  <!-- S6: effect of sample size -->
+  <div class="slide" id="slide-6">
+    <h2>How Sample Size Affects the Standard Error</h2>
+    <p>Continuing the landholding example, &sigma;=0.6 hectares. The standard error shrinks as sample size grows, but not in direct proportion, it shrinks with the square root of n.</p>
+    <div class="freq-table"><table>
+      <tr><th>Sample size (n)</th><th>Standard error (&sigma;/&radic;n)</th></tr>
+      <tr><td>10</td><td>0.6/&radic;10 &asymp; 0.190</td></tr>
+      <tr><td>30</td><td>0.6/&radic;30 &asymp; 0.110</td></tr>
+      <tr><td>100</td><td>0.6/&radic;100 = 0.060</td></tr>
+      <tr><td>400</td><td>0.6/&radic;400 = 0.030</td></tr>
+    </table></div>
+    <div class="tip-box"><strong>Diminishing returns:</strong> quadrupling the sample size from 100 to 400 only halves the standard error (from 0.060 to 0.030). This square-root relationship is why dramatically improving precision requires disproportionately larger samples, an important practical consideration in survey budgeting.</div>
+  </div>
+
+  <!-- S7: CLT statement -->
+  <div class="slide" id="slide-7">
+    <h2>The Central Limit Theorem</h2>
+    <p>The Central Limit Theorem (CLT) is one of the most powerful results in statistics. It states that, for a sufficiently large sample size n, the sampling distribution of the sample mean x&#772; is approximately normal, regardless of the shape of the population distribution from which the sample was drawn.</p>
+    <div class="formula-box">\[ \bar{X} \ \dot\sim\ N\left(\mu, \ \frac{\sigma}{\sqrt{n}}\right) \quad \text{as } n \text{ grows large} \]</div>
+    <div class="tip-box"><strong>The remarkable part:</strong> the population itself can be skewed, bimodal, uniform, or any other shape. The theorem says nothing about the population's shape needing to be normal, only about the shape of the distribution of sample means becoming approximately normal as n increases.</div>
+  </div>
+
+  <!-- S8: conditions and rule of thumb -->
+  <div class="slide" id="slide-8">
+    <h2>When Does the CLT Apply?</h2>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">If the population is already normal</div><div class="def-body">The sampling distribution of x&#772; is exactly normal for any sample size, even n=2.</div></div>
+      <div class="def-card"><div class="def-term">If the population is not normal</div><div class="def-body">The sampling distribution of x&#772; becomes approximately normal as n increases. A common rule of thumb is n &ge; 30, though more skewed populations may require larger n.</div></div>
+    </div>
+    <div class="warn-box"><strong>Important caveat:</strong> samples must be independent and identically distributed (drawn randomly from the same population) for the theorem to apply. Severely skewed populations, or populations with extreme outliers, may require sample sizes well beyond 30 before the normal approximation becomes reliable.</div>
+  </div>
+
+  <!-- S9: visual illustration -->
+  <div class="slide" id="slide-9">
+    <h2>Watching the Theorem Work</h2>
+    <p>Picture a strongly right-skewed population, such as household income in a district, where most households earn modestly but a small number earn very high incomes, pulling the mean above the median.</p>
+    <div class="example-box"><strong>As sample size n increases:</strong>
+    <br>&bull; n=2: the sampling distribution of x&#772; is still noticeably skewed, resembling the population.
+    <br>&bull; n=10: the skew softens, the distribution starts rounding into a bell-like shape.
+    <br>&bull; n=30 or more: the sampling distribution is approximately symmetric and bell-shaped, even though individual incomes remain heavily skewed.</div>
+    <div class="tip-box">This progressive smoothing toward normality, regardless of the original skew, is exactly what the Central Limit Theorem guarantees, and is the reason normal-based methods remain usable for analyzing averages of skewed data.</div>
+  </div>
+
+  <!-- S10: worked example - probability for sample mean -->
+  <div class="slide" id="slide-10">
+    <h2>Worked Example: Probability for a Sample Mean</h2>
+    <p>Birth weights in a district have &mu;=3.1 kg and &sigma;=0.5 kg (population shape unspecified). A clinic records a random sample of n=49 births. What is the probability that the sample mean birth weight is below 3.0 kg?</p>
+    <div class="formula-box">\[ \sigma_{\bar{x}} = \frac{0.5}{\sqrt{49}} = \frac{0.5}{7} \approx 0.0714 \]</div>
+    <div class="formula-box">\[ z = \frac{\bar{x}-\mu}{\sigma_{\bar{x}}} = \frac{3.0-3.1}{0.0714} \approx -1.40 \]</div>
+    <div class="example-box">From the standard normal table, &Phi;(-1.40) &asymp; 0.0808. There is about an 8.1% chance that this sample's mean birth weight falls below 3.0 kg.</div>
+    <div class="tip-box">Notice the z-score formula looks identical to Module 12's z-score for individual values, but here &sigma; is replaced by the standard error &sigma;/&radic;n, since the variable being standardized is a sample mean, not a single observation.</div>
+  </div>
+
+  <!-- S11: contrast individual vs sample mean probability -->
+  <div class="slide" id="slide-11">
+    <h2>A Critical Distinction: One Observation vs. a Sample Mean</h2>
+    <p>Using the same birth weight population (&mu;=3.1 kg, &sigma;=0.5 kg), compare two different questions.</p>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">P(one randomly chosen baby weighs below 3.0 kg)</div><div class="def-body">z = (3.0-3.1)/0.5 = -0.20. &Phi;(-0.20) &asymp; 0.4207, about 42.1%. Uses &sigma; directly, requires the population itself to be normal for this calculation to be exact.</div></div>
+      <div class="def-card"><div class="def-term">P(mean of 49 babies weighs below 3.0 kg)</div><div class="def-body">z = (3.0-3.1)/0.0714 &asymp; -1.40. &Phi;(-1.40) &asymp; 0.0808, about 8.1%. Uses the standard error &sigma;/&radic;n, and is approximately valid by the CLT even if the population is not normal.</div></div>
+    </div>
+    <div class="warn-box"><strong>The error to avoid:</strong> using &sigma; instead of &sigma;/&radic;n (or vice versa) produces a probability for the wrong question entirely. Sample means vary far less than individual values, which is exactly why averages are more precise estimates than single observations.</div>
+  </div>
+
+  <!-- S12: CLT for proportions -->
+  <div class="slide" id="slide-12">
+    <h2>The Central Limit Theorem for Proportions</h2>
+    <p>The same logic extends to sample proportions. If p is the true population proportion and n is the sample size, the sampling distribution of the sample proportion p&#770; is approximately normal when n is large enough.</p>
+    <div class="formula-box">\[ \hat{p} \ \dot\sim\ N\left(p, \ \sqrt{\frac{p(1-p)}{n}}\right), \quad \text{when } np \geq 10 \text{ and } n(1-p) \geq 10 \]</div>
+    <div class="example-box"><strong>Worked example:</strong> a survey finds that 40% of households in a district (p=0.40) use mobile banking. For a random sample of n=200 households, the standard error of p&#770; is &radic;(0.40 &times; 0.60 / 200) = &radic;0.0012 &asymp; 0.0346.</div>
+    <div class="tip-box">This is the same condition encountered in Module 12's normal approximation to the binomial: a sample proportion is simply a rescaled count of successes, so the same large-sample conditions apply.</div>
+  </div>
+
+  <!-- S13: anchor case -->
+  <div class="slide" id="slide-13">
+    <h2>Anchor Case: Monitoring Average Daily Wage</h2>
+    <p>A labor ministry monitors the average daily wage of informal sector workers, with a historical population mean of &mu;=450 taka and &sigma;=80 taka. This month's random sample of n=64 workers produces a sample mean of 430 taka. Is this a meaningfully low reading, or plausible random sampling variability?</p>
+    <div class="formula-box">\[ \sigma_{\bar{x}} = \frac{80}{\sqrt{64}} = \frac{80}{8} = 10 \]</div>
+    <div class="formula-box">\[ z = \frac{430-450}{10} = -2.0 \]</div>
+    <div class="example-box">&Phi;(-2.0) &asymp; 0.0228. A sample mean this low or lower would occur only about 2.3% of the time if the true average wage were still 450 taka, suggesting this month's reading is unusually low and worth investigating rather than dismissing as ordinary sampling variation.</div>
+  </div>
+
+  <!-- S14: common pitfalls -->
+  <div class="slide" id="slide-14">
+    <h2>Common Pitfalls</h2>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Confusing &sigma; with &sigma;/&radic;n</div><div class="def-body">Using the population standard deviation when the question is about a sample mean (or vice versa) gives the wrong probability entirely.</div></div>
+      <div class="def-card"><div class="def-term">Assuming small samples are automatically safe</div><div class="def-body">For strongly skewed populations, n=30 may not be large enough for the normal approximation to be reliable; the appropriate threshold depends on how non-normal the population is.</div></div>
+    </div>
+    <div class="warn-box"><strong>Non-random sampling breaks everything:</strong> the CLT assumes independent, randomly drawn samples. If a sample is biased (for example, convenience sampling that systematically over-represents certain groups), the sampling distribution theory described in this module does not protect against that bias. The CLT addresses random variability, not systematic bias.</div>
+  </div>
+
+  <!-- S15: recap -->
+  <div class="slide" id="slide-15">
+    <h2>Module 14 Recap</h2>
+    <ul class="takeaway-list">
+      <li><span class="t-num">1</span>A sampling distribution describes how a statistic, such as the sample mean, would vary across repeated random samples.</li>
+      <li><span class="t-num">2</span>The mean of the sampling distribution of x&#772; equals the population mean &mu; (unbiasedness).</li>
+      <li><span class="t-num">3</span>The standard error, &sigma;/&radic;n, measures the spread of the sampling distribution and shrinks as sample size grows.</li>
+      <li><span class="t-num">4</span>The Central Limit Theorem states that the sampling distribution of x&#772; becomes approximately normal as n grows, regardless of the population's shape.</li>
+      <li><span class="t-num">5</span>A common rule of thumb is n &ge; 30, though more skewed populations require larger samples.</li>
+      <li><span class="t-num">6</span>The same logic applies to sample proportions, with standard error &radic;(p(1-p)/n).</li>
+      <li><span class="t-num">7</span>The CLT corrects for random sampling variability, not for bias introduced by non-random sampling methods.</li>
+    </ul>
+    <div class="tip-box"><strong>Next module:</strong> Module 15 builds directly on these ideas to construct confidence intervals, using the standard error and the CLT to express how precisely a sample statistic estimates an unknown population parameter.</div>
+  </div>
+
+  <div class="slide-nav">
+    <button class="btn btn-ghost" id="prevBtn">&larr; Previous</button>
+    <span class="key-hint">Use <span class="kbd">&larr;</span> <span class="kbd">&rarr;</span> arrow keys to navigate</span>
+    <button class="btn btn-primary" id="nextBtn">Next &rarr;</button>
+  </div>
+</div>
+</div>
+
+<!-- ========== QUIZ ========== -->
+<div id="tab-quiz" class="tab-content">
+<div class="quiz-intro">
+  <h2>&#128221; Module Quiz</h2>
+  <p>15 questions on sampling distributions, standard error, and the Central Limit Theorem.</p>
+  <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
+</div>
+<div id="quiz-questions" style="display:none;">
+  <div class="quiz-question" id="qq-1">
+    <h4><span class="q-num">1.</span>A sampling distribution describes:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(1,this,false)">The distribution of individual values in one sample</button>
+      <button class="quiz-option" onclick="answerQ(1,this,true)">The distribution of a statistic, such as the sample mean, across all possible samples of a given size</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">The distribution of the entire population</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">A synonym for the standard deviation</button>
+    </div>
+    <div class="quiz-explain" id="qe-1">The sampling distribution describes how a statistic would vary across repeated random samples, not the values within one sample.</div>
+  </div>
+  <div class="quiz-question" id="qq-2">
+    <h4><span class="q-num">2.</span>The mean of the sampling distribution of the sample mean, &mu;<sub>x&#772;</sub>, equals:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(2,this,false)">&sigma;/&radic;n</button>
+      <button class="quiz-option" onclick="answerQ(2,this,true)">&mu;, the population mean</button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">x&#772; from one specific sample</button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">Always zero</button>
+    </div>
+    <div class="quiz-explain" id="qe-2">The sample mean is an unbiased estimator: the mean of its sampling distribution equals the true population mean &mu;.</div>
+  </div>
+  <div class="quiz-question" id="qq-3">
+    <h4><span class="q-num">3.</span>The standard error of the mean is calculated as:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(3,this,false)">&sigma;</button>
+      <button class="quiz-option" onclick="answerQ(3,this,true)">&sigma;/&radic;n</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">&sigma;<sup>2</sup>/n</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">&sigma; &times; &radic;n</button>
+    </div>
+    <div class="quiz-explain" id="qe-3">The standard error of the mean is &sigma;/&radic;n, the population standard deviation divided by the square root of the sample size.</div>
+  </div>
+  <div class="quiz-question" id="qq-4">
+    <h4><span class="q-num">4.</span>If &sigma;=0.6 and n increases from 100 to 400, what happens to the standard error?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(4,this,false)">It is divided by 4</button>
+      <button class="quiz-option" onclick="answerQ(4,this,true)">It is divided by 2</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">It stays the same</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">It is multiplied by 4</button>
+    </div>
+    <div class="quiz-explain" id="qe-4">Quadrupling n divides the standard error by &radic;4=2, since the standard error shrinks with the square root of sample size, not in direct proportion.</div>
+  </div>
+  <div class="quiz-question" id="qq-5">
+    <h4><span class="q-num">5.</span>The Central Limit Theorem states that, for sufficiently large n, the sampling distribution of the sample mean is approximately normal:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(5,this,false)">Only if the population distribution is already normal</button>
+      <button class="quiz-option" onclick="answerQ(5,this,true)">Regardless of the shape of the population distribution</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">Only for proportions, not means</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">Only when the sample size is exactly 30</button>
+    </div>
+    <div class="quiz-explain" id="qe-5">The remarkable feature of the CLT is that it holds regardless of the population's shape, given a sufficiently large sample size.</div>
+  </div>
+  <div class="quiz-question" id="qq-6">
+    <h4><span class="q-num">6.</span>If the population itself is already exactly normal, the sampling distribution of x&#772; is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(6,this,false)">Never normal</button>
+      <button class="quiz-option" onclick="answerQ(6,this,true)">Exactly normal, for any sample size</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">Normal only if n &ge; 30</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">Undefined</button>
+    </div>
+    <div class="quiz-explain" id="qe-6">If the population is normal, the sampling distribution of the mean is exactly normal even for very small sample sizes.</div>
+  </div>
+  <div class="quiz-question" id="qq-7">
+    <h4><span class="q-num">7.</span>A common rule of thumb for the CLT to provide a reasonable normal approximation for a non-normal population is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(7,this,false)">n &ge; 5</button>
+      <button class="quiz-option" onclick="answerQ(7,this,true)">n &ge; 30 (more for strongly skewed populations)</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">n &ge; 1000 always</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">No minimum sample size is ever needed</button>
+    </div>
+    <div class="quiz-explain" id="qe-7">n &ge; 30 is a commonly used rule of thumb, though more strongly skewed populations may require considerably larger samples for the approximation to be reliable.</div>
+  </div>
+  <div class="quiz-question" id="qq-8">
+    <h4><span class="q-num">8.</span>Birth weights have &mu;=3.1kg, &sigma;=0.5kg. For a sample of n=49, what is the standard error?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(8,this,false)">0.5</button>
+      <button class="quiz-option" onclick="answerQ(8,this,true)">Approximately 0.0714</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">7</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">49</button>
+    </div>
+    <div class="quiz-explain" id="qe-8">&sigma;<sub>x&#772;</sub> = 0.5/&radic;49 = 0.5/7 &asymp; 0.0714.</div>
+  </div>
+  <div class="quiz-question" id="qq-9">
+    <h4><span class="q-num">9.</span>For the same birth weight example, the z-score for a sample mean of 3.0 kg (n=49) is approximately:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(9,this,false)">-0.20</button>
+      <button class="quiz-option" onclick="answerQ(9,this,true)">-1.40</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">1.40</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">-7.0</button>
+    </div>
+    <div class="quiz-explain" id="qe-9">z = (3.0-3.1)/0.0714 &asymp; -1.40, using the standard error rather than &sigma; directly.</div>
+  </div>
+  <div class="quiz-question" id="qq-10">
+    <h4><span class="q-num">10.</span>What is the key difference between calculating P(one observation &lt; x) and P(sample mean &lt; x)?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(10,this,false)">There is no difference; both use &sigma; directly</button>
+      <button class="quiz-option" onclick="answerQ(10,this,true)">The sample mean calculation uses the standard error &sigma;/&radic;n instead of &sigma;</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">The sample mean calculation never uses z-scores</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">Individual observations always require a t-distribution</button>
+    </div>
+    <div class="quiz-explain" id="qe-10">Probabilities about individual values use &sigma; directly; probabilities about sample means use the standard error &sigma;/&radic;n, since sample means vary less than individual values.</div>
+  </div>
+  <div class="quiz-question" id="qq-11">
+    <h4><span class="q-num">11.</span>The Central Limit Theorem for proportions requires approximately which condition for the normal approximation to apply well?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(11,this,false)">n &ge; 30 only</button>
+      <button class="quiz-option" onclick="answerQ(11,this,true)">np &ge; 10 and n(1-p) &ge; 10</button>
+      <button class="quiz-option" onclick="answerQ(11,this,false)">p must equal 0.5</button>
+      <button class="quiz-option" onclick="answerQ(11,this,false)">n must be smaller than 10</button>
+    </div>
+    <div class="quiz-explain" id="qe-11">The condition np &ge; 10 and n(1-p) &ge; 10 mirrors the normal approximation to the binomial from Module 12, since a proportion is a rescaled count.</div>
+  </div>
+  <div class="quiz-question" id="qq-12">
+    <h4><span class="q-num">12.</span>A labor ministry finds a sample mean wage of 430 taka against a historical &mu;=450, &sigma;=80, n=64, giving z=-2.0. What does &Phi;(-2.0)&asymp;0.0228 suggest?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(12,this,false)">This result is completely typical and not worth investigating</button>
+      <button class="quiz-option" onclick="answerQ(12,this,true)">A sample mean this low would be uncommon if the true mean were still 450, suggesting the reading is worth investigating</button>
+      <button class="quiz-option" onclick="answerQ(12,this,false)">The population standard deviation must be wrong</button>
+      <button class="quiz-option" onclick="answerQ(12,this,false)">Sample size has no bearing on this conclusion</button>
+    </div>
+    <div class="quiz-explain" id="qe-12">A probability of only about 2.3% of seeing a sample mean this low under the historical assumption suggests this month's reading is unusual rather than ordinary sampling variability.</div>
+  </div>
+  <div class="quiz-question" id="qq-13">
+    <h4><span class="q-num">13.</span>Which scenario would make the Central Limit Theorem's guarantee NOT helpful, even with a large sample size?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(13,this,false)">The population distribution is right-skewed</button>
+      <button class="quiz-option" onclick="answerQ(13,this,true)">The sample was collected through a biased, non-random method that over-represents certain groups</button>
+      <button class="quiz-option" onclick="answerQ(13,this,false)">The population has a large standard deviation</button>
+      <button class="quiz-option" onclick="answerQ(13,this,false)">The sample size is exactly 1,000</button>
+    </div>
+    <div class="quiz-explain" id="qe-13">The CLT addresses random sampling variability, not systematic bias; a biased sampling method is not corrected by increasing sample size.</div>
+  </div>
+  <div class="quiz-question" id="qq-14">
+    <h4><span class="q-num">14.</span>As sample size increases, the sampling distribution of x&#772; drawn from a skewed population:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(14,this,false)">Becomes more skewed</button>
+      <button class="quiz-option" onclick="answerQ(14,this,true)">Becomes progressively more symmetric and bell-shaped</button>
+      <button class="quiz-option" onclick="answerQ(14,this,false)">Stays identical to the population shape</button>
+      <button class="quiz-option" onclick="answerQ(14,this,false)">Becomes uniform</button>
+    </div>
+    <div class="quiz-explain" id="qe-14">As n increases, the sampling distribution of the mean progressively smooths toward a normal shape, regardless of the original population's skew.</div>
+  </div>
+  <div class="quiz-question" id="qq-15">
+    <h4><span class="q-num">15.</span>Why is this module described as a "bridge" between probability theory and statistical inference?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(15,this,true)">Because confidence intervals and hypothesis tests in later modules rely directly on the standard error and the CLT introduced here</button>
+      <button class="quiz-option" onclick="answerQ(15,this,false)">Because it is the last module in the course</button>
+      <button class="quiz-option" onclick="answerQ(15,this,false)">Because it replaces the need for the normal distribution</button>
+      <button class="quiz-option" onclick="answerQ(15,this,false)">Because it only applies to proportions, not means</button>
+    </div>
+    <div class="quiz-explain" id="qe-15">The standard error and the Central Limit Theorem are the foundation for confidence intervals (Module 15), hypothesis testing (Module 16), and ANOVA (Module 17).</div>
+  </div>
+  <div class="quiz-footer">
+    <span class="quiz-progress-text" id="quiz-progress">0 of 15 answered</span>
+    <button class="btn btn-primary" onclick="submitQuiz()" id="btn-submit-quiz" disabled>Submit Quiz</button>
+  </div>
+  <div class="quiz-result" id="quiz-result">
+    <h3>Quiz Complete</h3>
+    <div class="score" id="quiz-score-display">0<span class="total"> / 15</span></div>
+    <div class="verdict" id="quiz-verdict"></div>
+    <p id="quiz-msg"></p>
+    <button class="btn btn-primary" onclick="retakeQuiz()">Retake Quiz</button>
+  </div>
+</div>
+</div>
+
+<!-- ========== FLASHCARDS ========== -->
+<div id="tab-flashcards" class="tab-content">
+<div class="flashcards-header">
+  <h2>&#127183; Flashcards</h2>
+  <p>20 key terms from Module 14. Click any card to reveal its definition.</p>
+</div>
+<div class="flashcards-grid" id="fc-grid"></div>
+</div>
+
+<!-- ========== REAL CASES ========== -->
+<div id="tab-cases" class="tab-content">
+<div class="cases-header">
+  <h2>&#127919; Real Cases</h2>
+  <p>Read each scenario, write your interpretation, then reveal what most people miss and what the careful reading looks like.</p>
+</div>
+
+<div class="case-card" id="case-1">
+  <h4>Case 1: "The Survey Looks Wrong Because the Average Changed"</h4>
+  <p class="case-prompt">A district health office reports that this quarter's sample mean clinic visit time (from a random sample of n=36 patients) is 22 minutes, compared to a long-standing historical mean of &mu;=20 minutes with &sigma;=6 minutes. A supervisor immediately concludes that something has changed at the clinic.</p>
+  <p class="case-q">Before concluding something changed, what should be calculated?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-1','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-1','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-1" onclick="markCaseWorked(1)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-1">Any difference between this quarter's sample mean and the historical mean can look like meaningful evidence of change, especially when reported as a single headline number.</div>
+  <div class="reveal-panel right-panel" id="right-case-1">The standard error is &sigma;/&radic;n = 6/&radic;36 = 1.0 minute, giving z=(22-20)/1.0=2.0. &Phi;(2.0)&asymp;0.9772, so P(sample mean &ge; 22)&asymp;1-0.9772=0.0228, about 2.3%. This is a fairly uncommon outcome under the historical assumption, so it is reasonable to suspect a real change, but the supervisor should base that conclusion on this calculated probability rather than on the raw two-minute difference alone, since sampling variability alone could occasionally produce a difference this large.</div>
+</div>
+
+<div class="case-card" id="case-2">
+  <h4>Case 2: Two Surveys, Two Different Standard Errors</h4>
+  <p class="case-prompt">Two separate research teams survey household electricity expenditure in the same district. Team A samples n=25 households; Team B samples n=400 households. Both report sample means close to the true population mean, but a stakeholder asks which team's result should be trusted "more."</p>
+  <p class="case-q">How should sample size factor into the comparison?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-2','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-2','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-2" onclick="markCaseWorked(2)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-2">If both sample means landed close to the true value, it might seem like both surveys are equally reliable and the sample size difference does not matter much.</div>
+  <div class="reveal-panel right-panel" id="right-case-2">Team B's standard error is &radic;(25/400)=1/4 as large as Team A's (since &sigma;/&radic;400 = (&sigma;/&radic;25)/4), meaning Team B's sample mean is drawn from a much tighter sampling distribution and is far less likely to have landed close to &mu; purely by chance. Team A's result, even though it happened to land close this time, carries substantially more sampling uncertainty, which would show up clearly if either survey were repeated multiple times.</div>
+</div>
+
+<div class="case-card" id="case-3">
+  <h4>Case 3: Applying the Wrong Standard Deviation</h4>
+  <p class="case-prompt">A student calculates the probability that a sample mean of 40 test scores falls below 65, using &mu;=70 and &sigma;=12, but plugs &sigma;=12 directly into the z-score formula instead of the standard error.</p>
+  <p class="case-q">What is wrong with this calculation, and how would correcting it change the answer?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-3','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-3','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-3" onclick="markCaseWorked(3)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-3">Since the z-score formula in Module 12 used &sigma; directly, it is an easy habit to carry that same formula over to sample mean problems without adjusting it.</div>
+  <div class="reveal-panel right-panel" id="right-case-3">The student's incorrect calculation gives z=(65-70)/12&asymp;-0.417, &Phi;(-0.417)&asymp;0.338. The correct calculation uses the standard error: &sigma;<sub>x&#772;</sub>=12/&radic;40&asymp;1.897, giving z=(65-70)/1.897&asymp;-2.636, &Phi;(-2.636)&asymp;0.0042. The two answers differ by nearly a factor of 80, illustrating how serious this common error is: using &sigma; instead of the standard error treats a sample mean as if it were a single observation, drastically overstating how much sample means actually vary.</div>
+</div>
+
+<div class="case-card" id="case-4">
+  <h4>Case 4: A Skewed Population, A Trusted Average</h4>
+  <p class="case-prompt">A microfinance institution tracks loan sizes, which are strongly right-skewed (many small loans, a few very large ones). An analyst wants to test whether this month's average loan size, based on a sample of n=80 loans, differs from the historical average, and a colleague objects: "You can't use normal-based methods, the data isn't normal."</p>
+  <p class="case-q">Is the colleague's objection valid?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-4','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-4','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-4" onclick="markCaseWorked(4)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-4">It is easy to conflate "the individual data is skewed" with "the sampling distribution of the mean must also be skewed," since both involve the same underlying numbers.</div>
+  <div class="reveal-panel right-panel" id="right-case-4">The colleague is conflating the population distribution (which is indeed skewed) with the sampling distribution of the sample mean (which, by the Central Limit Theorem, becomes approximately normal for a sufficiently large n, such as 80). Normal-based methods are not being applied to the individual skewed loan amounts; they are applied to the sampling distribution of the mean, which the CLT justifies. The objection would be valid only if n were too small for the CLT to kick in given how strongly skewed the loan-size distribution is.</div>
+</div>
+
+</div>
+
+<button class="reset-btn" onclick="resetProgress()">&#8635; Reset Progress</button>
+
+<script>
+const STORAGE_KEY='stats101-module14-progress-v1';
+const TOTAL_SLIDES=15,TOTAL_CARDS=20,TOTAL_CASES=4,TOTAL_QUIZ=15;
+
+const flashcardData=[
+  {term:'Population distribution',def:'The distribution of individual values across an entire population, described by parameters &mu; and &sigma;.'},
+  {term:'Sampling distribution',def:'The distribution of a statistic, such as the sample mean, across all possible samples of a given size drawn from a population.'},
+  {term:'Sample mean (x&#772;)',def:'The average of the values in one particular sample, used to estimate the population mean &mu;.'},
+  {term:'Unbiasedness',def:'The property that the mean of the sampling distribution of a statistic equals the true population parameter; for the sample mean, &mu;<sub>x&#772;</sub> = &mu;.'},
+  {term:'Standard error of the mean',def:'The standard deviation of the sampling distribution of the sample mean, calculated as &sigma;/&radic;n.'},
+  {term:'Standard deviation vs. standard error',def:'Standard deviation (&sigma;) measures spread of individual values; standard error (&sigma;/&radic;n) measures spread of the sample mean across repeated samples.'},
+  {term:'Square root law',def:'The principle that standard error shrinks proportionally to &radic;n, not n, meaning quadrupling sample size only halves the standard error.'},
+  {term:'Central Limit Theorem (CLT)',def:'The theorem stating that the sampling distribution of the sample mean becomes approximately normal as sample size grows, regardless of the population\'s shape.'},
+  {term:'n &ge; 30 rule of thumb',def:'A commonly used guideline for when the CLT provides an adequate normal approximation for moderately non-normal populations; stronger skew requires larger n.'},
+  {term:'Sample proportion (p&#770;)',def:'The proportion of successes observed in a sample, used to estimate the true population proportion p.'},
+  {term:'Standard error of a proportion',def:'The standard deviation of the sampling distribution of the sample proportion, calculated as &radic;(p(1-p)/n).'},
+  {term:'Large-sample condition for proportions',def:'np &ge; 10 and n(1-p) &ge; 10, the condition under which the sampling distribution of p&#770; is well approximated by a normal distribution.'},
+  {term:'Random sampling assumption',def:'The requirement that samples be drawn independently and randomly from the population for the CLT and standard error formulas to apply validly.'},
+  {term:'Sampling variability',def:'The natural variation in a statistic\'s value from one random sample to another, distinct from bias.'},
+  {term:'Bias (sampling)',def:'A systematic distortion in a sample statistic caused by a non-random or unrepresentative sampling method, which the CLT does not correct.'},
+  {term:'z-score for a sample mean',def:'z = (x&#772;-&mu;)/(&sigma;/&radic;n), standardizing a sample mean using the standard error rather than &sigma; directly.'},
+  {term:'Precision of an estimate',def:'How tightly a sample statistic is expected to cluster around the true parameter; improves (standard error shrinks) as sample size increases.'},
+  {term:'Population shape independence',def:'The defining feature of the CLT: the population can be skewed, uniform, bimodal, or any shape, and the sampling distribution of the mean still approaches normality.'},
+  {term:'Sample size and budgeting trade-off',def:'Because standard error shrinks with &radic;n, achieving large gains in precision requires disproportionately larger and more costly samples.'},
+  {term:'Foundation for inference',def:'The standard error and the CLT introduced in this module underpin confidence intervals, hypothesis tests, and other inference methods in later modules.'}
+];
+
+let state={slidesViewed:new Set(),quizScore:null,cardsFlipped:new Set(),casesWorked:new Set(),quizAnswers:{},quizSubmitted:false,currentSlide:1};
+
+function loadState(){
+  try{const s=localStorage.getItem(STORAGE_KEY);if(s){const p=JSON.parse(s);state.slidesViewed=new Set(p.slidesViewed||[]);state.quizScore=p.quizScore!==undefined?p.quizScore:null;state.cardsFlipped=new Set(p.cardsFlipped||[]);state.casesWorked=new Set(p.casesWorked||[]);state.quizAnswers=p.quizAnswers||{};state.quizSubmitted=p.quizSubmitted||false;state.currentSlide=p.currentSlide||1;}}catch(e){}
+}
+function saveState(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify({slidesViewed:[...state.slidesViewed],quizScore:state.quizScore,cardsFlipped:[...state.cardsFlipped],casesWorked:[...state.casesWorked],quizAnswers:state.quizAnswers,quizSubmitted:state.quizSubmitted,currentSlide:state.currentSlide}));}catch(e){}
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');btn.classList.add('active');
+}
+
+const prevBtn=document.getElementById('prevBtn');
+const nextBtn=document.getElementById('nextBtn');
+function showSlide(n){
+  if(n<1||n>TOTAL_SLIDES)return;
+  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+  document.getElementById('slide-'+n).classList.add('active');
+  state.currentSlide=n;state.slidesViewed.add(n);saveState();updateSlideUI();updateStats();
+}
+function updateSlideUI(){
+  const n=state.currentSlide;
+  document.getElementById('slide-counter').textContent='Slide '+n+' of '+TOTAL_SLIDES;
+  document.getElementById('slide-progress').style.width=(n/TOTAL_SLIDES*100)+'%';
+  prevBtn.disabled=n===1;
+  nextBtn.textContent=n===TOTAL_SLIDES?'Finish ✓':'Next →';
+}
+prevBtn.addEventListener('click',()=>showSlide(state.currentSlide-1));
+nextBtn.addEventListener('click',()=>{if(state.currentSlide<TOTAL_SLIDES)showSlide(state.currentSlide+1);});
+document.addEventListener('keydown',e=>{
+  const activeTab=document.querySelector('.tab-content.active');
+  if(!activeTab||activeTab.id!=='tab-slides')return;
+  if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
+  if(e.key==='ArrowRight'){e.preventDefault();nextBtn.click();}
+  else if(e.key==='ArrowLeft'){e.preventDefault();prevBtn.click();}
+});
+
+let quizAnswered=0,quizCorrect=0;
+function startQuiz(){document.querySelector('.quiz-intro').style.display='none';document.getElementById('quiz-questions').style.display='block';if(state.quizSubmitted)restoreQuizState();}
+function answerQ(qNum,btn,correct){
+  const qq=document.getElementById('qq-'+qNum);if(qq.classList.contains('answered'))return;
+  qq.classList.add('answered');qq.querySelectorAll('.quiz-option').forEach(o=>o.classList.add('disabled'));
+  btn.classList.add(correct?'correct':'wrong');if(correct)quizCorrect++;
+  document.getElementById('qe-'+qNum).classList.add('show');
+  state.quizAnswers[qNum]=correct;quizAnswered++;
+  document.getElementById('quiz-progress').textContent=quizAnswered+' of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=quizAnswered<TOTAL_QUIZ;saveState();
+}
+function submitQuiz(){
+  state.quizScore=quizCorrect;state.quizSubmitted=true;saveState();
+  document.getElementById('quiz-score-display').innerHTML=quizCorrect+'<span class="total"> / '+TOTAL_QUIZ+'</span>';
+  const v=document.getElementById('quiz-verdict'),m=document.getElementById('quiz-msg');
+  if(quizCorrect>=14){v.textContent='Excellent';v.className='verdict great';m.textContent='Strong command of sampling distributions and the Central Limit Theorem.';}
+  else if(quizCorrect>=10){v.textContent='Good';v.className='verdict good';m.textContent='Solid. Review the explanations on questions you missed.';}
+  else{v.textContent='Keep going';v.className='verdict ok';m.textContent='Revisit the slides on standard error and the CLT before retaking.';}
+  document.getElementById('quiz-result').classList.add('show');updateStats();
+}
+function retakeQuiz(){
+  state.quizScore=null;state.quizSubmitted=false;state.quizAnswers={};quizCorrect=0;quizAnswered=0;saveState();
+  document.getElementById('quiz-result').classList.remove('show');
+  document.querySelectorAll('.quiz-question').forEach(q=>{q.classList.remove('answered');q.querySelectorAll('.quiz-option').forEach(o=>o.classList.remove('correct','wrong','disabled'));q.querySelectorAll('.quiz-explain').forEach(e=>e.classList.remove('show'));});
+  document.getElementById('quiz-progress').textContent='0 of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=true;updateStats();
+}
+function restoreQuizState(){
+  Object.entries(state.quizAnswers).forEach(([qNum,correct])=>{
+    const qq=document.getElementById('qq-'+qNum);if(!qq)return;
+    qq.classList.add('answered');qq.querySelectorAll('.quiz-option').forEach(o=>o.classList.add('disabled'));
+    document.getElementById('qe-'+qNum).classList.add('show');quizAnswered++;if(correct)quizCorrect++;
+  });
+  document.getElementById('quiz-progress').textContent=quizAnswered+' of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=quizAnswered<TOTAL_QUIZ;
+  if(state.quizSubmitted)submitQuiz();
+}
+
+function buildFlashcards(){
+  const grid=document.getElementById('fc-grid');
+  flashcardData.forEach((fc,i)=>{
+    const div=document.createElement('div');div.className='flashcard'+(state.cardsFlipped.has(i)?' flipped':'');
+    div.innerHTML='<div class="flashcard-inner"><div class="flashcard-front">'+fc.term+'<span class="fc-hint">Click to reveal definition</span></div><div class="flashcard-back">'+fc.def+'</div></div>';
+    div.addEventListener('click',()=>{div.classList.toggle('flipped');state.cardsFlipped.add(i);saveState();updateStats();});
+    grid.appendChild(div);
+  });
+}
+
+function revealCase(id,type){document.getElementById(type+'-'+id).classList.add('show');}
+function markCaseWorked(n){
+  state.casesWorked.add(n);saveState();
+  const btn=document.getElementById('worked-case-'+n);btn.textContent='Worked';btn.classList.add('done');updateStats();
+}
+
+function updateStats(){
+  document.getElementById('stat-slides').textContent=Math.round(state.slidesViewed.size/TOTAL_SLIDES*100)+'%';
+  document.getElementById('stat-quiz').textContent=state.quizScore!==null?state.quizScore+' / '+TOTAL_QUIZ:'—';
+  document.getElementById('stat-cards').textContent=state.cardsFlipped.size+' / '+TOTAL_CARDS;
+  document.getElementById('stat-cases').textContent=state.casesWorked.size+' / '+TOTAL_CASES;
+}
+function resetProgress(){if(!confirm('Reset all progress for this module?'))return;localStorage.removeItem(STORAGE_KEY);location.reload();}
+
+loadState();buildFlashcards();showSlide(state.currentSlide);updateStats();
+if(state.quizSubmitted){document.querySelector('.quiz-intro').style.display='none';document.getElementById('quiz-questions').style.display='block';restoreQuizState();}
+state.casesWorked.forEach(n=>{const btn=document.getElementById('worked-case-'+n);if(btn){btn.textContent='Worked';btn.classList.add('done');}});
+</script>
+</div>
+</body>
+</html>

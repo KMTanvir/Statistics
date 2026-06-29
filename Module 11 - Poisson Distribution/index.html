@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 11: Poisson Distribution</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;
+  --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#dbeafe;
+  --accent:#4f46e5;--success:#059669;--success-light:#d1fae5;
+  --danger:#dc2626;--danger-light:#fee2e2;
+  --warning:#d97706;--warning-light:#fef3c7;
+  --border:#e2e8f0;
+  --shadow:0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.08),0 4px 10px rgba(0,0,0,.04);
+  --radius:12px;--radius-sm:8px;--transition:.2s cubic-bezier(.4,0,.2,1);
+}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;}
+.app{max-width:1100px;margin:0 auto;padding:24px 20px 80px;}
+header.mod-header{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%);color:#fff;padding:32px 28px;border-radius:var(--radius);margin-bottom:20px;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;}
+header.mod-header::before{content:"";position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:rgba(255,255,255,.08);border-radius:50%;}
+header.mod-header::after{content:"";position:absolute;bottom:-30px;right:80px;width:100px;height:100px;background:rgba(255,255,255,.05);border-radius:50%;}
+.mod-badge{display:inline-block;background:rgba(255,255,255,.2);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:.5px;position:relative;z-index:1;}
+header.mod-header h1{font-size:28px;margin:12px 0 8px;font-weight:700;position:relative;z-index:1;}
+header.mod-header p.mod-sub{font-size:14px;opacity:.88;max-width:640px;position:relative;z-index:1;}
+header.mod-header p.mod-instructor{font-size:13px;opacity:.8;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.2);position:relative;z-index:1;}
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;padding:14px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;}
+.stat{text-align:center;padding:6px;}
+.stat .stat-value{font-size:22px;font-weight:700;color:var(--primary);line-height:1.2;}
+.stat .stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:2px;}
+.tabs{display:flex;gap:4px;background:#fff;padding:6px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;flex-wrap:wrap;}
+.tab-btn{flex:1;min-width:110px;padding:11px 16px;background:transparent;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;transition:all var(--transition);font-family:inherit;}
+.tab-btn:hover{background:var(--bg);color:var(--text);}
+.tab-btn.active{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.28);}
+.tab-content{display:none;animation:fadeIn .28s ease-in-out;}
+.tab-content.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);margin-bottom:16px;}
+.progress-bar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:12px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:3px;transition:width .4s ease;}
+.slide-counter{text-align:center;color:var(--muted);font-size:13px;margin-bottom:14px;font-weight:500;}
+.slide{display:none;min-height:440px;padding:4px;animation:slideIn .3s ease;}
+.slide.active{display:block;}
+@keyframes slideIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+.slide h2{font-size:26px;margin-bottom:6px;color:var(--primary-dark);font-weight:700;line-height:1.25;}
+.slide h3{font-size:18px;margin:20px 0 8px;color:var(--text);font-weight:600;}
+.slide p{margin-bottom:12px;color:#334155;}
+.slide ul,.slide ol{margin:0 0 14px 22px;}
+.slide li{margin-bottom:7px;color:#334155;}
+.slide .slide-sub{color:var(--muted);font-size:15px;margin-bottom:18px;font-style:italic;}
+.obj-list{list-style:none;padding:0;margin:14px 0;}
+.obj-list li{padding:9px 0 9px 32px;position:relative;color:#334155;border-bottom:1px solid var(--border);}
+.obj-list li:last-child{border-bottom:none;}
+.obj-list li::before{content:"";position:absolute;left:0;top:13px;width:18px;height:18px;background:var(--success-light);border-radius:50%;}
+.obj-list li::after{content:"✓";position:absolute;left:3px;top:10px;color:var(--success);font-size:11px;font-weight:700;}
+.example-box{background:var(--primary-light);border-left:4px solid var(--primary);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.example-box strong{color:var(--primary-dark);}
+.tip-box{background:var(--success-light);border-left:4px solid var(--success);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.tip-box strong{color:var(--success);}
+.warn-box{background:var(--warning-light);border-left:4px solid var(--warning);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.warn-box strong{color:var(--warning);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:14px 0;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:14px 0;}
+.def-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;}
+.def-card .def-term{font-weight:700;color:var(--primary-dark);font-size:15px;margin-bottom:6px;}
+.def-card .def-body{font-size:14px;color:#334155;}
+.formula-box{background:#0f172a;color:#e2e8f0;padding:18px 22px;border-radius:var(--radius-sm);margin:14px 0;text-align:center;font-size:16px;overflow-x:auto;}
+.freq-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;}
+.freq-table th{background:var(--primary);color:#fff;padding:9px 12px;text-align:left;font-weight:600;}
+.freq-table th:not(:first-child),.freq-table td:not(:first-child){text-align:right;}
+.freq-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:#334155;}
+.freq-table tr:nth-child(even) td{background:#f8fafc;}
+.freq-table tr.total-row td{font-weight:700;background:var(--primary-light);color:var(--primary-dark);border-top:2px solid var(--primary);}
+.freq-table tr.highlight-row td{background:#fef3c7;}
+.freq-table th:first-child{border-radius:8px 0 0 0;}.freq-table th:last-child{border-radius:0 8px 0 0;}
+.practice{background:#f1f5f9;border:2px dashed #cbd5e1;border-radius:var(--radius-sm);padding:18px;margin:20px 0;}
+.practice h4{color:var(--primary);margin-bottom:10px;font-size:15px;}
+.practice-q{margin-bottom:10px;color:var(--text);font-weight:500;}
+.practice-options{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+.practice-btn{padding:8px 14px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;font-size:14px;transition:all var(--transition);color:var(--text);}
+.practice-btn:hover{border-color:var(--primary);background:var(--primary-light);}
+.practice-btn.correct{background:var(--success-light);border-color:var(--success);color:var(--success);font-weight:600;}
+.practice-btn.wrong{background:var(--danger-light);border-color:var(--danger);color:var(--danger);}
+.practice-btn.disabled{pointer-events:none;opacity:.75;}
+.practice-feedback{margin-top:10px;padding:10px 14px;border-radius:6px;font-size:14px;display:none;}
+.practice-feedback.show{display:block;}
+.practice-feedback.right{background:var(--success-light);color:var(--success);border:1px solid var(--success);}
+.practice-feedback.wrong{background:var(--danger-light);color:var(--danger);border:1px solid var(--danger);}
+.slide-nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border);gap:10px;flex-wrap:wrap;}
+.key-hint{font-size:12px;color:var(--muted);}
+.kbd{display:inline-block;background:#f1f5f9;border:1px solid var(--border);border-bottom-width:2px;border-radius:4px;padding:1px 6px;font-family:monospace;font-size:11px;color:var(--text);}
+.btn{padding:10px 20px;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;transition:all var(--transition);font-family:inherit;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover:not(:disabled){background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,.28);}
+.btn-primary:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover:not(:disabled){background:var(--bg);color:var(--text);}
+.btn-ghost:disabled{opacity:.45;cursor:not-allowed;}
+.quiz-intro{background:#fff;padding:22px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;text-align:center;}
+.quiz-intro h2{color:var(--primary-dark);margin-bottom:8px;}
+.quiz-intro p{color:var(--muted);margin-bottom:14px;}
+.quiz-question{background:#fff;border-radius:var(--radius);padding:22px;margin-bottom:14px;box-shadow:var(--shadow);border:1px solid var(--border);}
+.quiz-question h4{font-size:16px;margin-bottom:14px;color:var(--text);font-weight:600;}
+.q-num{color:var(--primary);font-weight:700;margin-right:6px;}
+.quiz-options{display:grid;gap:8px;}
+.quiz-option{padding:11px 16px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:#fff;transition:all var(--transition);font-size:14px;color:var(--text);text-align:left;font-family:inherit;}
+.quiz-option:hover{border-color:var(--primary);background:var(--primary-light);transform:translateX(2px);}
+.quiz-option.correct{border-color:var(--success);background:var(--success-light);color:var(--success);font-weight:600;}
+.quiz-option.wrong{border-color:var(--danger);background:var(--danger-light);color:var(--danger);}
+.quiz-option.disabled{pointer-events:none;}
+.quiz-explain{display:none;margin-top:10px;padding:10px 14px;background:#f8fafc;border-left:3px solid var(--primary);border-radius:4px;font-size:13px;color:#334155;}
+.quiz-explain.show{display:block;}
+.quiz-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px 20px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);flex-wrap:wrap;}
+.quiz-progress-text{font-size:13px;color:var(--muted);}
+.quiz-result{display:none;padding:30px;background:linear-gradient(135deg,#f0fdf4 0%,#dbeafe 100%);border-radius:var(--radius);text-align:center;margin-top:16px;box-shadow:var(--shadow);}
+.quiz-result.show{display:block;}
+.quiz-result h3{font-size:24px;margin-bottom:10px;color:var(--primary-dark);}
+.quiz-result .score{font-size:48px;font-weight:700;color:var(--primary);margin:14px 0;line-height:1;}
+.quiz-result .score .total{font-size:26px;color:var(--muted);}
+.quiz-result p{color:#334155;margin-bottom:16px;font-size:15px;}
+.verdict{display:inline-block;padding:6px 14px;border-radius:16px;font-weight:600;font-size:14px;margin-bottom:8px;}
+.verdict.great{background:var(--success-light);color:var(--success);}
+.verdict.good{background:var(--primary-light);color:var(--primary-dark);}
+.verdict.ok{background:var(--warning-light);color:var(--warning);}
+.flashcards-header{background:#fff;padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;text-align:center;}
+.flashcards-header h2{color:var(--primary-dark);margin-bottom:6px;}
+.flashcards-header p{color:var(--muted);font-size:14px;}
+.flashcards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+.flashcard{perspective:1000px;height:170px;cursor:pointer;}
+.flashcard-inner{position:relative;width:100%;height:100%;transition:transform .55s;transform-style:preserve-3d;}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+.flashcard-front,.flashcard-back{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:var(--shadow);}
+.flashcard-front{background:linear-gradient(135deg,#fff 0%,#f8fafc 100%);border:2px solid var(--primary-light);color:var(--primary-dark);font-weight:600;font-size:16px;}
+.flashcard-front .fc-hint{font-size:11px;color:var(--muted);font-weight:400;margin-top:8px;font-style:italic;}
+.flashcard-back{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%);color:#fff;transform:rotateY(180deg);font-size:13px;line-height:1.55;}
+.cases-header{background:#fff;padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;}
+.cases-header h2{color:var(--primary-dark);margin-bottom:6px;}
+.cases-header p{color:var(--muted);font-size:14px;}
+.case-card{background:#fff;border-radius:var(--radius);padding:24px;margin-bottom:16px;box-shadow:var(--shadow);border-left:4px solid var(--primary);}
+.case-card h4{font-size:16px;color:var(--primary-dark);font-weight:700;margin-bottom:12px;}
+.case-prompt{color:#334155;font-size:15px;margin-bottom:14px;line-height:1.6;}
+.case-q{font-weight:600;color:var(--text);margin-bottom:12px;font-size:15px;}
+.case-textarea{width:100%;min-height:80px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;resize:vertical;background:#f8fafc;color:var(--text);transition:border-color var(--transition);}
+.case-textarea:focus{outline:none;border-color:var(--primary);background:#fff;}
+.reveal-btns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+.reveal-btn{padding:8px 16px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;transition:all var(--transition);}
+.reveal-btn.miss{color:var(--warning);border-color:var(--warning);}
+.reveal-btn.miss:hover{background:var(--warning-light);}
+.reveal-btn.right{color:var(--success);border-color:var(--success);}
+.reveal-btn.right:hover{background:var(--success-light);}
+.reveal-panel{display:none;margin-top:12px;padding:14px 16px;border-radius:var(--radius-sm);font-size:14px;line-height:1.6;}
+.reveal-panel.show{display:block;}
+.reveal-panel.miss-panel{background:var(--warning-light);border-left:3px solid var(--warning);color:#78350f;}
+.reveal-panel.right-panel{background:var(--success-light);border-left:3px solid var(--success);color:#064e3b;}
+.case-worked-btn{margin-top:10px;padding:6px 14px;background:var(--primary-light);color:var(--primary-dark);border:none;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;}
+.case-worked-btn.done{background:var(--success-light);color:var(--success);}
+.takeaway-list{list-style:none;padding:0;margin:16px 0;}
+.takeaway-list li{padding:12px 16px 12px 48px;position:relative;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:10px;font-size:15px;color:#1e293b;border:1px solid var(--border);}
+.takeaway-list li .t-num{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:24px;height:24px;background:var(--primary);color:#fff;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.reset-btn{position:fixed;bottom:18px;right:18px;background:#fff;border:1px solid var(--border);padding:8px 14px;border-radius:20px;font-size:13px;color:var(--muted);cursor:pointer;box-shadow:var(--shadow);font-family:inherit;transition:all var(--transition);z-index:100;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.cricket-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;}
+.cricket-table th{background:#1e293b;color:#fff;padding:7px 8px;text-align:center;font-weight:600;}
+.cricket-table td{padding:6px 8px;text-align:center;border-bottom:1px solid var(--border);color:#334155;}
+.cricket-table tr:nth-child(even) td{background:#f8fafc;}
+@media(max-width:720px){
+  .app{padding:14px 12px 80px;}
+  header.mod-header{padding:22px 18px;}
+  header.mod-header h1{font-size:22px;}
+  .card{padding:20px 16px;}
+  .two-col,.three-col{grid-template-columns:1fr;}
+  .stats-bar{grid-template-columns:repeat(2,1fr);}
+  .slide h2{font-size:22px;}
+  .freq-table,.cricket-table{font-size:12px;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="mod-header">
+  <span class="mod-badge">Module 11 of 17</span>
+  <h1>Poisson Distribution</h1>
+  <p class="mod-sub">Modeling counts of rare events over time or space. Hospital arrivals, road accidents, and flood occurrences, when events happen randomly but at a predictable average rate.</p>
+  <p class="mod-instructor"><strong>K.M. Tanvir</strong> &nbsp;·&nbsp; Statistics for Non-Statisticians</p>
+</header>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-value" id="stat-slides">0%</div><div class="stat-label">Slides Viewed</div></div>
+  <div class="stat"><div class="stat-value" id="stat-quiz">&#8212;</div><div class="stat-label">Quiz Score</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cards">0 / 20</div><div class="stat-label">Cards Flipped</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cases">0 / 4</div><div class="stat-label">Cases Worked</div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('slides',this)">&#128214; Slides</button>
+  <button class="tab-btn" onclick="switchTab('quiz',this)">&#128221; Quiz</button>
+  <button class="tab-btn" onclick="switchTab('flashcards',this)">&#127183; Flashcards</button>
+  <button class="tab-btn" onclick="switchTab('cases',this)">&#127919; Real Cases</button>
+</div>
+
+<!-- ========== SLIDES ========== -->
+<div id="tab-slides" class="tab-content active">
+<div class="card">
+  <div class="progress-bar"><div class="progress-fill" id="slide-progress"></div></div>
+  <div class="slide-counter" id="slide-counter">Slide 1 of 14</div>
+  <!-- S1: objectives -->
+  <div class="slide active" id="slide-1">
+    <h2>Poisson Distribution</h2>
+    <p class="slide-sub">Module 11 &nbsp;·&nbsp; By the end of this module, you will be able to:</p>
+    <ul class="obj-list">
+      <li>Recognize the conditions of a Poisson process and identify when it applies to a counting situation</li>
+      <li>Calculate a Poisson probability using the Poisson formula</li>
+      <li>Calculate cumulative Poisson probabilities, including "at least" and "at most" questions</li>
+      <li>Calculate and interpret the mean and variance of a Poisson distribution</li>
+      <li>Rescale a Poisson rate across different time or space intervals</li>
+      <li>Use the Poisson distribution as an approximation to the binomial, and recognize when the Poisson model itself breaks down</li>
+    </ul>
+    <div class="tip-box"><strong>Continuing from Modules 9 and 10:</strong> the binomial distribution counted successes in a fixed number of discrete trials, and the negative binomial counted trials needed to reach a fixed number of successes. The Poisson distribution removes the idea of discrete trials altogether, counting how many times a rare event occurs over a continuous span of time or space.</div>
+  </div>
+
+  <!-- S2: poisson process conditions -->
+  <div class="slide" id="slide-2">
+    <h2>The Poisson Process</h2>
+    <p>A Poisson process describes events that occur randomly and independently over a continuous interval of time or space, at a constant average rate. Three conditions must hold:</p>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Constant average rate</div><div class="def-body">Events occur at a steady average rate, denoted &lambda; (lambda), over the interval being studied. &lambda; does not change within the interval.</div></div>
+      <div class="def-card"><div class="def-term">Independence</div><div class="def-body">The occurrence of one event does not make another event more or less likely to occur elsewhere in the interval.</div></div>
+    </div>
+    <div class="def-card" style="margin-top:14px;"><div class="def-term">No simultaneous events</div><div class="def-body">Two events cannot occur at exactly the same instant or point; in any sufficiently small sub-interval, the probability of more than one event is negligible.</div></div>
+    <div class="warn-box"><strong>Contrast with the binomial:</strong> the binomial distribution counts successes among a fixed, countable number of discrete trials (n). The Poisson distribution has no such n: it counts events that could in principle happen any number of times across a continuous interval, with only the average rate &lambda; fixed in advance.</div>
+  </div>
+
+  <!-- S3: poisson formula -->
+  <div class="slide" id="slide-3">
+    <h2>The Poisson Probability Formula</h2>
+    <p>If X is the number of events occurring in an interval with average rate &lambda;, the probability of observing exactly x events is:</p>
+    <div class="formula-box">\[ P(X = x) = \frac{e^{-\lambda} \lambda^{x}}{x!}, \qquad x = 0, 1, 2, \dots \]</div>
+    <p>Here e &asymp; 2.71828 is the base of the natural logarithm, and x! is the familiar factorial. Unlike the binomial formula, there is no upper limit on x: in principle, any non-negative whole number of events is possible, though probabilities shrink rapidly once x is far from &lambda;.</p>
+    <div class="tip-box"><strong>Only one parameter:</strong> the entire Poisson distribution is determined by &lambda; alone, the average number of events per interval. This is simpler than the binomial, which requires both n and p.</div>
+  </div>
+
+  <!-- S4: worked example -->
+  <div class="slide" id="slide-4">
+    <h2>Worked Example: Snakebite Cases at a Rural Clinic</h2>
+    <p>During monsoon season, a rural health clinic receives an average of 3 snakebite patients per week (&lambda; = 3). Assuming arrivals are independent and occur at a steady average rate, what is the probability the clinic receives exactly 5 snakebite patients in a given week?</p>
+    <div class="formula-box">\[ P(X = 5) = \frac{e^{-3} \, 3^{5}}{5!} \]</div>
+    <table class="freq-table">
+      <thead><tr><th>Component</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>\(e^{-3}\)</td><td>0.04979</td></tr>
+        <tr><td>\(3^5\)</td><td>243</td></tr>
+        <tr><td>\(5!\)</td><td>120</td></tr>
+      </tbody>
+    </table>
+    <div class="example-box">P(X = 5) = (0.04979 &times; 243) / 120 &asymp; 12.098 / 120 &asymp; <strong>0.1008</strong>, about a 10.1% chance of exactly 5 cases in a week.</div>
+  </div>
+
+  <!-- S5: distribution table and shape -->
+  <div class="slide" id="slide-5">
+    <h2>The Full Distribution for &lambda; = 3</h2>
+    <table class="freq-table">
+      <thead><tr><th>x (cases)</th><th>P(X = x)</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>0.0498</td></tr>
+        <tr><td>1</td><td>0.1494</td></tr>
+        <tr><td>2</td><td>0.2240</td></tr>
+        <tr class="highlight-row"><td>3</td><td>0.2240</td></tr>
+        <tr><td>4</td><td>0.1680</td></tr>
+        <tr><td>5</td><td>0.1008</td></tr>
+        <tr><td>6</td><td>0.0504</td></tr>
+        <tr><td>7 or more</td><td>0.0336</td></tr>
+      </tbody>
+    </table>
+    <svg viewBox="0 0 480 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:480px;margin:10px auto;display:block;">
+      <text x="5" y="14" font-size="10" fill="#64748b" font-family="Inter,sans-serif">Probability mass, &lambda;=3 (right-skewed, peak near x=2-3)</text>
+      <g font-family="Inter,sans-serif" font-size="10" fill="#1e293b">
+        <rect x="20"  y="146" width="40" height="6"   fill="#2563eb"/>
+        <rect x="65"  y="115" width="40" height="37"  fill="#2563eb"/>
+        <rect x="110" y="86"  width="40" height="66"  fill="#2563eb"/>
+        <rect x="155" y="86"  width="40" height="66"  fill="#4f46e5"/>
+        <rect x="200" y="103" width="40" height="49"  fill="#2563eb"/>
+        <rect x="245" y="122" width="40" height="30"  fill="#2563eb"/>
+        <rect x="290" y="137" width="40" height="15"  fill="#2563eb"/>
+        <rect x="335" y="142" width="40" height="10"  fill="#2563eb"/>
+        <text x="35"  y="156">0</text><text x="80" y="156">1</text><text x="125" y="156">2</text>
+        <text x="170" y="156">3</text><text x="215" y="156">4</text><text x="260" y="156">5</text>
+        <text x="305" y="156">6</text><text x="350" y="156">7+</text>
+      </g>
+    </svg>
+    <div class="tip-box"><strong>Shape:</strong> like the binomial with small p, the Poisson distribution is right-skewed for small &lambda;, with a peak near &lambda; and a long tail toward higher counts. As &lambda; grows large, the Poisson distribution becomes increasingly symmetric and bell-shaped.</div>
+  </div>
+
+  <!-- S6: cumulative probabilities -->
+  <div class="slide" id="slide-6">
+    <h2>Cumulative Poisson Probabilities</h2>
+    <p>As with the binomial and negative binomial distributions, the complement rule from Module 8 is the fastest route to "at least" questions.</p>
+    <div class="example-box"><strong>"At most 2 cases in a week" (&lambda;=3):</strong>
+    <br>P(X &le; 2) = P(0) + P(1) + P(2) = 0.0498 + 0.1494 + 0.2240 = <strong>0.4232</strong>.</div>
+    <div class="example-box"><strong>"At least 3 cases in a week":</strong>
+    <br>P(X &ge; 3) = 1 &minus; P(X &le; 2) = 1 &minus; 0.4232 = <strong>0.5768</strong>, meaning the clinic should expect 3 or more snakebite cases in more than half of all weeks during monsoon season.</div>
+    <div class="tip-box">This complement-rule shortcut matters even more for the Poisson distribution than for the binomial, since x has no upper limit, and summing every individual term beyond a handful of values quickly becomes impractical by hand.</div>
+  </div>
+
+  <!-- S7: mean and variance -->
+  <div class="slide" id="slide-7">
+    <h2>Mean and Variance of the Poisson Distribution</h2>
+    <p>The Poisson distribution has an unusually simple and memorable property: its mean and variance are both equal to &lambda;.</p>
+    <div class="formula-box">\[ \mu = E(X) = \lambda, \qquad \sigma^2 = Var(X) = \lambda \]</div>
+    <div class="example-box"><strong>Snakebite clinic example (&lambda; = 3):</strong>
+    <br>&mu; = <strong>3 cases per week</strong>, on average.
+    <br>&sigma;&sup2; = <strong>3</strong>, so &sigma; = &radic;3 &asymp; <strong>1.73 cases</strong>.</div>
+    <div class="warn-box"><strong>Why this is notable:</strong> for the binomial distribution, mean (np) and variance (np(1-p)) are generally different. For the Poisson distribution they are always identical. This gives a useful diagnostic: if real count data has a sample variance much larger than its sample mean ("overdispersion"), the data likely violates the Poisson assumptions, often because the event rate is not actually constant.</div>
+  </div>
+
+  <!-- S8: poisson approximation to binomial -->
+  <div class="slide" id="slide-8">
+    <h2>The Poisson Approximation to the Binomial</h2>
+    <p>When a binomial experiment has a large number of trials n and a small probability of success p, such that the product &lambda; = np stays moderate, the binomial distribution is closely approximated by a Poisson distribution with that same &lambda;.</p>
+    <div class="formula-box">\[ \text{Binomial}(n, p) \approx \text{Poisson}(\lambda = np), \quad \text{when } n \text{ is large and } p \text{ is small} \]</div>
+    <div class="example-box"><strong>Worked example:</strong> a rare genetic condition affects 0.03% of newborns (p = 0.0003) in a region with 10,000 births per year (n = 10,000). The exact binomial calculation of P(X=5) is cumbersome by hand, but with &lambda; = np = 10,000 &times; 0.0003 = 3, the Poisson formula from Slide 3 gives P(X=5) &asymp; 0.1008, the same value computed for the snakebite clinic.</div>
+    <div class="tip-box"><strong>Practical rule of thumb:</strong> the Poisson approximation works well when n &ge; 20 and p &le; 0.05, and especially well when n is very large and p is very small, exactly the regime where binomial calculations by hand or by combinations become impractical.</div>
+  </div>
+
+  <!-- S9: rate scaling -->
+  <div class="slide" id="slide-9">
+    <h2>Rescaling the Rate Across Intervals</h2>
+    <p>Because &lambda; is an average rate, it scales proportionally with the size of the interval. If the average rate over one interval is known, the rate over a longer or shorter interval is found by simple proportion.</p>
+    <div class="example-box"><strong>From weeks to days:</strong> if the snakebite clinic averages &lambda; = 3 cases per week, the average daily rate is &lambda;<sub>day</sub> = 3 / 7 &asymp; <strong>0.4286 cases per day</strong>.
+    <br><br><strong>From weeks to months:</strong> over a 4-week month, &lambda;<sub>month</sub> = 3 &times; 4 = <strong>12 cases per month</strong>.</div>
+    <div class="warn-box"><strong>A common error:</strong> using the weekly &lambda; = 3 directly in a question that asks about a single day, or vice versa, without rescaling, produces a probability for the wrong interval entirely. Always match &lambda; to the interval the question actually asks about before applying the Poisson formula.</div>
+  </div>
+
+  <!-- S10: sum of independent poissons -->
+  <div class="slide" id="slide-10">
+    <h2>Combining Independent Poisson Processes</h2>
+    <p>If two independent Poisson processes occur over the same interval, with rates &lambda;<sub>1</sub> and &lambda;<sub>2</sub>, the total number of combined events is itself Poisson distributed, with rate &lambda;<sub>1</sub> + &lambda;<sub>2</sub>.</p>
+    <div class="formula-box">\[ X_1 \sim \text{Poisson}(\lambda_1), \ X_2 \sim \text{Poisson}(\lambda_2), \ \text{independent} \implies X_1 + X_2 \sim \text{Poisson}(\lambda_1 + \lambda_2) \]</div>
+    <div class="example-box"><strong>Worked example:</strong> two rural clinics in neighboring upazilas each see snakebite cases independently, Clinic A at &lambda;<sub>A</sub> = 3 per week and Clinic B at &lambda;<sub>B</sub> = 2 per week. The district's total weekly snakebite caseload across both clinics follows a Poisson distribution with &lambda; = 3 + 2 = <strong>5 cases per week</strong>.</div>
+    <div class="tip-box"><strong>Use in practice:</strong> this property lets a district health office aggregate independently monitored facilities into a single regional rate without re-deriving the distribution from scratch.</div>
+  </div>
+
+  <!-- S11: anchor case -->
+  <div class="slide" id="slide-11">
+    <h2>Anchor Case: Accidents at a Dhaka Intersection</h2>
+    <p>A busy intersection records an average of 2.5 traffic accidents per month (&lambda; = 2.5), based on several years of data. A traffic safety committee proposes a rule: "if more than 5 accidents occur in a month, flag the intersection for an emergency engineering review."</p>
+    <div class="example-box"><strong>Question: how often would this rule trigger purely by chance, even if nothing about the intersection has changed?</strong>
+    <br>Summing P(0) through P(5) for &lambda;=2.5 gives P(X &le; 5) &asymp; 0.9580.
+    <br>P(X &gt; 5) = 1 &minus; 0.9580 &asymp; <strong>0.0420</strong>, about a 4.2% chance in any given month.</div>
+    <div class="tip-box"><strong>Interpreting the 4.2%:</strong> over a year, a 4.2% monthly chance means the rule will likely trigger a review roughly once every two years even with no real change in safety, a "false alarm" rate the committee should weigh deliberately, exactly as the factory manager in Module 9 had to weigh a defect-rate alarm threshold.</div>
+  </div>
+
+  <!-- S12: when poisson fails -->
+  <div class="slide" id="slide-12">
+    <h2>When the Poisson Conditions Fail</h2>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Non-constant rate</div><div class="def-body">If accidents cluster heavily during rush hours and are rare overnight, a single daily &lambda; averaged across the whole day misrepresents risk at any specific hour.</div></div>
+      <div class="def-card"><div class="def-term">Non-independent events</div><div class="def-body">If one flood damages upstream embankments and makes a second flood more likely soon after, the independence assumption is violated.</div></div>
+    </div>
+    <div class="warn-box"><strong>Overdispersion as a warning sign:</strong> when real count data shows a sample variance much larger than the sample mean, contradicting the Poisson property that &mu; = &sigma;&sup2;, this is strong evidence that the constant-rate or independence assumptions do not hold, and a more flexible model (such as the negative binomial used for overdispersed counts) may be more appropriate.</div>
+    <div class="tip-box"><strong>Practical fix:</strong> splitting a non-constant-rate interval into smaller, more homogeneous sub-intervals (such as separate rates for rush hour versus overnight) often restores a reasonable approximation to the Poisson model within each sub-interval.</div>
+  </div>
+
+  <!-- S13: decision guide -->
+  <div class="slide" id="slide-13">
+    <h2>Choosing Among Binomial, Negative Binomial, and Poisson</h2>
+    <svg viewBox="0 0 700 190" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;margin:10px auto;display:block;">
+      <text x="10" y="22" font-size="10" font-weight="700" fill="#94a3b8" font-family="Inter,sans-serif" letter-spacing="0.5">SITUATION</text>
+      <text x="430" y="22" font-size="10" font-weight="700" fill="#94a3b8" font-family="Inter,sans-serif" letter-spacing="0.5">MODEL</text>
+      <line x1="0" y1="28" x2="700" y2="28" stroke="#e2e8f0" stroke-width="1"/>
+      <rect x="0" y="30"  width="700" height="36" rx="4" fill="#eff6ff"/>
+      <rect x="0" y="68"  width="700" height="36" rx="4" fill="#fef3c7"/>
+      <rect x="0" y="106" width="700" height="36" rx="4" fill="#f0fdf4"/>
+      <rect x="0" y="144" width="700" height="36" rx="4" fill="#fdf2f8"/>
+      <text x="10" y="53"  font-size="13" fill="#1e40af" font-family="Inter,sans-serif">Fixed number of discrete trials (n); count successes</text>
+      <text x="430" y="53" font-size="13" font-weight="700" fill="#1e40af" font-family="Inter,sans-serif">Binomial</text>
+      <text x="10" y="91"  font-size="13" fill="#92400e" font-family="Inter,sans-serif">Fixed number of successes (r); count trials needed</text>
+      <text x="430" y="91" font-size="13" font-weight="700" fill="#92400e" font-family="Inter,sans-serif">Negative binomial</text>
+      <text x="10" y="129"  font-size="13" fill="#065f46" font-family="Inter,sans-serif">No fixed trials at all; count rare events over time/space</text>
+      <text x="430" y="129" font-size="13" font-weight="700" fill="#065f46" font-family="Inter,sans-serif">Poisson</text>
+      <text x="10" y="167"  font-size="13" fill="#9d174d" font-family="Inter,sans-serif">Binomial with n large, p small, &lambda;=np moderate</text>
+      <text x="430" y="167" font-size="13" font-weight="700" fill="#9d174d" font-family="Inter,sans-serif">Poisson (approximation)</text>
+    </svg>
+    <div class="tip-box"><strong>The common thread across all three:</strong> every model in this family rests on the same foundation laid in Module 8, independent events with a constant probability or rate. What differs is what the study design or process holds fixed: the number of trials, the number of successes, or neither, only an average rate.</div>
+  </div>
+
+  <!-- S14: recap -->
+  <div class="slide" id="slide-14">
+    <h2>Module 11 Recap</h2>
+    <ul class="takeaway-list">
+      <li><span class="t-num">1</span>The Poisson distribution counts rare events over a continuous interval of time or space, governed by a single parameter &lambda;, the average rate.</li>
+      <li><span class="t-num">2</span>A Poisson process requires a constant average rate, independent events, and no two events at exactly the same instant.</li>
+      <li><span class="t-num">3</span>The Poisson formula, P(X=x) = e^(&minus;&lambda;) &lambda;^x / x!, has no upper limit on x.</li>
+      <li><span class="t-num">4</span>Mean and variance are both equal to &lambda;, an unusually simple and diagnostically useful property.</li>
+      <li><span class="t-num">5</span>The Poisson distribution approximates the binomial well when n is large and p is small, with &lambda; = np.</li>
+      <li><span class="t-num">6</span>&lambda; scales proportionally with interval length, and independent Poisson rates over the same interval add together.</li>
+      <li><span class="t-num">7</span>Overdispersion (sample variance much larger than sample mean) signals that the constant-rate or independence assumptions likely fail.</li>
+    </ul>
+    <div class="tip-box"><strong>Next module:</strong> Module 12 turns to the normal distribution, the continuous bell-shaped model that underlies the approximations referenced throughout this module and the two before it.</div>
+  </div>
+
+  <div class="slide-nav">
+    <button class="btn btn-ghost" id="prevBtn">&larr; Previous</button>
+    <span class="key-hint">Use <span class="kbd">&larr;</span> <span class="kbd">&rarr;</span> arrow keys to navigate</span>
+    <button class="btn btn-primary" id="nextBtn">Next &rarr;</button>
+  </div>
+</div>
+</div>
+
+<!-- ========== QUIZ ========== -->
+<div id="tab-quiz" class="tab-content">
+<div class="quiz-intro">
+  <h2>&#128221; Module Quiz</h2>
+  <p>14 questions on the Poisson process, the Poisson formula, mean and variance, rate scaling, and the binomial approximation.</p>
+  <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
+</div>
+<div id="quiz-questions" style="display:none;">
+  <div class="quiz-question" id="qq-1">
+    <h4><span class="q-num">1.</span>Which of the following is NOT a required condition of a Poisson process?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(1,this,false)">A constant average rate over the interval</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">Independent events</button>
+      <button class="quiz-option" onclick="answerQ(1,this,true)">A fixed, known number of trials, n</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">No two events occurring at exactly the same instant</button>
+    </div>
+    <div class="quiz-explain" id="qe-1">Unlike the binomial distribution, the Poisson distribution has no fixed number of discrete trials; it counts events over a continuous interval governed only by the rate &lambda;.</div>
+  </div>
+  <div class="quiz-question" id="qq-2">
+    <h4><span class="q-num">2.</span>The Poisson distribution is fully determined by:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(2,this,false)">n and p</button>
+      <button class="quiz-option" onclick="answerQ(2,this,true)">&lambda; alone</button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">r and p</button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">&mu; and n</button>
+    </div>
+    <div class="quiz-explain" id="qe-2">The entire Poisson distribution is determined by a single parameter, &lambda;, the average rate of events.</div>
+  </div>
+  <div class="quiz-question" id="qq-3">
+    <h4><span class="q-num">3.</span>A clinic averages &lambda;=3 snakebite cases per week. What is P(X=5)?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(3,this,false)">0.0498</button>
+      <button class="quiz-option" onclick="answerQ(3,this,true)">e^(-3) &times; 3^5 / 5! &asymp; 0.1008</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">3/5 = 0.60</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">5/3 &asymp; 1.667</button>
+    </div>
+    <div class="quiz-explain" id="qe-3">P(X=5) = e^(-3)(3^5)/5! = (0.04979 &times; 243)/120 &asymp; 0.1008.</div>
+  </div>
+  <div class="quiz-question" id="qq-4">
+    <h4><span class="q-num">4.</span>For a Poisson distribution with &lambda; = 3, P(X &le; 2) = 0.4232. What is P(X &ge; 3)?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(4,this,false)">0.4232</button>
+      <button class="quiz-option" onclick="answerQ(4,this,true)">0.5768</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">1.4232</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">0.2116</button>
+    </div>
+    <div class="quiz-explain" id="qe-4">By the complement rule, P(X &ge; 3) = 1 - P(X &le; 2) = 1 - 0.4232 = 0.5768.</div>
+  </div>
+  <div class="quiz-question" id="qq-5">
+    <h4><span class="q-num">5.</span>For any Poisson distribution, the relationship between the mean and the variance is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(5,this,false)">The variance is always larger than the mean</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">The variance is always smaller than the mean</button>
+      <button class="quiz-option" onclick="answerQ(5,this,true)">The variance always equals the mean</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">There is no fixed relationship</button>
+    </div>
+    <div class="quiz-explain" id="qe-5">For the Poisson distribution, &mu; = &sigma;&sup2; = &lambda;, always.</div>
+  </div>
+  <div class="quiz-question" id="qq-6">
+    <h4><span class="q-num">6.</span>The Poisson distribution provides a good approximation to the binomial distribution when:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(6,this,false)">n is small and p is close to 0.5</button>
+      <button class="quiz-option" onclick="answerQ(6,this,true)">n is large and p is small, with &lambda;=np moderate</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">n equals p</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">The trials are not independent</button>
+    </div>
+    <div class="quiz-explain" id="qe-6">The Poisson approximation works well for large n and small p, holding &lambda;=np at a moderate value.</div>
+  </div>
+  <div class="quiz-question" id="qq-7">
+    <h4><span class="q-num">7.</span>A rare condition affects 0.03% of 10,000 newborns. What &lambda; should be used for a Poisson approximation?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(7,this,false)">0.0003</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">10,000</button>
+      <button class="quiz-option" onclick="answerQ(7,this,true)">3 (since &lambda;=np=10,000&times;0.0003)</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">0.3</button>
+    </div>
+    <div class="quiz-explain" id="qe-7">&lambda; = np = 10,000 &times; 0.0003 = 3.</div>
+  </div>
+  <div class="quiz-question" id="qq-8">
+    <h4><span class="q-num">8.</span>If a process has &lambda;=3 cases per week, what is the average daily rate?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(8,this,false)">3 per day</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">21 per day</button>
+      <button class="quiz-option" onclick="answerQ(8,this,true)">3/7 &asymp; 0.4286 per day</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">7/3 per day</button>
+    </div>
+    <div class="quiz-explain" id="qe-8">&lambda; scales proportionally with the interval length: 3 per week / 7 days per week = 0.4286 per day.</div>
+  </div>
+  <div class="quiz-question" id="qq-9">
+    <h4><span class="q-num">9.</span>Clinic A sees cases at &lambda;<sub>A</sub>=3/week and Clinic B independently at &lambda;<sub>B</sub>=2/week. What is the distribution of their combined weekly caseload?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(9,this,false)">Poisson with &lambda;=1.5</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">Poisson with &lambda;=6</button>
+      <button class="quiz-option" onclick="answerQ(9,this,true)">Poisson with &lambda;=5</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">Not Poisson, since two clinics are involved</button>
+    </div>
+    <div class="quiz-explain" id="qe-9">The sum of two independent Poisson variables is Poisson with rate equal to the sum: &lambda;=3+2=5.</div>
+  </div>
+  <div class="quiz-question" id="qq-10">
+    <h4><span class="q-num">10.</span>An intersection averages &lambda;=2.5 accidents per month, and P(X &le; 5) &asymp; 0.9580. What is the probability of more than 5 accidents in a month?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(10,this,true)">&asymp; 0.0420</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">&asymp; 0.9580</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">&asymp; 0.5000</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">&asymp; 0.0042</button>
+    </div>
+    <div class="quiz-explain" id="qe-10">P(X &gt; 5) = 1 - P(X &le; 5) = 1 - 0.9580 = 0.0420.</div>
+  </div>
+  <div class="quiz-question" id="qq-11">
+    <h4><span class="q-num">11.</span>Why might using a single daily &lambda; for traffic accidents be misleading if accidents cluster heavily during rush hour?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(11,this,true)">It violates the constant-rate condition, since the true rate varies considerably within the day</button>
+      <button class="quiz-option" onclick="answerQ(11,this,false)">The Poisson formula cannot handle rates above 1</button>
+      <button class="quiz-option" onclick="answerQ(11,this,false)">Traffic accidents are never independent of each other</button>
+      <button class="quiz-option" onclick="answerQ(11,this,false)">&lambda; must always be a whole number</button>
+    </div>
+    <div class="quiz-explain" id="qe-11">A single daily average masks the fact that the rate is much higher during rush hour and much lower overnight, violating the constant-rate assumption within the day.</div>
+  </div>
+  <div class="quiz-question" id="qq-12">
+    <h4><span class="q-num">12.</span>"Overdispersion" in count data refers to:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(12,this,false)">The sample mean being larger than expected</button>
+      <button class="quiz-option" onclick="answerQ(12,this,true)">The sample variance being much larger than the sample mean, contradicting the Poisson property &mu;=&sigma;&sup2;</button>
+      <button class="quiz-option" onclick="answerQ(12,this,false)">Having too many zero counts</button>
+      <button class="quiz-option" onclick="answerQ(12,this,false)">A sample size that is too large for Poisson</button>
+    </div>
+    <div class="quiz-explain" id="qe-12">Overdispersion describes data where the variance substantially exceeds the mean, signaling that the Poisson assumptions of constant rate or independence likely do not hold.</div>
+  </div>
+  <div class="quiz-question" id="qq-13">
+    <h4><span class="q-num">13.</span>A flood-prone river basin averages &lambda;=1.2 floods per year. What is P(zero floods in a year)?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(13,this,true)">e^(-1.2) &asymp; 0.3012</button>
+      <button class="quiz-option" onclick="answerQ(13,this,false)">1.2</button>
+      <button class="quiz-option" onclick="answerQ(13,this,false)">1 - 1.2 = -0.2</button>
+      <button class="quiz-option" onclick="answerQ(13,this,false)">0.012</button>
+    </div>
+    <div class="quiz-explain" id="qe-13">P(X=0) = e^(-&lambda;) &lambda;^0 / 0! = e^(-1.2) &asymp; 0.3012, since &lambda;^0=1 and 0!=1.</div>
+  </div>
+  <div class="quiz-question" id="qq-14">
+    <h4><span class="q-num">14.</span>A flash flood damages an upstream embankment, making a second flood more likely in the weeks that follow. Why does this violate the Poisson model?</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(14,this,true)">It violates independence, since the occurrence of one event changes the probability of another</button>
+      <button class="quiz-option" onclick="answerQ(14,this,false)">It violates the requirement that &lambda; be a whole number</button>
+      <button class="quiz-option" onclick="answerQ(14,this,false)">It means the binomial distribution should be used instead</button>
+      <button class="quiz-option" onclick="answerQ(14,this,false)">It does not violate any Poisson condition</button>
+    </div>
+    <div class="quiz-explain" id="qe-14">The Poisson model requires that events be independent; if one flood physically increases the likelihood of a subsequent flood, that condition is violated.</div>
+  </div>
+  <div class="quiz-footer">
+    <span class="quiz-progress-text" id="quiz-progress">0 of 14 answered</span>
+    <button class="btn btn-primary" onclick="submitQuiz()" id="btn-submit-quiz" disabled>Submit Quiz</button>
+  </div>
+  <div class="quiz-result" id="quiz-result">
+    <h3>Quiz Complete</h3>
+    <div class="score" id="quiz-score-display">0<span class="total"> / 14</span></div>
+    <div class="verdict" id="quiz-verdict"></div>
+    <p id="quiz-msg"></p>
+    <button class="btn btn-primary" onclick="retakeQuiz()">Retake Quiz</button>
+  </div>
+</div>
+</div>
+
+<!-- ========== FLASHCARDS ========== -->
+<div id="tab-flashcards" class="tab-content">
+<div class="flashcards-header">
+  <h2>&#127183; Flashcards</h2>
+  <p>20 key terms from Module 11. Click any card to reveal its definition.</p>
+</div>
+<div class="flashcards-grid" id="fc-grid"></div>
+</div>
+
+<!-- ========== REAL CASES ========== -->
+<div id="tab-cases" class="tab-content">
+<div class="cases-header">
+  <h2>&#127919; Real Cases</h2>
+  <p>Read each scenario, write your interpretation, then reveal what most people miss and what the careful reading looks like.</p>
+</div>
+
+<div class="case-card" id="case-1">
+  <h4>Case 1: Staffing a Rural Clinic for Peak Demand</h4>
+  <p class="case-prompt">A rural clinic averages &lambda;=3 snakebite cases per week during monsoon season and staffs exactly enough antivenom doses for 3 cases per week, reasoning that this matches the average demand.</p>
+  <p class="case-q">Is stocking exactly the average (3 doses) a safe staffing policy?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-1','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-1','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-1" onclick="markCaseWorked(1)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-1">Stocking exactly the average demand feels intuitively sufficient, since "on average" the supply should match the need.</div>
+  <div class="reveal-panel right-panel" id="right-case-1">Matching the mean ignores the considerable week-to-week variability. With &lambda;=3, &sigma;=&radic;3&asymp;1.73, and P(X &ge; 3)&asymp;0.5768, meaning the clinic will need 3 or more doses in well over half of all weeks, and will sometimes need 5, 6, or more. Stocking only the mean guarantees frequent shortages; the clinic should calculate a higher stock level, such as the 90th or 95th percentile of the Poisson distribution, to cover demand in nearly all weeks.</div>
+</div>
+
+<div class="case-card" id="case-2">
+  <h4>Case 2: A Rare-Disease Risk Calculation</h4>
+  <p class="case-prompt">A health analyst needs to compute the probability that exactly 4 newborns out of 10,000 (p=0.0003 each) develop a rare congenital condition, and worries that the exact binomial formula, involving C(10000,4), is too unwieldy to compute by hand.</p>
+  <p class="case-q">Is there a practical shortcut available?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-2','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-2','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-2" onclick="markCaseWorked(2)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-2">With n this large, it seems the only path forward is computing the unwieldy combination C(10000,4) directly, or giving up on an exact answer.</div>
+  <div class="reveal-panel right-panel" id="right-case-2">Since n=10,000 is large and p=0.0003 is small, the Poisson approximation with &lambda;=np=3 applies, replacing the unwieldy binomial calculation with the simple formula P(X=4)=e^(-3)(3^4)/4! &asymp; 0.168. This is far easier to compute and very close to the exact binomial probability, illustrating exactly why the Poisson approximation exists.</div>
+</div>
+
+<div class="case-card" id="case-3">
+  <h4>Case 3: Comparing Two "Rates" Across Reports</h4>
+  <p class="case-prompt">One district report states "the river basin floods at a rate of 1.2 per year," while a partner agency's report on the same basin states "0.1 floods per month," and a reviewer assumes one of the two figures must be wrong.</p>
+  <p class="case-q">Can both figures be correct descriptions of the same flooding pattern?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-3','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-3','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-3" onclick="markCaseWorked(3)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-3">1.2 per year and 0.1 per month look like different numbers describing the same basin, inviting suspicion that one report contains an error.</div>
+  <div class="reveal-panel right-panel" id="right-case-3">Both figures describe the same underlying rate, just rescaled across different intervals: 1.2 floods per year / 12 months per year = 0.1 floods per month exactly. Because &lambda; scales proportionally with interval length, neither figure is wrong; they are consistent once converted to a common timeframe. The lesson is to always check the stated interval before comparing two reported rates.</div>
+</div>
+
+<div class="case-card" id="case-4">
+  <h4>Case 4: A Misapplied Poisson Model After Embankment Failure</h4>
+  <p class="case-prompt">A planning office uses a Poisson model with &lambda;=1.2 floods per year to estimate flood risk for an upcoming year, even though a major embankment failed during the most recent flood and has not yet been repaired, substantially raising the basin's vulnerability to a follow-on flood in the near term.</p>
+  <p class="case-q">Is continuing to apply the same Poisson model with &lambda;=1.2 appropriate going forward?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-4','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-4','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-4" onclick="markCaseWorked(4)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-4">Since &lambda;=1.2 is based on solid historical data, it can seem reasonable to keep using the same established rate going forward.</div>
+  <div class="reveal-panel right-panel" id="right-case-4">No, the historical &lambda;=1.2 was estimated under conditions where the independence assumption held. With the embankment damaged, a flood is now more likely to be followed by another flood in the near term, violating independence and likely raising the effective near-term rate above 1.2. The planning office should not mechanically apply the historical Poisson model immediately after such a structural change; the rate needs re-estimation, or a different model entirely, until normal independent conditions are restored.</div>
+</div>
+
+</div>
+
+<button class="reset-btn" onclick="resetProgress()">&#8635; Reset Progress</button>
+
+<script>
+const STORAGE_KEY='stats101-module11-progress-v1';
+const TOTAL_SLIDES=14,TOTAL_CARDS=20,TOTAL_CASES=4,TOTAL_QUIZ=14;
+
+const flashcardData=[
+  {term:'Poisson process',def:'A process in which events occur randomly and independently over a continuous interval of time or space, at a constant average rate &lambda;.'},
+  {term:'Poisson distribution',def:'The probability distribution of the number of events occurring in an interval of a Poisson process, governed by the single parameter &lambda;.'},
+  {term:'Lambda (&lambda;)',def:'The average rate of events per interval; the single parameter that fully determines a Poisson distribution.'},
+  {term:'Poisson probability formula',def:'P(X=x) = e^(-&lambda;) &lambda;^x / x!, the probability of exactly x events occurring, for x = 0, 1, 2, ...'},
+  {term:'No upper limit on x',def:'Unlike the binomial distribution, the Poisson distribution places no fixed ceiling on the number of events that can occur in an interval.'},
+  {term:'Constant rate condition',def:'A required Poisson assumption: the average rate of events does not change within the interval being studied.'},
+  {term:'Independence (Poisson)',def:'A required Poisson assumption: the occurrence of one event does not affect the probability of another event occurring elsewhere in the interval.'},
+  {term:'No simultaneous events',def:'A required Poisson assumption: in any sufficiently small sub-interval, the probability of more than one event occurring is negligible.'},
+  {term:'Poisson mean',def:'&mu; = &lambda;, the expected number of events per interval.'},
+  {term:'Poisson variance',def:'&sigma;&sup2; = &lambda;, always equal to the mean, a defining property of the Poisson distribution.'},
+  {term:'Equidispersion',def:'The property that mean and variance are equal in a true Poisson process; its absence (overdispersion or underdispersion) signals a violated assumption.'},
+  {term:'Overdispersion',def:'When observed count data has a sample variance substantially larger than its sample mean, suggesting the constant-rate or independence assumptions of the Poisson model do not hold.'},
+  {term:'Poisson approximation to the binomial',def:'When n is large and p is small with &lambda;=np moderate, the binomial distribution is closely approximated by a Poisson distribution with that &lambda;.'},
+  {term:'Rate scaling',def:'The principle that &lambda; scales proportionally with interval length, allowing conversion between rates over different time or space units.'},
+  {term:'Sum of independent Poisson variables',def:'If X1~Poisson(&lambda;1) and X2~Poisson(&lambda;2) are independent, then X1+X2~Poisson(&lambda;1+&lambda;2).'},
+  {term:'Complement rule (Poisson use)',def:'P(X &gt; k) = 1 - P(X &le; k), the practical way to compute "more than" probabilities given the unbounded range of x.'},
+  {term:'Right-skewed Poisson',def:'The shape of a Poisson distribution for small &lambda;: most mass near 0 to &lambda;, with a long tail toward higher counts.'},
+  {term:'Large-&lambda; symmetry',def:'As &lambda; grows large, the Poisson distribution becomes increasingly symmetric and bell-shaped, foreshadowing the normal distribution in Module 12.'},
+  {term:'Interval mismatch error',def:'Using a rate &lambda; defined for one interval (such as a week) directly in a calculation for a different interval (such as a day) without rescaling.'},
+  {term:'Poisson process violation',def:'Any departure from constant rate, independence, or non-simultaneity, such as event clustering or one event triggering another, that makes the Poisson model inappropriate.'}
+];
+
+let state={slidesViewed:new Set(),quizScore:null,cardsFlipped:new Set(),casesWorked:new Set(),quizAnswers:{},quizSubmitted:false,currentSlide:1};
+
+function loadState(){
+  try{const s=localStorage.getItem(STORAGE_KEY);if(s){const p=JSON.parse(s);state.slidesViewed=new Set(p.slidesViewed||[]);state.quizScore=p.quizScore!==undefined?p.quizScore:null;state.cardsFlipped=new Set(p.cardsFlipped||[]);state.casesWorked=new Set(p.casesWorked||[]);state.quizAnswers=p.quizAnswers||{};state.quizSubmitted=p.quizSubmitted||false;state.currentSlide=p.currentSlide||1;}}catch(e){}
+}
+function saveState(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify({slidesViewed:[...state.slidesViewed],quizScore:state.quizScore,cardsFlipped:[...state.cardsFlipped],casesWorked:[...state.casesWorked],quizAnswers:state.quizAnswers,quizSubmitted:state.quizSubmitted,currentSlide:state.currentSlide}));}catch(e){}
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');btn.classList.add('active');
+}
+
+const prevBtn=document.getElementById('prevBtn');
+const nextBtn=document.getElementById('nextBtn');
+function showSlide(n){
+  if(n<1||n>TOTAL_SLIDES)return;
+  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+  document.getElementById('slide-'+n).classList.add('active');
+  state.currentSlide=n;state.slidesViewed.add(n);saveState();updateSlideUI();updateStats();
+}
+function updateSlideUI(){
+  const n=state.currentSlide;
+  document.getElementById('slide-counter').textContent='Slide '+n+' of '+TOTAL_SLIDES;
+  document.getElementById('slide-progress').style.width=(n/TOTAL_SLIDES*100)+'%';
+  prevBtn.disabled=n===1;
+  nextBtn.textContent=n===TOTAL_SLIDES?'Finish ✓':'Next →';
+}
+prevBtn.addEventListener('click',()=>showSlide(state.currentSlide-1));
+nextBtn.addEventListener('click',()=>{if(state.currentSlide<TOTAL_SLIDES)showSlide(state.currentSlide+1);});
+document.addEventListener('keydown',e=>{
+  const activeTab=document.querySelector('.tab-content.active');
+  if(!activeTab||activeTab.id!=='tab-slides')return;
+  if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
+  if(e.key==='ArrowRight'){e.preventDefault();nextBtn.click();}
+  else if(e.key==='ArrowLeft'){e.preventDefault();prevBtn.click();}
+});
+
+let quizAnswered=0,quizCorrect=0;
+function startQuiz(){document.querySelector('.quiz-intro').style.display='none';document.getElementById('quiz-questions').style.display='block';if(state.quizSubmitted)restoreQuizState();}
+function answerQ(qNum,btn,correct){
+  const qq=document.getElementById('qq-'+qNum);if(qq.classList.contains('answered'))return;
+  qq.classList.add('answered');qq.querySelectorAll('.quiz-option').forEach(o=>o.classList.add('disabled'));
+  btn.classList.add(correct?'correct':'wrong');if(correct)quizCorrect++;
+  document.getElementById('qe-'+qNum).classList.add('show');
+  state.quizAnswers[qNum]=correct;quizAnswered++;
+  document.getElementById('quiz-progress').textContent=quizAnswered+' of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=quizAnswered<TOTAL_QUIZ;saveState();
+}
+function submitQuiz(){
+  state.quizScore=quizCorrect;state.quizSubmitted=true;saveState();
+  document.getElementById('quiz-score-display').innerHTML=quizCorrect+'<span class="total"> / '+TOTAL_QUIZ+'</span>';
+  const v=document.getElementById('quiz-verdict'),m=document.getElementById('quiz-msg');
+  if(quizCorrect>=13){v.textContent='Excellent';v.className='verdict great';m.textContent='Strong command of the Poisson process and its formula.';}
+  else if(quizCorrect>=9){v.textContent='Good';v.className='verdict good';m.textContent='Solid. Review the explanations on questions you missed.';}
+  else{v.textContent='Keep going';v.className='verdict ok';m.textContent='Revisit the slides on the Poisson conditions and the mean/variance property before retaking.';}
+  document.getElementById('quiz-result').classList.add('show');updateStats();
+}
+function retakeQuiz(){
+  state.quizScore=null;state.quizSubmitted=false;state.quizAnswers={};quizCorrect=0;quizAnswered=0;saveState();
+  document.getElementById('quiz-result').classList.remove('show');
+  document.querySelectorAll('.quiz-question').forEach(q=>{q.classList.remove('answered');q.querySelectorAll('.quiz-option').forEach(o=>o.classList.remove('correct','wrong','disabled'));q.querySelectorAll('.quiz-explain').forEach(e=>e.classList.remove('show'));});
+  document.getElementById('quiz-progress').textContent='0 of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=true;updateStats();
+}
+function restoreQuizState(){
+  Object.entries(state.quizAnswers).forEach(([qNum,correct])=>{
+    const qq=document.getElementById('qq-'+qNum);if(!qq)return;
+    qq.classList.add('answered');qq.querySelectorAll('.quiz-option').forEach(o=>o.classList.add('disabled'));
+    document.getElementById('qe-'+qNum).classList.add('show');quizAnswered++;if(correct)quizCorrect++;
+  });
+  document.getElementById('quiz-progress').textContent=quizAnswered+' of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=quizAnswered<TOTAL_QUIZ;
+  if(state.quizSubmitted)submitQuiz();
+}
+
+function buildFlashcards(){
+  const grid=document.getElementById('fc-grid');
+  flashcardData.forEach((fc,i)=>{
+    const div=document.createElement('div');div.className='flashcard'+(state.cardsFlipped.has(i)?' flipped':'');
+    div.innerHTML='<div class="flashcard-inner"><div class="flashcard-front">'+fc.term+'<span class="fc-hint">Click to reveal definition</span></div><div class="flashcard-back">'+fc.def+'</div></div>';
+    div.addEventListener('click',()=>{div.classList.toggle('flipped');state.cardsFlipped.add(i);saveState();updateStats();});
+    grid.appendChild(div);
+  });
+}
+
+function revealCase(id,type){document.getElementById(type+'-'+id).classList.add('show');}
+function markCaseWorked(n){
+  state.casesWorked.add(n);saveState();
+  const btn=document.getElementById('worked-case-'+n);btn.textContent='Worked';btn.classList.add('done');updateStats();
+}
+
+function updateStats(){
+  document.getElementById('stat-slides').textContent=Math.round(state.slidesViewed.size/TOTAL_SLIDES*100)+'%';
+  document.getElementById('stat-quiz').textContent=state.quizScore!==null?state.quizScore+' / '+TOTAL_QUIZ:'—';
+  document.getElementById('stat-cards').textContent=state.cardsFlipped.size+' / '+TOTAL_CARDS;
+  document.getElementById('stat-cases').textContent=state.casesWorked.size+' / '+TOTAL_CASES;
+}
+function resetProgress(){if(!confirm('Reset all progress for this module?'))return;localStorage.removeItem(STORAGE_KEY);location.reload();}
+
+loadState();buildFlashcards();showSlide(state.currentSlide);updateStats();
+if(state.quizSubmitted){document.querySelector('.quiz-intro').style.display='none';document.getElementById('quiz-questions').style.display='block';restoreQuizState();}
+state.casesWorked.forEach(n=>{const btn=document.getElementById('worked-case-'+n);if(btn){btn.textContent='Worked';btn.classList.add('done');}});
+</script>
+</div>
+</body>
+</html>

@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 8: Elementary Probability</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;
+  --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#dbeafe;
+  --accent:#4f46e5;--success:#059669;--success-light:#d1fae5;
+  --danger:#dc2626;--danger-light:#fee2e2;
+  --warning:#d97706;--warning-light:#fef3c7;
+  --border:#e2e8f0;
+  --shadow:0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.08),0 4px 10px rgba(0,0,0,.04);
+  --radius:12px;--radius-sm:8px;--transition:.2s cubic-bezier(.4,0,.2,1);
+}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;}
+.app{max-width:1100px;margin:0 auto;padding:24px 20px 80px;}
+header.mod-header{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%);color:#fff;padding:32px 28px;border-radius:var(--radius);margin-bottom:20px;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;}
+header.mod-header::before{content:"";position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:rgba(255,255,255,.08);border-radius:50%;}
+header.mod-header::after{content:"";position:absolute;bottom:-30px;right:80px;width:100px;height:100px;background:rgba(255,255,255,.05);border-radius:50%;}
+.mod-badge{display:inline-block;background:rgba(255,255,255,.2);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:.5px;position:relative;z-index:1;}
+header.mod-header h1{font-size:28px;margin:12px 0 8px;font-weight:700;position:relative;z-index:1;}
+header.mod-header p.mod-sub{font-size:14px;opacity:.88;max-width:640px;position:relative;z-index:1;}
+header.mod-header p.mod-instructor{font-size:13px;opacity:.8;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.2);position:relative;z-index:1;}
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;padding:14px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;}
+.stat{text-align:center;padding:6px;}
+.stat .stat-value{font-size:22px;font-weight:700;color:var(--primary);line-height:1.2;}
+.stat .stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:2px;}
+.tabs{display:flex;gap:4px;background:#fff;padding:6px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;flex-wrap:wrap;}
+.tab-btn{flex:1;min-width:110px;padding:11px 16px;background:transparent;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;transition:all var(--transition);font-family:inherit;}
+.tab-btn:hover{background:var(--bg);color:var(--text);}
+.tab-btn.active{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.28);}
+.tab-content{display:none;animation:fadeIn .28s ease-in-out;}
+.tab-content.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);margin-bottom:16px;}
+.progress-bar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:12px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:3px;transition:width .4s ease;}
+.slide-counter{text-align:center;color:var(--muted);font-size:13px;margin-bottom:14px;font-weight:500;}
+.slide{display:none;min-height:440px;padding:4px;animation:slideIn .3s ease;}
+.slide.active{display:block;}
+@keyframes slideIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+.slide h2{font-size:26px;margin-bottom:6px;color:var(--primary-dark);font-weight:700;line-height:1.25;}
+.slide h3{font-size:18px;margin:20px 0 8px;color:var(--text);font-weight:600;}
+.slide p{margin-bottom:12px;color:#334155;}
+.slide ul,.slide ol{margin:0 0 14px 22px;}
+.slide li{margin-bottom:7px;color:#334155;}
+.slide .slide-sub{color:var(--muted);font-size:15px;margin-bottom:18px;font-style:italic;}
+.obj-list{list-style:none;padding:0;margin:14px 0;}
+.obj-list li{padding:9px 0 9px 32px;position:relative;color:#334155;border-bottom:1px solid var(--border);}
+.obj-list li:last-child{border-bottom:none;}
+.obj-list li::before{content:"";position:absolute;left:0;top:13px;width:18px;height:18px;background:var(--success-light);border-radius:50%;}
+.obj-list li::after{content:"✓";position:absolute;left:3px;top:10px;color:var(--success);font-size:11px;font-weight:700;}
+.example-box{background:var(--primary-light);border-left:4px solid var(--primary);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.example-box strong{color:var(--primary-dark);}
+.tip-box{background:var(--success-light);border-left:4px solid var(--success);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.tip-box strong{color:var(--success);}
+.warn-box{background:var(--warning-light);border-left:4px solid var(--warning);padding:16px 20px;border-radius:var(--radius-sm);margin:16px 0;}
+.warn-box strong{color:var(--warning);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:14px 0;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:14px 0;}
+.def-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;}
+.def-card .def-term{font-weight:700;color:var(--primary-dark);font-size:15px;margin-bottom:6px;}
+.def-card .def-body{font-size:14px;color:#334155;}
+.formula-box{background:#0f172a;color:#e2e8f0;padding:18px 22px;border-radius:var(--radius-sm);margin:14px 0;text-align:center;font-size:16px;overflow-x:auto;}
+.freq-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;}
+.freq-table th{background:var(--primary);color:#fff;padding:9px 12px;text-align:left;font-weight:600;}
+.freq-table th:not(:first-child),.freq-table td:not(:first-child){text-align:right;}
+.freq-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:#334155;}
+.freq-table tr:nth-child(even) td{background:#f8fafc;}
+.freq-table tr.total-row td{font-weight:700;background:var(--primary-light);color:var(--primary-dark);border-top:2px solid var(--primary);}
+.freq-table tr.highlight-row td{background:#fef3c7;}
+.freq-table th:first-child{border-radius:8px 0 0 0;}.freq-table th:last-child{border-radius:0 8px 0 0;}
+.practice{background:#f1f5f9;border:2px dashed #cbd5e1;border-radius:var(--radius-sm);padding:18px;margin:20px 0;}
+.practice h4{color:var(--primary);margin-bottom:10px;font-size:15px;}
+.practice-q{margin-bottom:10px;color:var(--text);font-weight:500;}
+.practice-options{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+.practice-btn{padding:8px 14px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;font-size:14px;transition:all var(--transition);color:var(--text);}
+.practice-btn:hover{border-color:var(--primary);background:var(--primary-light);}
+.practice-btn.correct{background:var(--success-light);border-color:var(--success);color:var(--success);font-weight:600;}
+.practice-btn.wrong{background:var(--danger-light);border-color:var(--danger);color:var(--danger);}
+.practice-btn.disabled{pointer-events:none;opacity:.75;}
+.practice-feedback{margin-top:10px;padding:10px 14px;border-radius:6px;font-size:14px;display:none;}
+.practice-feedback.show{display:block;}
+.practice-feedback.right{background:var(--success-light);color:var(--success);border:1px solid var(--success);}
+.practice-feedback.wrong{background:var(--danger-light);color:var(--danger);border:1px solid var(--danger);}
+.slide-nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border);gap:10px;flex-wrap:wrap;}
+.key-hint{font-size:12px;color:var(--muted);}
+.kbd{display:inline-block;background:#f1f5f9;border:1px solid var(--border);border-bottom-width:2px;border-radius:4px;padding:1px 6px;font-family:monospace;font-size:11px;color:var(--text);}
+.btn{padding:10px 20px;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;transition:all var(--transition);font-family:inherit;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover:not(:disabled){background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,.28);}
+.btn-primary:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover:not(:disabled){background:var(--bg);color:var(--text);}
+.btn-ghost:disabled{opacity:.45;cursor:not-allowed;}
+.quiz-intro{background:#fff;padding:22px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;text-align:center;}
+.quiz-intro h2{color:var(--primary-dark);margin-bottom:8px;}
+.quiz-intro p{color:var(--muted);margin-bottom:14px;}
+.quiz-question{background:#fff;border-radius:var(--radius);padding:22px;margin-bottom:14px;box-shadow:var(--shadow);border:1px solid var(--border);}
+.quiz-question h4{font-size:16px;margin-bottom:14px;color:var(--text);font-weight:600;}
+.q-num{color:var(--primary);font-weight:700;margin-right:6px;}
+.quiz-options{display:grid;gap:8px;}
+.quiz-option{padding:11px 16px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:#fff;transition:all var(--transition);font-size:14px;color:var(--text);text-align:left;font-family:inherit;}
+.quiz-option:hover{border-color:var(--primary);background:var(--primary-light);transform:translateX(2px);}
+.quiz-option.correct{border-color:var(--success);background:var(--success-light);color:var(--success);font-weight:600;}
+.quiz-option.wrong{border-color:var(--danger);background:var(--danger-light);color:var(--danger);}
+.quiz-option.disabled{pointer-events:none;}
+.quiz-explain{display:none;margin-top:10px;padding:10px 14px;background:#f8fafc;border-left:3px solid var(--primary);border-radius:4px;font-size:13px;color:#334155;}
+.quiz-explain.show{display:block;}
+.quiz-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px 20px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);flex-wrap:wrap;}
+.quiz-progress-text{font-size:13px;color:var(--muted);}
+.quiz-result{display:none;padding:30px;background:linear-gradient(135deg,#f0fdf4 0%,#dbeafe 100%);border-radius:var(--radius);text-align:center;margin-top:16px;box-shadow:var(--shadow);}
+.quiz-result.show{display:block;}
+.quiz-result h3{font-size:24px;margin-bottom:10px;color:var(--primary-dark);}
+.quiz-result .score{font-size:48px;font-weight:700;color:var(--primary);margin:14px 0;line-height:1;}
+.quiz-result .score .total{font-size:26px;color:var(--muted);}
+.quiz-result p{color:#334155;margin-bottom:16px;font-size:15px;}
+.verdict{display:inline-block;padding:6px 14px;border-radius:16px;font-weight:600;font-size:14px;margin-bottom:8px;}
+.verdict.great{background:var(--success-light);color:var(--success);}
+.verdict.good{background:var(--primary-light);color:var(--primary-dark);}
+.verdict.ok{background:var(--warning-light);color:var(--warning);}
+.flashcards-header{background:#fff;padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;text-align:center;}
+.flashcards-header h2{color:var(--primary-dark);margin-bottom:6px;}
+.flashcards-header p{color:var(--muted);font-size:14px;}
+.flashcards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+.flashcard{perspective:1000px;height:170px;cursor:pointer;}
+.flashcard-inner{position:relative;width:100%;height:100%;transition:transform .55s;transform-style:preserve-3d;}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+.flashcard-front,.flashcard-back{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:var(--shadow);}
+.flashcard-front{background:linear-gradient(135deg,#fff 0%,#f8fafc 100%);border:2px solid var(--primary-light);color:var(--primary-dark);font-weight:600;font-size:16px;}
+.flashcard-front .fc-hint{font-size:11px;color:var(--muted);font-weight:400;margin-top:8px;font-style:italic;}
+.flashcard-back{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%);color:#fff;transform:rotateY(180deg);font-size:13px;line-height:1.55;}
+.cases-header{background:#fff;padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;}
+.cases-header h2{color:var(--primary-dark);margin-bottom:6px;}
+.cases-header p{color:var(--muted);font-size:14px;}
+.case-card{background:#fff;border-radius:var(--radius);padding:24px;margin-bottom:16px;box-shadow:var(--shadow);border-left:4px solid var(--primary);}
+.case-card h4{font-size:16px;color:var(--primary-dark);font-weight:700;margin-bottom:12px;}
+.case-prompt{color:#334155;font-size:15px;margin-bottom:14px;line-height:1.6;}
+.case-q{font-weight:600;color:var(--text);margin-bottom:12px;font-size:15px;}
+.case-textarea{width:100%;min-height:80px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;resize:vertical;background:#f8fafc;color:var(--text);transition:border-color var(--transition);}
+.case-textarea:focus{outline:none;border-color:var(--primary);background:#fff;}
+.reveal-btns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+.reveal-btn{padding:8px 16px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;transition:all var(--transition);}
+.reveal-btn.miss{color:var(--warning);border-color:var(--warning);}
+.reveal-btn.miss:hover{background:var(--warning-light);}
+.reveal-btn.right{color:var(--success);border-color:var(--success);}
+.reveal-btn.right:hover{background:var(--success-light);}
+.reveal-panel{display:none;margin-top:12px;padding:14px 16px;border-radius:var(--radius-sm);font-size:14px;line-height:1.6;}
+.reveal-panel.show{display:block;}
+.reveal-panel.miss-panel{background:var(--warning-light);border-left:3px solid var(--warning);color:#78350f;}
+.reveal-panel.right-panel{background:var(--success-light);border-left:3px solid var(--success);color:#064e3b;}
+.case-worked-btn{margin-top:10px;padding:6px 14px;background:var(--primary-light);color:var(--primary-dark);border:none;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;}
+.case-worked-btn.done{background:var(--success-light);color:var(--success);}
+.takeaway-list{list-style:none;padding:0;margin:16px 0;}
+.takeaway-list li{padding:12px 16px 12px 48px;position:relative;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:10px;font-size:15px;color:#1e293b;border:1px solid var(--border);}
+.takeaway-list li .t-num{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:24px;height:24px;background:var(--primary);color:#fff;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.reset-btn{position:fixed;bottom:18px;right:18px;background:#fff;border:1px solid var(--border);padding:8px 14px;border-radius:20px;font-size:13px;color:var(--muted);cursor:pointer;box-shadow:var(--shadow);font-family:inherit;transition:all var(--transition);z-index:100;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.cricket-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;}
+.cricket-table th{background:#1e293b;color:#fff;padding:7px 8px;text-align:center;font-weight:600;}
+.cricket-table td{padding:6px 8px;text-align:center;border-bottom:1px solid var(--border);color:#334155;}
+.cricket-table tr:nth-child(even) td{background:#f8fafc;}
+@media(max-width:720px){
+  .app{padding:14px 12px 80px;}
+  header.mod-header{padding:22px 18px;}
+  header.mod-header h1{font-size:22px;}
+  .card{padding:20px 16px;}
+  .two-col,.three-col{grid-template-columns:1fr;}
+  .stats-bar{grid-template-columns:repeat(2,1fr);}
+  .slide h2{font-size:22px;}
+  .freq-table,.cricket-table{font-size:12px;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="mod-header">
+  <span class="mod-badge">Module 8 of 17</span>
+  <h1>Elementary Probability</h1>
+  <p class="mod-sub">Sample spaces, events, probability rules, conditional probability, and independence. Why a positive medical test does not mean what most people think it means.</p>
+  <p class="mod-instructor"><strong>K.M. Tanvir</strong> &nbsp;·&nbsp; Statistics for Non-Statisticians</p>
+</header>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-value" id="stat-slides">0%</div><div class="stat-label">Slides Viewed</div></div>
+  <div class="stat"><div class="stat-value" id="stat-quiz">&#8212;</div><div class="stat-label">Quiz Score</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cards">0 / 20</div><div class="stat-label">Cards Flipped</div></div>
+  <div class="stat"><div class="stat-value" id="stat-cases">0 / 5</div><div class="stat-label">Cases Worked</div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('slides',this)">&#128214; Slides</button>
+  <button class="tab-btn" onclick="switchTab('quiz',this)">&#128221; Quiz</button>
+  <button class="tab-btn" onclick="switchTab('flashcards',this)">&#127183; Flashcards</button>
+  <button class="tab-btn" onclick="switchTab('cases',this)">&#127919; Real Cases</button>
+</div>
+
+<!-- ========== SLIDES ========== -->
+<div id="tab-slides" class="tab-content active">
+<div class="card">
+  <div class="progress-bar"><div class="progress-fill" id="slide-progress"></div></div>
+  <div class="slide-counter" id="slide-counter">Slide 1 of 18</div>
+  <!-- S1: objectives -->
+  <div class="slide active" id="slide-1">
+    <h2>Elementary Probability</h2>
+    <p class="slide-sub">Module 8 &nbsp;·&nbsp; By the end of this module, you will be able to:</p>
+    <ul class="obj-list">
+      <li>Define a sample space and an event, and distinguish simple from compound events</li>
+      <li>Assign probabilities using the classical, empirical, and subjective approaches</li>
+      <li>Apply the complement rule and the addition rule, including when events are not mutually exclusive</li>
+      <li>Distinguish independent from dependent events, and apply the multiplication rule to each</li>
+      <li>Calculate and interpret a conditional probability</li>
+      <li>Apply Bayes' theorem to update a probability in light of new evidence</li>
+      <li>Recognize common probability misconceptions, including base rate neglect and the gambler's fallacy</li>
+    </ul>
+    <div class="tip-box"><strong>The question this module answers:</strong> every method covered so far in this course described data that had already been collected. Probability is the formal language for describing uncertainty about what has not yet happened, or what is not yet known, and it is the foundation underneath every distribution and every inference method covered later in this course.</div>
+  </div>
+
+  <!-- S2: sample space and events -->
+  <div class="slide" id="slide-2">
+    <h2>Sample Space and Events</h2>
+    <p>Any process with an uncertain outcome, called a <strong>random experiment</strong>, has a full list of possible outcomes called the <strong>sample space</strong>, denoted S.</p>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Sample space (S)</div><div class="def-body">The set of all possible outcomes of a random experiment. Example: rolling a six-sided die has sample space S = {1, 2, 3, 4, 5, 6}.</div></div>
+      <div class="def-card"><div class="def-term">Event</div><div class="def-body">Any subset of the sample space, a collection of outcomes we are interested in. Example: "rolling an even number" is the event {2, 4, 6}.</div></div>
+    </div>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Simple event</div><div class="def-body">An event consisting of exactly one outcome, such as "rolling a 4."</div></div>
+      <div class="def-card"><div class="def-term">Compound event</div><div class="def-body">An event consisting of two or more outcomes, such as "rolling an even number."</div></div>
+    </div>
+    <div class="tip-box"><strong>Example:</strong> a microcredit officer visiting a household records whether the household has electricity access (yes/no) and whether it has a mobile financial account (yes/no). The sample space has four outcomes: (yes,yes), (yes,no), (no,yes), (no,no).</div>
+  </div>
+
+  <!-- S3: probability framework -->
+  <div class="slide" id="slide-3">
+    <h2>What a Probability Must Satisfy</h2>
+    <p>A probability is a number assigned to an event describing how likely it is. Every valid probability assignment must follow three basic rules:</p>
+    <ul>
+      <li>The probability of any event A is between 0 and 1: \( 0 \le P(A) \le 1 \)</li>
+      <li>The probability of the entire sample space is 1: \( P(S) = 1 \), since something in the sample space must happen</li>
+      <li>The probabilities of all the simple events in the sample space sum to 1</li>
+    </ul>
+    <div class="formula-box">\[ 0 \le P(A) \le 1, \qquad P(S) = 1 \]</div>
+    <div class="warn-box"><strong>A probability of 0 or 1 is still meaningful:</strong> P(A) = 0 means A essentially cannot happen; P(A) = 1 means A is essentially certain. Neither means the question was answered incorrectly.</div>
+  </div>
+
+  <!-- S4: three approaches -->
+  <div class="slide" id="slide-4">
+    <h2>Three Ways to Assign a Probability</h2>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Classical probability</div><div class="def-body">Used when all outcomes in the sample space are equally likely. P(A) = (number of outcomes in A) divided by (total number of outcomes in S). Example: rolling a fair die, P(even) = 3/6 = 0.5.</div></div>
+      <div class="def-card"><div class="def-term">Empirical probability</div><div class="def-body">Based on observed relative frequency from past data. Example: if 18 of the last 120 intercity bus departures left more than 15 minutes late, the empirical probability of a late departure is 18/120 = 0.15.</div></div>
+    </div>
+    <div class="def-card"><div class="def-term">Subjective probability</div><div class="def-body">A degree of belief based on judgment and available information, used when neither equally likely outcomes nor extensive historical data are available. Example: an economist estimates a 30 percent probability that the central bank cuts its policy rate at the next meeting.</div></div>
+    <div class="tip-box"><strong>All three are legitimate:</strong> the right approach depends on what is actually known about the situation, not on which formula looks the most rigorous.</div>
+  </div>
+
+  <!-- S5: complement rule -->
+  <div class="slide" id="slide-5">
+    <h2>The Complement Rule</h2>
+    <p>The <strong>complement</strong> of event A, written A&prime; (or "not A"), consists of every outcome in the sample space that is not in A. Since A and A&prime; together cover the whole sample space:</p>
+    <div class="formula-box">\[ P(A') = 1 - P(A) \]</div>
+    <div class="example-box">If the probability that a randomly selected garment factory shipment passes quality inspection on the first try is 0.82, the probability that it does not pass on the first try is 1 &minus; 0.82 = <strong>0.18</strong>.</div>
+    <div class="tip-box"><strong>Useful trick:</strong> when "at least one" or "none" appears in a probability question, it is often far easier to calculate the complement first and subtract from 1, rather than calculating the event directly.</div>
+  </div>
+
+  <!-- S6: addition rule mutually exclusive -->
+  <div class="slide" id="slide-6">
+    <h2>The Addition Rule: Mutually Exclusive Events</h2>
+    <p>Two events are <strong>mutually exclusive</strong> if they cannot both happen at the same time, that is, they share no outcomes. For mutually exclusive events:</p>
+    <div class="formula-box">\[ P(A \text{ or } B) = P(A) + P(B) \]</div>
+    <div class="example-box">A retailer's daily sales fall into exactly one of three categories: low, medium, or high. P(low) = 0.25, P(medium) = 0.45, P(high) = 0.30. Since a day cannot be both low and medium, P(low or medium) = 0.25 + 0.45 = <strong>0.70</strong>.</div>
+    <div class="warn-box"><strong>Check before adding:</strong> simply adding probabilities only works when the two events truly cannot occur together. Adding probabilities for events that can overlap double-counts the overlap and gives a number that is too large.</div>
+  </div>
+
+  <!-- S7: addition rule general -->
+  <div class="slide" id="slide-7">
+    <h2>The Addition Rule: General Case</h2>
+    <p>When two events can occur together, the general addition rule subtracts the overlap once, so it is not counted twice:</p>
+    <div class="formula-box">\[ P(A \text{ or } B) = P(A) + P(B) - P(A \text{ and } B) \]</div>
+    <svg viewBox="0 0 300 160" style="width:100%;max-width:300px;display:block;margin:14px auto;">
+      <circle cx="115" cy="80" r="60" fill="#dbeafe" stroke="#2563eb" stroke-width="2" opacity="0.75"/>
+      <circle cx="185" cy="80" r="60" fill="#d1fae5" stroke="#059669" stroke-width="2" opacity="0.75"/>
+      <text x="85" y="80" font-size="13" fill="#1d4ed8" text-anchor="middle">A</text>
+      <text x="215" y="80" font-size="13" fill="#047857" text-anchor="middle">B</text>
+      <text x="150" y="84" font-size="11" fill="#1e293b" text-anchor="middle">A and B</text>
+    </svg>
+    <div class="example-box">During the monsoon season, P(rain on a given day) = 0.60, P(flood warning issued) = 0.15, and P(both rain and a flood warning) = 0.10. P(rain or flood warning) = 0.60 + 0.15 &minus; 0.10 = <strong>0.65</strong>.</div>
+  </div>
+
+  <!-- S8: independence -->
+  <div class="slide" id="slide-8">
+    <h2>Independent and Dependent Events</h2>
+    <p>Two events are <strong>independent</strong> if the occurrence of one does not change the probability of the other. Formally, A and B are independent if and only if:</p>
+    <div class="formula-box">\[ P(A \text{ and } B) = P(A) \times P(B) \]</div>
+    <div class="example-box">Checking the rain and flood-warning example from the previous slide: if rain and flood warnings were independent, we would expect P(rain) &times; P(flood) = 0.60 &times; 0.15 = 0.09. The actual joint probability was given as 0.10, close to but not exactly 0.09, so these events are <strong>not quite independent</strong>, which makes sense since flood warnings are issued partly because of rainfall.</div>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Independent events</div><div class="def-body">Knowing one event occurred gives no information about the other. Example: the outcome of one coin flip and the outcome of a separate, later coin flip.</div></div>
+      <div class="def-card"><div class="def-term">Dependent events</div><div class="def-body">Knowing one event occurred changes the probability of the other. Example: drawing two cards from a deck without replacement.</div></div>
+    </div>
+  </div>
+
+  <!-- S9: multiplication rule independent -->
+  <div class="slide" id="slide-9">
+    <h2>The Multiplication Rule: Independent Events</h2>
+    <p>For independent events, the probability that both occur is simply the product of their individual probabilities, the same formula used to define independence:</p>
+    <div class="formula-box">\[ P(A \text{ and } B) = P(A) \times P(B) \]</div>
+    <div class="example-box">A factory has two independently operating backup generators, each with a 5 percent chance of failing on a given day. The probability that both fail on the same day is 0.05 &times; 0.05 = <strong>0.0025</strong>, just one-quarter of one percent, which is exactly why redundant independent backups are used: the chance of total failure shrinks dramatically.</div>
+    <div class="tip-box"><strong>This extends to more than two events:</strong> for any number of mutually independent events, the probability that all of them occur is the product of all their individual probabilities.</div>
+  </div>
+
+  <!-- S10: conditional probability -->
+  <div class="slide" id="slide-10">
+    <h2>Conditional Probability</h2>
+    <p>The <strong>conditional probability</strong> of B given A, written P(B|A), is the probability that B occurs given that A is known to have occurred. It is defined as:</p>
+    <div class="formula-box">\[ P(B \mid A) = \frac{P(A \text{ and } B)}{P(A)} \]</div>
+    <div class="example-box">Among a bank's loan applicants, 40 percent have a co-signer, and 12 percent both have a co-signer and are approved. The probability that an applicant is approved given that they have a co-signer is P(approved | co-signer) = 0.12 &divide; 0.40 = <strong>0.30</strong>, or 30 percent.</div>
+    <div class="tip-box"><strong>Independence revisited:</strong> A and B are independent exactly when P(B|A) = P(B), meaning learning that A occurred does not change how likely B is.</div>
+  </div>
+
+  <!-- S11: multiplication rule dependent -->
+  <div class="slide" id="slide-11">
+    <h2>The Multiplication Rule: Dependent Events</h2>
+    <p>Rearranging the conditional probability formula gives the general multiplication rule, valid whether or not A and B are independent:</p>
+    <div class="formula-box">\[ P(A \text{ and } B) = P(A) \times P(B \mid A) \]</div>
+    <div class="example-box">A class project group is formed by selecting two students at random, without replacement, from a class of 12 students, 5 of whom are statistics majors. P(first student is a statistics major) = 5/12. Given the first was a statistics major, P(second is also a statistics major) = 4/11, since one statistics major and one total student have been removed. P(both statistics majors) = (5/12) &times; (4/11) = 20/132 &asymp; <strong>0.152</strong>.</div>
+    <div class="warn-box"><strong>Without replacement changes the probabilities:</strong> sampling without replacement makes each successive draw depend on what was already drawn, which is exactly why the second fraction in the example is not also 5/12.</div>
+  </div>
+
+  <!-- S12: tree diagram -->
+  <div class="slide" id="slide-12">
+    <h2>Tree Diagrams for Sequential Events</h2>
+    <p>A <strong>tree diagram</strong> organizes a sequence of dependent events into branches, with each path's probability equal to the product of the probabilities along that path, exactly as in the multiplication rule.</p>
+    <svg viewBox="0 0 460 200" style="width:100%;max-width:460px;display:block;margin:14px auto;">
+      <circle cx="30" cy="100" r="4" fill="#1e293b"/>
+      <line x1="30" y1="100" x2="170" y2="40" stroke="#2563eb" stroke-width="1.5"/>
+      <line x1="30" y1="100" x2="170" y2="160" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="95" y="62" font-size="11" fill="#1d4ed8">5/12 (stat)</text>
+      <text x="95" y="148" font-size="11" fill="#1d4ed8">7/12 (econ)</text>
+      <circle cx="170" cy="40" r="3" fill="#1e293b"/>
+      <circle cx="170" cy="160" r="3" fill="#1e293b"/>
+      <line x1="170" y1="40" x2="340" y2="15" stroke="#059669" stroke-width="1.5"/>
+      <line x1="170" y1="40" x2="340" y2="65" stroke="#059669" stroke-width="1.5"/>
+      <line x1="170" y1="160" x2="340" y2="135" stroke="#059669" stroke-width="1.5"/>
+      <line x1="170" y1="160" x2="340" y2="185" stroke="#059669" stroke-width="1.5"/>
+      <text x="245" y="20" font-size="10" fill="#047857">4/11 stat</text>
+      <text x="245" y="72" font-size="10" fill="#047857">7/11 econ</text>
+      <text x="245" y="140" font-size="10" fill="#047857">5/11 stat</text>
+      <text x="245" y="192" font-size="10" fill="#047857">6/11 econ</text>
+      <text x="350" y="17" font-size="10" fill="#1e293b">20/132</text>
+      <text x="350" y="67" font-size="10" fill="#1e293b">35/132</text>
+      <text x="350" y="137" font-size="10" fill="#1e293b">35/132</text>
+      <text x="350" y="187" font-size="10" fill="#1e293b">42/132</text>
+    </svg>
+    <p>Each path from the starting point to an end branch represents one possible sequence of outcomes, and its probability is the product of the fractions along that path. The four end-branch probabilities in this diagram sum to 132/132 = 1, confirming the full sample space is accounted for.</p>
+  </div>
+
+  <!-- S13: bayes intuition -->
+  <div class="slide" id="slide-13">
+    <h2>Building Toward Bayes' Theorem</h2>
+    <p>Conditional probability lets us calculate P(positive test | has disease), since medical tests are validated by giving them to people whose true status is already known. But the question a patient actually wants answered is the reverse: <strong>P(has disease | positive test)</strong>. These are not the same number, and confusing them is one of the most consequential probability mistakes in practice.</p>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Sensitivity</div><div class="def-body">P(positive test | has disease). How well the test catches true cases. A highly sensitive test rarely misses someone who is actually sick.</div></div>
+      <div class="def-card"><div class="def-term">Specificity</div><div class="def-body">P(negative test | does not have disease). How well the test clears true non-cases. A highly specific test rarely flags someone who is actually healthy.</div></div>
+    </div>
+    <div class="warn-box"><strong>The missing ingredient:</strong> sensitivity and specificity alone are not enough. Going from "P(positive | disease)" to "P(disease | positive)" also requires knowing how common the disease is in the population being tested, called the <strong>base rate</strong> or <strong>prevalence</strong>.</div>
+  </div>
+
+  <!-- S14: bayes formula -->
+  <div class="slide" id="slide-14">
+    <h2>Bayes' Theorem</h2>
+    <p><strong>Bayes' theorem</strong> formally reverses the direction of a conditional probability, combining the base rate with the test's known properties:</p>
+    <div class="formula-box">\[ P(A \mid B) = \frac{P(B \mid A) \, P(A)}{P(B)} \]</div>
+    <p>Applied to a diagnostic test, with D for "has disease" and Pos for "tests positive":</p>
+    <div class="formula-box">\[ P(D \mid \text{Pos}) = \frac{P(\text{Pos} \mid D)\,P(D)}{P(\text{Pos} \mid D)\,P(D) + P(\text{Pos} \mid D')\,P(D')} \]</div>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Prior probability</div><div class="def-body">P(D), the base rate or prevalence of the disease before any test result is known.</div></div>
+      <div class="def-card"><div class="def-term">Posterior probability</div><div class="def-body">P(D | Pos), the updated probability of disease after the positive test result has been taken into account.</div></div>
+    </div>
+  </div>
+
+  <!-- S15: worked medical test example -->
+  <div class="slide" id="slide-15">
+    <h2>Worked Example: The Medical Test Paradox</h2>
+    <p>A rapid diagnostic test for a disease has 95 percent sensitivity and 90 percent specificity. In the population being screened, the disease has a 1 percent prevalence. A patient tests positive. What is the probability they actually have the disease?</p>
+    <table class="freq-table">
+      <thead><tr><th>Quantity</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>P(D), prevalence</td><td>0.01</td></tr>
+        <tr><td>P(D&prime;), no disease</td><td>0.99</td></tr>
+        <tr><td>P(Pos | D), sensitivity</td><td>0.95</td></tr>
+        <tr><td>P(Pos | D&prime;), false positive rate</td><td>0.10</td></tr>
+      </tbody>
+    </table>
+    <div class="example-box">P(Pos) = P(Pos|D)P(D) + P(Pos|D&prime;)P(D&prime;) = (0.95)(0.01) + (0.10)(0.99) = 0.0095 + 0.099 = <strong>0.1085</strong>
+    <br>P(D | Pos) = 0.0095 &divide; 0.1085 = <strong>0.0876</strong>, about 8.8 percent.</div>
+    <div class="warn-box"><strong>The paradox:</strong> a test that is correct 95 percent of the time on sick patients still leaves a patient who tests positive with under a 9 percent chance of actually being sick. This happens because the disease is rare, so the much larger pool of healthy people, even at a low 10 percent false-positive rate, produces more false positives in absolute terms than the small pool of truly sick people produces true positives.</div>
+  </div>
+
+  <!-- S16: misconceptions -->
+  <div class="slide" id="slide-16">
+    <h2>Common Probability Misconceptions</h2>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Base rate neglect</div><div class="def-body">Ignoring how common or rare an event is in the overall population, exactly the mistake that makes the medical test result feel more conclusive than it is.</div></div>
+      <div class="def-card"><div class="def-term">Gambler's fallacy</div><div class="def-body">Believing that independent random events "owe" a different outcome after a streak, such as expecting tails to be more likely after five consecutive heads on a fair coin. Each flip remains independent, with probability 0.5 regardless of history.</div></div>
+    </div>
+    <div class="two-col">
+      <div class="def-card"><div class="def-term">Confusing P(A|B) with P(B|A)</div><div class="def-body">Also called the prosecutor's fallacy in legal settings: the probability of evidence given innocence is not the same number as the probability of innocence given the evidence.</div></div>
+      <div class="def-card"><div class="def-term">Treating dependent events as independent</div><div class="def-body">Multiplying P(A) by P(B) when A and B are actually related, such as assuming two nearby rivers flood independently when both respond to the same regional rainfall.</div></div>
+    </div>
+    <div class="tip-box"><strong>Why this matters:</strong> every one of these mistakes has the same shape: substituting an easier, intuitive-feeling number for the actual quantity the question asked for.</div>
+  </div>
+
+  <!-- S17: anchor case -->
+  <div class="slide" id="slide-17">
+    <h2>Anchor Case: A Disease Screening Program</h2>
+    <p>A public health office is deciding whether to roll out the rapid test from the worked example, sensitivity 95 percent and specificity 90 percent, as a mass screening tool in a population where prevalence is 1 percent. A junior official argues: "since the test is 95 percent accurate, anyone who tests positive should be treated as a confirmed case."</p>
+    <div class="warn-box"><strong>The flaw in this reasoning:</strong> as the worked example showed, a positive result here corresponds to only about an 8.8 percent chance of actually having the disease, not 95 percent. Treating every positive as confirmed would mean roughly 91 percent of those flagged are healthy people who would be needlessly treated or isolated.</div>
+    <div class="example-box"><strong>A better policy:</strong> use the inexpensive rapid test as a first-stage filter, then confirm every positive result with a second, more specific test before acting on it. Combining two test results, using the multiplication rule for the (approximately independent) tests, drives the false-positive problem down sharply, since a person would need to be incorrectly flagged by both tests.</div>
+  </div>
+
+  <!-- S18: recap -->
+  <div class="slide" id="slide-18">
+    <h2>Module Recap</h2>
+    <ul class="takeaway-list">
+      <li><span class="t-num">1</span>A sample space lists every possible outcome of a random experiment; an event is any subset of that sample space</li>
+      <li><span class="t-num">2</span>Probabilities can be assigned classically, empirically from data, or subjectively, and every valid assignment stays between 0 and 1 and sums to 1 over the sample space</li>
+      <li><span class="t-num">3</span>The complement rule, P(A&prime;) = 1 &minus; P(A), is often the easiest path to "at least one" type questions</li>
+      <li><span class="t-num">4</span>The addition rule adds probabilities directly for mutually exclusive events, but must subtract the overlap, P(A and B), otherwise</li>
+      <li><span class="t-num">5</span>Independent events satisfy P(A and B) = P(A)P(B); dependent events require the conditional probability P(B|A) instead</li>
+      <li><span class="t-num">6</span>Conditional probability, P(B|A) = P(A and B)/P(A), measures how a known event changes the probability of another</li>
+      <li><span class="t-num">7</span>Bayes' theorem reverses a conditional probability, combining sensitivity, specificity, and the base rate to find P(disease | positive test)</li>
+      <li><span class="t-num">8</span>Ignoring the base rate, as in the medical test paradox, is one of the most common and consequential probability mistakes in practice</li>
+    </ul>
+    <div class="tip-box"><strong>Next module:</strong> Module 9 builds on this foundation with the binomial distribution, the probability model for counting successes across a fixed number of independent yes/no trials.</div>
+  </div>
+
+  <div class="slide-nav">
+    <button class="btn btn-ghost" id="prevBtn">&larr; Previous</button>
+    <span class="key-hint">Use <span class="kbd">&larr;</span> <span class="kbd">&rarr;</span> arrow keys to navigate</span>
+    <button class="btn btn-primary" id="nextBtn">Next &rarr;</button>
+  </div>
+</div>
+</div>
+
+<!-- ========== QUIZ ========== -->
+<div id="tab-quiz" class="tab-content">
+<div class="quiz-intro">
+  <h2>&#128221; Module Quiz</h2>
+  <p>16 questions on sample spaces, probability rules, independence, conditional probability, and Bayes' theorem.</p>
+  <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
+</div>
+<div id="quiz-questions" style="display:none;">
+  <div class="quiz-question" id="qq-1">
+    <h4><span class="q-num">1.</span>The sample space of a random experiment is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(1,this,false)">Only the outcomes we are interested in</button>
+      <button class="quiz-option" onclick="answerQ(1,this,true)">The set of all possible outcomes</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">A number between 0 and 1</button>
+      <button class="quiz-option" onclick="answerQ(1,this,false)">Always exactly two outcomes</button>
+    </div>
+    <div class="quiz-explain" id="qe-1">The sample space lists every possible outcome, whether or not we are specifically interested in each one.</div>
+  </div>
+  <div class="quiz-question" id="qq-2">
+    <h4><span class="q-num">2.</span>A weather forecaster says "based on the historical record, it has rained on 15 percent of days with these conditions." This is an example of:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(2,this,false)">Classical probability</button>
+      <button class="quiz-option" onclick="answerQ(2,this,true)">Empirical probability</button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">Subjective probability</button>
+      <button class="quiz-option" onclick="answerQ(2,this,false)">The complement rule</button>
+    </div>
+    <div class="quiz-explain" id="qe-2">Basing a probability on observed relative frequency in past data is the empirical approach.</div>
+  </div>
+  <div class="quiz-question" id="qq-3">
+    <h4><span class="q-num">3.</span>If P(a shipment fails inspection) = 0.18, then P(a shipment passes inspection) is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(3,this,false)">0.18</button>
+      <button class="quiz-option" onclick="answerQ(3,this,true)">0.82</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">1.18</button>
+      <button class="quiz-option" onclick="answerQ(3,this,false)">Cannot be determined</button>
+    </div>
+    <div class="quiz-explain" id="qe-3">By the complement rule, P(pass) = 1 minus P(fail) = 1 minus 0.18 = 0.82.</div>
+  </div>
+  <div class="quiz-question" id="qq-4">
+    <h4><span class="q-num">4.</span>Two events A and B are mutually exclusive. The probability that A or B occurs is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(4,this,false)">P(A) &times; P(B)</button>
+      <button class="quiz-option" onclick="answerQ(4,this,true)">P(A) + P(B)</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">P(A) + P(B) &minus; P(A and B)</button>
+      <button class="quiz-option" onclick="answerQ(4,this,false)">P(A) &minus; P(B)</button>
+    </div>
+    <div class="quiz-explain" id="qe-4">When two events cannot occur together, there is no overlap to subtract, so the probabilities simply add.</div>
+  </div>
+  <div class="quiz-question" id="qq-5">
+    <h4><span class="q-num">5.</span>If events A and B can occur together, the correct formula for P(A or B) is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(5,this,false)">P(A) + P(B)</button>
+      <button class="quiz-option" onclick="answerQ(5,this,true)">P(A) + P(B) &minus; P(A and B)</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">P(A) &times; P(B)</button>
+      <button class="quiz-option" onclick="answerQ(5,this,false)">P(A and B) &minus; P(A) &minus; P(B)</button>
+    </div>
+    <div class="quiz-explain" id="qe-5">The general addition rule subtracts the overlap once, so it is not counted twice.</div>
+  </div>
+  <div class="quiz-question" id="qq-6">
+    <h4><span class="q-num">6.</span>Two events A and B are independent if and only if:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(6,this,false)">P(A and B) = 0</button>
+      <button class="quiz-option" onclick="answerQ(6,this,true)">P(A and B) = P(A) &times; P(B)</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">P(A) = P(B)</button>
+      <button class="quiz-option" onclick="answerQ(6,this,false)">P(A or B) = 1</button>
+    </div>
+    <div class="quiz-explain" id="qe-6">Independence means the joint probability equals the product of the individual probabilities, equivalently that P(B|A) = P(B).</div>
+  </div>
+  <div class="quiz-question" id="qq-7">
+    <h4><span class="q-num">7.</span>Two independent backup generators each have a 5 percent chance of failing on a given day. The probability that both fail the same day is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(7,this,false)">0.10</button>
+      <button class="quiz-option" onclick="answerQ(7,this,true)">0.0025</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">0.05</button>
+      <button class="quiz-option" onclick="answerQ(7,this,false)">0.95</button>
+    </div>
+    <div class="quiz-explain" id="qe-7">For independent events, multiply the individual probabilities: 0.05 times 0.05 equals 0.0025.</div>
+  </div>
+  <div class="quiz-question" id="qq-8">
+    <h4><span class="q-num">8.</span>The conditional probability P(B | A) is defined as:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(8,this,false)">P(A) &times; P(B)</button>
+      <button class="quiz-option" onclick="answerQ(8,this,true)">P(A and B) divided by P(A)</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">P(A) divided by P(B)</button>
+      <button class="quiz-option" onclick="answerQ(8,this,false)">1 minus P(A)</button>
+    </div>
+    <div class="quiz-explain" id="qe-8">Conditional probability restricts attention to cases where A occurred, then asks what share of those also have B.</div>
+  </div>
+  <div class="quiz-question" id="qq-9">
+    <h4><span class="q-num">9.</span>Drawing two cards from a deck of 52 without replacement, the probability of the second card depends on what the first card was. This makes the two draws:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(9,this,false)">Independent</button>
+      <button class="quiz-option" onclick="answerQ(9,this,true)">Dependent</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">Mutually exclusive</button>
+      <button class="quiz-option" onclick="answerQ(9,this,false)">Impossible to analyze</button>
+    </div>
+    <div class="quiz-explain" id="qe-9">Removing a card changes the composition of the deck, so the second draw's probabilities depend on the first draw's outcome.</div>
+  </div>
+  <div class="quiz-question" id="qq-10">
+    <h4><span class="q-num">10.</span>The general multiplication rule for any two events A and B is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(10,this,false)">P(A and B) = P(A) + P(B)</button>
+      <button class="quiz-option" onclick="answerQ(10,this,true)">P(A and B) = P(A) &times; P(B | A)</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">P(A and B) = P(A) &minus; P(B)</button>
+      <button class="quiz-option" onclick="answerQ(10,this,false)">P(A and B) = P(A | B)</button>
+    </div>
+    <div class="quiz-explain" id="qe-10">This general form holds whether or not A and B are independent; it simplifies to P(A) times P(B) only when they are independent.</div>
+  </div>
+  <div class="quiz-question" id="qq-11">
+    <h4><span class="q-num">11.</span>In a tree diagram for a two-stage random process, the probability of one complete path from start to end is found by:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(11,this,false)">Adding the branch probabilities along that path</button>
+      <button class="quiz-option" onclick="answerQ(11,this,true)">Multiplying the branch probabilities along that path</button>
+      <button class="quiz-option" onclick="answerQ(11,this,false)">Subtracting the branch probabilities</button>
+      <button class="quiz-option" onclick="answerQ(11,this,false)">Taking the largest branch probability</button>
+    </div>
+    <div class="quiz-explain" id="qe-11">Each path's probability is the product of the branch probabilities along it, applying the multiplication rule sequentially.</div>
+  </div>
+  <div class="quiz-question" id="qq-12">
+    <h4><span class="q-num">12.</span>The sensitivity of a diagnostic test is defined as:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(12,this,true)">P(positive test | has disease)</button>
+      <button class="quiz-option" onclick="answerQ(12,this,false)">P(has disease | positive test)</button>
+      <button class="quiz-option" onclick="answerQ(12,this,false)">P(negative test | no disease)</button>
+      <button class="quiz-option" onclick="answerQ(12,this,false)">The disease's prevalence in the population</button>
+    </div>
+    <div class="quiz-explain" id="qe-12">Sensitivity is how well the test catches true cases: the probability of testing positive given the disease is actually present.</div>
+  </div>
+  <div class="quiz-question" id="qq-13">
+    <h4><span class="q-num">13.</span>Bayes' theorem is used to:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(13,this,false)">Calculate the mean of a dataset</button>
+      <button class="quiz-option" onclick="answerQ(13,this,true)">Reverse the direction of a conditional probability, combining it with a base rate</button>
+      <button class="quiz-option" onclick="answerQ(13,this,false)">Test whether two events are mutually exclusive</button>
+      <button class="quiz-option" onclick="answerQ(13,this,false)">Calculate a regression coefficient</button>
+    </div>
+    <div class="quiz-explain" id="qe-13">Bayes' theorem converts a known conditional probability, such as P(positive | disease), into its reverse, P(disease | positive), using the base rate.</div>
+  </div>
+  <div class="quiz-question" id="qq-14">
+    <h4><span class="q-num">14.</span>In the worked medical test example, a test with 95 percent sensitivity and 90 percent specificity, used on a population with 1 percent disease prevalence, gave a positive predictive value of about 8.8 percent. The main reason this number is so much lower than 95 percent is:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(14,this,false)">The test's sensitivity was miscalculated</button>
+      <button class="quiz-option" onclick="answerQ(14,this,true)">The disease is rare, so the much larger healthy population still produces more false positives in absolute terms than true cases produce true positives</button>
+      <button class="quiz-option" onclick="answerQ(14,this,false)">Specificity does not matter for this calculation</button>
+      <button class="quiz-option" onclick="answerQ(14,this,false)">Bayes' theorem does not apply to rare diseases</button>
+    </div>
+    <div class="quiz-explain" id="qe-14">A low base rate means the healthy group is huge, so even a low false-positive rate among them generates more false positives in absolute number than the small group of true cases generates true positives.</div>
+  </div>
+  <div class="quiz-question" id="qq-15">
+    <h4><span class="q-num">15.</span>After five consecutive heads on a fair coin, a gambler bets heavily on tails, reasoning that tails is "due." This is an example of:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(15,this,false)">Correct use of conditional probability</button>
+      <button class="quiz-option" onclick="answerQ(15,this,true)">The gambler's fallacy</button>
+      <button class="quiz-option" onclick="answerQ(15,this,false)">Base rate neglect</button>
+      <button class="quiz-option" onclick="answerQ(15,this,false)">The addition rule</button>
+    </div>
+    <div class="quiz-explain" id="qe-15">Each flip of a fair coin is independent of past flips, so the probability of tails remains 0.5 regardless of any streak; believing otherwise is the gambler's fallacy.</div>
+  </div>
+  <div class="quiz-question" id="qq-16">
+    <h4><span class="q-num">16.</span>Treating P(evidence | innocent) as if it were the same number as P(innocent | evidence) is an example of:</h4>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQ(16,this,false)">The complement rule</button>
+      <button class="quiz-option" onclick="answerQ(16,this,true)">The prosecutor's fallacy, confusing a conditional probability with its reverse</button>
+      <button class="quiz-option" onclick="answerQ(16,this,false)">The multiplication rule for independent events</button>
+      <button class="quiz-option" onclick="answerQ(16,this,false)">A correct application of Bayes' theorem</button>
+    </div>
+    <div class="quiz-explain" id="qe-16">P(B|A) and P(A|B) are generally different numbers; treating them as interchangeable is the prosecutor's fallacy, the same structural mistake as the medical test paradox.</div>
+  </div>
+  <div class="quiz-footer">
+    <span class="quiz-progress-text" id="quiz-progress">0 of 16 answered</span>
+    <button class="btn btn-primary" onclick="submitQuiz()" id="btn-submit-quiz" disabled>Submit Quiz</button>
+  </div>
+  <div class="quiz-result" id="quiz-result">
+    <h3>Quiz Complete</h3>
+    <div class="score" id="quiz-score-display">0<span class="total"> / 16</span></div>
+    <div class="verdict" id="quiz-verdict"></div>
+    <p id="quiz-msg"></p>
+    <button class="btn btn-primary" onclick="retakeQuiz()">Retake Quiz</button>
+  </div>
+</div>
+</div>
+
+<!-- ========== FLASHCARDS ========== -->
+<div id="tab-flashcards" class="tab-content">
+<div class="flashcards-header">
+  <h2>&#127183; Flashcards</h2>
+  <p>20 key terms from Module 8. Click any card to reveal its definition.</p>
+</div>
+<div class="flashcards-grid" id="fc-grid"></div>
+</div>
+
+<!-- ========== REAL CASES ========== -->
+<div id="tab-cases" class="tab-content">
+<div class="cases-header">
+  <h2>&#127919; Real Cases</h2>
+  <p>Read each scenario, write your interpretation, then reveal what most people miss and what the careful reading looks like.</p>
+</div>
+
+<div class="case-card" id="case-1">
+  <h4>Case 1: A Mass Screening Decision</h4>
+  <p class="case-prompt">A health office plans to screen an entire upazila for a disease with 1 percent prevalence, using a test with 95 percent sensitivity and 90 percent specificity. An official proposes treating every positive result as a confirmed case and beginning treatment immediately, citing the test's "95 percent accuracy."</p>
+  <p class="case-q">What is wrong with using the headline 95 percent figure to justify this policy?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-1','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-1','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-1" onclick="markCaseWorked(1)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-1">A single accuracy-sounding number, 95 percent, feels like it should answer the question a patient or official actually cares about.</div>
+  <div class="reveal-panel right-panel" id="right-case-1">95 percent is the sensitivity, P(positive | disease), not the chance a positive result is correct, P(disease | positive). Applying Bayes' theorem with the 1 percent prevalence, as in the worked example, gives a positive predictive value of only about 8.8 percent. Treating every positive as confirmed would mean roughly 9 in 10 flagged people are actually healthy. A confirmatory second test before acting on any single positive result would substantially reduce this problem.</div>
+</div>
+
+<div class="case-card" id="case-2">
+  <h4>Case 2: The "Hot Hand" at the Lottery Counter</h4>
+  <p class="case-prompt">A lottery ticket seller notices that a particular number combination has not won in the last 40 draws and tells customers it is "due" to win soon, since by their reasoning every number must eventually balance out.</p>
+  <p class="case-q">Is the seller's reasoning a valid use of probability?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-2','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-2','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-2" onclick="markCaseWorked(2)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-2">A long losing streak feels like it should build up pressure toward a win, the same intuition behind "the longer it takes, the more it owes you."</div>
+  <div class="reveal-panel right-panel" id="right-case-2">If each lottery draw is an independent random event, the probability of any specific combination winning is exactly the same on every draw, regardless of how many times it has failed to win before. This is the gambler's fallacy: independent draws have no memory, and "due" is not a property that probability assigns to anything.</div>
+</div>
+
+<div class="case-card" id="case-3">
+  <h4>Case 3: Adding Probabilities That Overlap</h4>
+  <p class="case-prompt">A quality control report states: "12 percent of units have a cosmetic defect, and 8 percent have a functional defect, so 20 percent of units have some defect." Records show that 3 percent of units have both defects.</p>
+  <p class="case-q">Is 20 percent the correct figure for "some defect"?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-3','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-3','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-3" onclick="markCaseWorked(3)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-3">Adding two percentages to get a combined rate feels natural and is the first thing most people reach for.</div>
+  <div class="reveal-panel right-panel" id="right-case-3">Since some units have both defects, simply adding 12 percent and 8 percent double-counts those units. The general addition rule applies: P(some defect) = 0.12 + 0.08 &minus; 0.03 = <strong>0.17</strong>, or 17 percent, not 20 percent. The 20 percent figure overstates the true defect rate by exactly the size of the overlap.</div>
+</div>
+
+<div class="case-card" id="case-4">
+  <h4>Case 4: Assuming Two Rivers Flood Independently</h4>
+  <p class="case-prompt">A flood insurance model assumes that flooding at two river gauges in the same regional watershed are independent events, each with a 10 percent annual probability of exceeding a critical level. Based on this, the model estimates P(both gauges flood in the same year) = 0.10 &times; 0.10 = 0.01, or 1 percent, and prices policies accordingly.</p>
+  <p class="case-q">What is the risk in assuming independence here?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-4','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-4','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-4" onclick="markCaseWorked(4)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-4">Multiplying two probabilities together is a quick, clean calculation, and it is tempting to use it whenever two events seem physically separate.</div>
+  <div class="reveal-panel right-panel" id="right-case-4">Two rivers in the same regional watershed are both driven by the same regional rainfall, so flooding at one gauge is informative about flooding at the other: these events are very plausibly dependent, not independent. If they are positively dependent, the true P(both flood) is higher than the 1 percent the independence assumption produces, meaning the insurer is underpricing the risk of a single extreme rainfall event causing both rivers to flood at once.</div>
+</div>
+
+<div class="case-card" id="case-5">
+  <h4>Case 5: A Courtroom Probability Argument</h4>
+  <p class="case-prompt">In a trial, a forensic expert testifies that a particular piece of evidence would occur in only 1 in 10,000 innocent people, that is, P(evidence | innocent) = 1/10,000. A prosecutor tells the jury this means the defendant is innocent with probability only 1 in 10,000, that is, P(innocent | evidence) = 1/10,000.</p>
+  <p class="case-q">Is the prosecutor's restatement a valid use of the expert's number?</p>
+  <textarea class="case-textarea" placeholder="Write your interpretation here before revealing..."></textarea>
+  <div class="reveal-btns">
+    <button class="reveal-btn miss" onclick="revealCase('case-5','miss')">What most people miss</button>
+    <button class="reveal-btn right" onclick="revealCase('case-5','right')">The careful reading</button>
+    <button class="case-worked-btn" id="worked-case-5" onclick="markCaseWorked(5)">Mark as worked</button>
+  </div>
+  <div class="reveal-panel miss-panel" id="miss-case-5">Swapping the order of the two events in a conditional probability sentence feels like a harmless rewording, since both versions use the same two events and the same number.</div>
+  <div class="reveal-panel right-panel" id="right-case-5">P(evidence | innocent) and P(innocent | evidence) are generally different numbers, related through Bayes' theorem, which also requires the base rate, here the probability that a random person matching the suspect description is actually guilty before any evidence is considered. This substitution is the prosecutor's fallacy, the courtroom version of the same mistake as the medical test paradox, and it can make weak evidence sound far more conclusive of guilt than it actually is.</div>
+</div>
+
+</div>
+
+<button class="reset-btn" onclick="resetProgress()">&#8635; Reset Progress</button>
+
+<script>
+const STORAGE_KEY='stats101-module8-progress-v1';
+const TOTAL_SLIDES=18,TOTAL_CARDS=20,TOTAL_CASES=5,TOTAL_QUIZ=16;
+
+const flashcardData=[
+  {term:'Sample space',def:'The set of all possible outcomes of a random experiment, denoted S.'},
+  {term:'Event',def:'Any subset of the sample space; a collection of one or more outcomes of interest.'},
+  {term:'Simple event',def:'An event consisting of exactly one outcome.'},
+  {term:'Compound event',def:'An event consisting of two or more outcomes.'},
+  {term:'Classical probability',def:'Probability based on equally likely outcomes: number of outcomes in the event divided by total outcomes in the sample space.'},
+  {term:'Empirical probability',def:'Probability based on observed relative frequency from past data.'},
+  {term:'Subjective probability',def:'A degree of belief based on judgment, used when equally likely outcomes or extensive data are not available.'},
+  {term:'Complement rule',def:'P(A complement) = 1 minus P(A); the probability that an event does not occur.'},
+  {term:'Mutually exclusive events',def:'Two events that cannot both occur at the same time; they share no outcomes.'},
+  {term:'Addition rule (general)',def:'P(A or B) = P(A) + P(B) minus P(A and B); subtracts the overlap so it is not double-counted.'},
+  {term:'Independent events',def:'Events where the occurrence of one does not change the probability of the other: P(A and B) = P(A) times P(B).'},
+  {term:'Dependent events',def:'Events where the occurrence of one changes the probability of the other.'},
+  {term:'Multiplication rule (general)',def:'P(A and B) = P(A) times P(B given A); valid for both independent and dependent events.'},
+  {term:'Conditional probability',def:'P(B given A) = P(A and B) divided by P(A); the probability of B given that A is known to have occurred.'},
+  {term:'Tree diagram',def:'A diagram organizing a sequence of dependent events into branches, where each path probability is the product of the branch probabilities along it.'},
+  {term:'Sensitivity',def:'P(positive test given disease present); how well a test catches true cases.'},
+  {term:'Specificity',def:'P(negative test given disease absent); how well a test clears true non-cases.'},
+  {term:'Base rate (prevalence)',def:'How common an event or condition is in the overall population before any test result or evidence is considered.'},
+  {term:"Bayes' theorem",def:'A formula that reverses the direction of a conditional probability, combining a known conditional probability with the base rate to find its reverse.'},
+  {term:'Gambler’s fallacy',def:'The mistaken belief that independent random events owe a different outcome after a streak, when in fact each independent trial is unaffected by past outcomes.'}
+];
+
+let state={slidesViewed:new Set(),quizScore:null,cardsFlipped:new Set(),casesWorked:new Set(),quizAnswers:{},quizSubmitted:false,currentSlide:1};
+
+function loadState(){
+  try{const s=localStorage.getItem(STORAGE_KEY);if(s){const p=JSON.parse(s);state.slidesViewed=new Set(p.slidesViewed||[]);state.quizScore=p.quizScore!==undefined?p.quizScore:null;state.cardsFlipped=new Set(p.cardsFlipped||[]);state.casesWorked=new Set(p.casesWorked||[]);state.quizAnswers=p.quizAnswers||{};state.quizSubmitted=p.quizSubmitted||false;state.currentSlide=p.currentSlide||1;}}catch(e){}
+}
+function saveState(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify({slidesViewed:[...state.slidesViewed],quizScore:state.quizScore,cardsFlipped:[...state.cardsFlipped],casesWorked:[...state.casesWorked],quizAnswers:state.quizAnswers,quizSubmitted:state.quizSubmitted,currentSlide:state.currentSlide}));}catch(e){}
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');btn.classList.add('active');
+}
+
+const prevBtn=document.getElementById('prevBtn');
+const nextBtn=document.getElementById('nextBtn');
+function showSlide(n){
+  if(n<1||n>TOTAL_SLIDES)return;
+  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+  document.getElementById('slide-'+n).classList.add('active');
+  state.currentSlide=n;state.slidesViewed.add(n);saveState();updateSlideUI();updateStats();
+}
+function updateSlideUI(){
+  const n=state.currentSlide;
+  document.getElementById('slide-counter').textContent='Slide '+n+' of '+TOTAL_SLIDES;
+  document.getElementById('slide-progress').style.width=(n/TOTAL_SLIDES*100)+'%';
+  prevBtn.disabled=n===1;
+  nextBtn.textContent=n===TOTAL_SLIDES?'Finish ✓':'Next →';
+}
+prevBtn.addEventListener('click',()=>showSlide(state.currentSlide-1));
+nextBtn.addEventListener('click',()=>{if(state.currentSlide<TOTAL_SLIDES)showSlide(state.currentSlide+1);});
+document.addEventListener('keydown',e=>{
+  const activeTab=document.querySelector('.tab-content.active');
+  if(!activeTab||activeTab.id!=='tab-slides')return;
+  if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
+  if(e.key==='ArrowRight'){e.preventDefault();nextBtn.click();}
+  else if(e.key==='ArrowLeft'){e.preventDefault();prevBtn.click();}
+});
+
+let quizAnswered=0,quizCorrect=0;
+function startQuiz(){document.querySelector('.quiz-intro').style.display='none';document.getElementById('quiz-questions').style.display='block';if(state.quizSubmitted)restoreQuizState();}
+function answerQ(qNum,btn,correct){
+  const qq=document.getElementById('qq-'+qNum);if(qq.classList.contains('answered'))return;
+  qq.classList.add('answered');qq.querySelectorAll('.quiz-option').forEach(o=>o.classList.add('disabled'));
+  btn.classList.add(correct?'correct':'wrong');if(correct)quizCorrect++;
+  document.getElementById('qe-'+qNum).classList.add('show');
+  state.quizAnswers[qNum]=correct;quizAnswered++;
+  document.getElementById('quiz-progress').textContent=quizAnswered+' of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=quizAnswered<TOTAL_QUIZ;saveState();
+}
+function submitQuiz(){
+  state.quizScore=quizCorrect;state.quizSubmitted=true;saveState();
+  document.getElementById('quiz-score-display').innerHTML=quizCorrect+'<span class="total"> / '+TOTAL_QUIZ+'</span>';
+  const v=document.getElementById('quiz-verdict'),m=document.getElementById('quiz-msg');
+  if(quizCorrect>=14){v.textContent='Excellent';v.className='verdict great';m.textContent='Strong command of probability rules, conditional probability, and Bayes’ theorem.';}
+  else if(quizCorrect>=10){v.textContent='Good';v.className='verdict good';m.textContent='Solid. Review the explanations on questions you missed.';}
+  else{v.textContent='Keep going';v.className='verdict ok';m.textContent='Revisit the slides on conditional probability and Bayes’ theorem before retaking.';}
+  document.getElementById('quiz-result').classList.add('show');updateStats();
+}
+function retakeQuiz(){
+  state.quizScore=null;state.quizSubmitted=false;state.quizAnswers={};quizCorrect=0;quizAnswered=0;saveState();
+  document.getElementById('quiz-result').classList.remove('show');
+  document.querySelectorAll('.quiz-question').forEach(q=>{q.classList.remove('answered');q.querySelectorAll('.quiz-option').forEach(o=>o.classList.remove('correct','wrong','disabled'));q.querySelectorAll('.quiz-explain').forEach(e=>e.classList.remove('show'));});
+  document.getElementById('quiz-progress').textContent='0 of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=true;updateStats();
+}
+function restoreQuizState(){
+  Object.entries(state.quizAnswers).forEach(([qNum,correct])=>{
+    const qq=document.getElementById('qq-'+qNum);if(!qq)return;
+    qq.classList.add('answered');qq.querySelectorAll('.quiz-option').forEach(o=>o.classList.add('disabled'));
+    document.getElementById('qe-'+qNum).classList.add('show');quizAnswered++;if(correct)quizCorrect++;
+  });
+  document.getElementById('quiz-progress').textContent=quizAnswered+' of '+TOTAL_QUIZ+' answered';
+  document.getElementById('btn-submit-quiz').disabled=quizAnswered<TOTAL_QUIZ;
+  if(state.quizSubmitted)submitQuiz();
+}
+
+function buildFlashcards(){
+  const grid=document.getElementById('fc-grid');
+  flashcardData.forEach((fc,i)=>{
+    const div=document.createElement('div');div.className='flashcard'+(state.cardsFlipped.has(i)?' flipped':'');
+    div.innerHTML='<div class="flashcard-inner"><div class="flashcard-front">'+fc.term+'<span class="fc-hint">Click to reveal definition</span></div><div class="flashcard-back">'+fc.def+'</div></div>';
+    div.addEventListener('click',()=>{div.classList.toggle('flipped');state.cardsFlipped.add(i);saveState();updateStats();});
+    grid.appendChild(div);
+  });
+}
+
+function revealCase(id,type){document.getElementById(type+'-'+id).classList.add('show');}
+function markCaseWorked(n){
+  state.casesWorked.add(n);saveState();
+  const btn=document.getElementById('worked-case-'+n);btn.textContent='Worked';btn.classList.add('done');updateStats();
+}
+
+function updateStats(){
+  document.getElementById('stat-slides').textContent=Math.round(state.slidesViewed.size/TOTAL_SLIDES*100)+'%';
+  document.getElementById('stat-quiz').textContent=state.quizScore!==null?state.quizScore+' / '+TOTAL_QUIZ:'—';
+  document.getElementById('stat-cards').textContent=state.cardsFlipped.size+' / '+TOTAL_CARDS;
+  document.getElementById('stat-cases').textContent=state.casesWorked.size+' / '+TOTAL_CASES;
+}
+function resetProgress(){if(!confirm('Reset all progress for this module?'))return;localStorage.removeItem(STORAGE_KEY);location.reload();}
+
+loadState();buildFlashcards();showSlide(state.currentSlide);updateStats();
+if(state.quizSubmitted){document.querySelector('.quiz-intro').style.display='none';document.getElementById('quiz-questions').style.display='block';restoreQuizState();}
+state.casesWorked.forEach(n=>{const btn=document.getElementById('worked-case-'+n);if(btn){btn.textContent='Worked';btn.classList.add('done');}});
+</script>
+</div>
+</body>
+</html>
