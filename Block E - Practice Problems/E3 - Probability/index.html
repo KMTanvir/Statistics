@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>E3 · Probability | Block E</title>
+<script>
+MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+  options:{skipHtmlTags:['script','noscript','style','textarea','pre']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;
+  --primary:#2563eb;--accent:#4f46e5;--success:#059669;
+  --border:#e2e8f0;--radius:14px;--radius-sm:10px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.08);
+}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:var(--bg);
+  color:var(--text);line-height:1.65;min-height:100vh;-webkit-font-smoothing:antialiased}
+.app{max-width:900px;margin:0 auto;padding:24px 18px 80px}
+.topbar{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.back-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);
+  color:var(--primary);font-size:.9rem;font-weight:600;text-decoration:none;
+  box-shadow:var(--shadow);transition:.15s}
+.back-btn:hover{background:var(--primary);color:#fff}
+.page-header{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 60%,#7c3aed 100%);
+  color:#fff;padding:36px 32px;border-radius:var(--radius);margin-bottom:28px;
+  box-shadow:var(--shadow-lg);position:relative;overflow:hidden}
+.page-header::before{content:"";position:absolute;top:-40%;right:-8%;width:360px;height:360px;
+  background:radial-gradient(circle,rgba(255,255,255,.12),transparent 70%);border-radius:50%}
+.page-header-inner{position:relative;z-index:1}
+.ph-kicker{display:inline-block;background:rgba(255,255,255,.18);padding:5px 13px;
+  border-radius:999px;font-size:.75rem;font-weight:700;letter-spacing:.5px;
+  text-transform:uppercase;margin-bottom:12px}
+.ph-title{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;letter-spacing:-.03em;margin-bottom:8px}
+.ph-desc{font-size:.95rem;opacity:.88;max-width:540px;line-height:1.55}
+.section-title{font-size:1.05rem;font-weight:700;color:var(--primary);
+  margin:32px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--border)}
+.prob-card{background:var(--card);border-radius:var(--radius);
+  box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:14px;overflow:hidden}
+.prob-head{display:flex;align-items:flex-start;gap:14px;
+  padding:16px 20px 12px;border-bottom:1px solid var(--border)}
+.prob-num{flex-shrink:0;background:var(--primary);color:#fff;
+  font-size:.78rem;font-weight:700;padding:4px 10px;border-radius:6px;letter-spacing:.4px;margin-top:2px}
+.prob-title{font-size:.97rem;font-weight:700;color:var(--text)}
+.prob-body{padding:14px 20px}
+.prob-body p{margin-bottom:.8em;font-size:.93rem}
+.prob-body p:last-child{margin-bottom:0}
+.prob-body table,.solution table{border-collapse:collapse;width:100%;margin:10px 0;font-size:.88rem}
+.prob-body th,.prob-body td,.solution th,.solution td{border:1px solid var(--border);padding:6px 10px;text-align:center}
+.prob-body th,.solution th{background:#f1f5f9;font-weight:600}
+.prob-foot{padding:8px 20px 14px}
+.reveal-btn{border:1.5px solid var(--accent);color:var(--accent);background:transparent;
+  padding:7px 18px;border-radius:var(--radius-sm);font-size:.87rem;font-weight:600;
+  cursor:pointer;transition:.15s}
+.reveal-btn:hover,.reveal-btn.shown{background:var(--accent);color:#fff}
+.solution{display:none;border-top:1px solid var(--border);
+  padding:16px 20px;background:#f8fafc;font-size:.91rem}
+.solution.show{display:block}
+.solution p{margin-bottom:.75em}
+.solution p:last-child{margin-bottom:0}
+.sol-label{font-weight:700;color:var(--accent);margin-bottom:8px;font-size:.88rem;text-transform:uppercase;letter-spacing:.4px}
+.ans-box{background:var(--success);color:#fff;border-radius:8px;
+  padding:9px 15px;margin-top:12px;font-weight:600;font-size:.91rem}
+
+.cheat-sheet{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+  border:2px solid var(--primary);margin-bottom:24px;overflow:hidden}
+.cs-head{background:linear-gradient(90deg,var(--primary),var(--accent));color:#fff;
+  padding:12px 20px;font-weight:700;font-size:.92rem;letter-spacing:.3px}
+.cs-body{padding:14px 20px;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:4px 28px}
+.cs-row{font-size:.88rem;padding:5px 0;border-bottom:1px solid #f1f5f9;line-height:1.5}
+.cs-row:last-child{border-bottom:none}
+.cs-row strong{color:var(--primary)}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <a class="back-btn" href="../../index.html">&#8592; Back to Portal</a>
+  </div>
+  <header class="page-header">
+    <div class="page-header-inner">
+      <div class="ph-kicker">Block E · Section 3</div>
+      <h1 class="ph-title">E3 · Probability</h1>
+      <p class="ph-desc">29 practice problems in three groups: probability rules and Bayes’ theorem (E3.1–E3.8), discrete distributions (E3.9–E3.20), and the normal distribution (E3.21–E3.29).</p>
+    </div>
+  </header>
+<div class="cheat-sheet">
+  <div class="cs-head">Key Formulas · Probability</div>
+  <div class="cs-body">
+    <div class="cs-row"><strong>Complement:</strong> \(P(A') = 1 - P(A)\)</div>
+    <div class="cs-row"><strong>Union (2 events):</strong> \(P(A\cup B)=P(A)+P(B)-P(A\cap B)\)</div>
+    <div class="cs-row"><strong>Union (3 events):</strong> \(P(A\cup B\cup C)=P(A)+P(B)+P(C)-P(A\cap B)-P(A\cap C)-P(B\cap C)+P(A\cap B\cap C)\)</div>
+    <div class="cs-row"><strong>Conditional:</strong> \(P(A|B)=P(A\cap B)/P(B)\)</div>
+    <div class="cs-row"><strong>Independent:</strong> \(P(A\cap B)=P(A)\cdot P(B)\)</div>
+    <div class="cs-row"><strong>Bayes:</strong> \(P(A_i|D)=\dfrac{P(A_i)P(D|A_i)}{\sum_j P(A_j)P(D|A_j)}\)</div>
+    <div class="cs-row"><strong>Series reliability:</strong> \(R=R_1\times R_2\times\cdots\times R_n\)</div>
+    <div class="cs-row"><strong>Parallel reliability:</strong> \(R=1-(1-R_1)(1-R_2)\cdots(1-R_n)\)</div>
+    <div class="cs-row"><strong>Binomial:</strong> \(P(X=x)=\binom{n}{x}p^x q^{n-x},\quad \mu=np,\quad \sigma^2=npq\)</div>
+    <div class="cs-row"><strong>Poisson:</strong> \(P(X=x)=\dfrac{e^{-\lambda}\lambda^x}{x!},\quad \mu=\sigma^2=\lambda\) &nbsp; (Poisson approx: \(\lambda=np\), \(n\) large, \(p\) small)</div>
+    <div class="cs-row"><strong>Geometric:</strong> \(P(X=x)=q^{x-1}p,\quad P(\text{no success in } k) = q^k\)</div>
+    <div class="cs-row"><strong>Standard normal:</strong> \(Z=(X-\mu)/\sigma\); &nbsp; \(\Phi(-z)=1-\Phi(z)\)</div>
+    <div class="cs-row"><strong>Percentile:</strong> \(x=\mu+z\sigma\)</div>
+    <div class="cs-row"><strong>Empirical rule:</strong> \(\mu\pm\sigma\): 68.27%; \(\mu\pm2\sigma\): 95.45%; \(\mu\pm3\sigma\): 99.73%</div>
+  </div>
+</div>
+<h2 class="section-title">Group 1 &nbsp;&middot;&nbsp; Probability Rules, System Reliability and Bayes&rsquo; Theorem &nbsp;(E3.1·E3.8)</h2>
+<div class="prob-card" id="E3.1">
+  <div class="prob-head">
+    <span class="prob-num">E3.1</span>
+    <span class="prob-title">Series circuit · three components</span>
+  </div>
+  <div class="prob-body"><p>A series circuit has three independent components with reliabilities \(R_1=0.95\), \(R_2=0.90\), \(R_3=0.85\). Find the reliability of the circuit.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_1')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_1"><div class="sol-label">Solution</div>
+<p>In a <strong>series system</strong>, the system works only if <em>all</em> components work:</p>
+<p>\[R_\text{system} = R_1 \times R_2 \times R_3 = 0.95\times0.90\times0.85 = 0.7268\]</p>
+<div class="ans-box">System reliability = 0.7268 (72.68%)</div></div>
+</div>
+<div class="prob-card" id="E3.2">
+  <div class="prob-head">
+    <span class="prob-num">E3.2</span>
+    <span class="prob-title">Parallel circuit · two components</span>
+  </div>
+  <div class="prob-body"><p>A parallel circuit has two independent components with reliabilities \(R_1=0.90\) and \(R_2=0.85\). Find the reliability of the system.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_2')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_2"><div class="sol-label">Solution</div>
+<p>In a <strong>parallel system</strong>, the system fails only if <em>all</em> components fail. Failure probabilities: \(F_1=0.10\), \(F_2=0.15\).</p>
+<p>\[R_\text{system} = 1 - F_1\times F_2 = 1-0.10\times0.15 = 0.985\]</p>
+<div class="ans-box">System reliability = 0.985 (98.5%)</div></div>
+</div>
+<div class="prob-card" id="E3.3">
+  <div class="prob-head">
+    <span class="prob-num">E3.3</span>
+    <span class="prob-title">Series–parallel combined circuit</span>
+  </div>
+  <div class="prob-body"><p>A circuit has two subsystems in series. Subsystem A has two components in parallel with reliabilities 0.90 and 0.85. Subsystem B has two components in parallel with reliabilities 0.95 and 0.80. Find the overall reliability.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_3')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_3"><div class="sol-label">Solution</div>
+<p>\(R_A = 1-(1-0.90)(1-0.85) = 1-0.015 = 0.985\)</p>
+<p>\(R_B = 1-(1-0.95)(1-0.80) = 1-0.010 = 0.990\)</p>
+<p>\(R_\text{system} = R_A\times R_B = 0.985\times0.990 = 0.9752\)</p>
+<div class="ans-box">System reliability = 0.9752 (97.52%)</div></div>
+</div>
+<div class="prob-card" id="E3.4">
+  <div class="prob-head">
+    <span class="prob-num">E3.4</span>
+    <span class="prob-title">Reliability · four components in parallel</span>
+  </div>
+  <div class="prob-body"><p>Four independent components, each with reliability 0.75, are connected in parallel. Find the system reliability.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_4')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_4"><div class="sol-label">Solution</div>
+<p>Each component fails with probability 0.25. The system fails only if all four fail:</p>
+<p>\[R = 1-(0.25)^4 = 1-0.003906 = 0.9961\]</p>
+<div class="ans-box">System reliability = 0.9961 (99.61%)</div></div>
+</div>
+<div class="prob-card" id="E3.5">
+  <div class="prob-head">
+    <span class="prob-num">E3.5</span>
+    <span class="prob-title">Series circuit · four components</span>
+  </div>
+  <div class="prob-body"><p>Four independent components with reliabilities 0.99, 0.95, 0.90, and 0.85 are connected in series. Find the system reliability.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_5')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_5"><div class="sol-label">Solution</div>
+<p>\[R = 0.99\times0.95\times0.90\times0.85 = 0.7198\]</p>
+<div class="ans-box">System reliability = 0.7198 (71.98%)</div></div>
+</div>
+<div class="prob-card" id="E3.6">
+  <div class="prob-head">
+    <span class="prob-num">E3.6</span>
+    <span class="prob-title">Mixed series–parallel network</span>
+  </div>
+  <div class="prob-body"><p>Component A is in series with a parallel block containing components B and C. Reliabilities: \(R_A=0.98\), \(R_B=0.92\), \(R_C=0.88\). Find the system reliability.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_6')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_6"><div class="sol-label">Solution</div>
+<p>Parallel block (B and C): \(R_{BC}=1-(1-0.92)(1-0.88)=1-0.08\times0.12=0.9904\)</p>
+<p>Overall (A in series with BC): \(R=0.98\times0.9904=0.9706\)</p>
+<div class="ans-box">System reliability = 0.9706 (97.06%)</div></div>
+</div>
+<div class="prob-card" id="E3.7">
+  <div class="prob-head">
+    <span class="prob-num">E3.7</span>
+    <span class="prob-title">Cloud storage · contingency table probabilities</span>
+  </div>
+  <div class="prob-body"><p>A survey of 500 users records subscription tier (Free/Premium) and satisfaction (Satisfied/Unsatisfied):</p>
+<table><tr><th></th><th>Satisfied</th><th>Unsatisfied</th><th>Total</th></tr>
+<tr><th>Free</th><td>180</td><td>120</td><td>300</td></tr>
+<tr><th>Premium</th><td>160</td><td>40</td><td>200</td></tr>
+<tr><th>Total</th><td>340</td><td>160</td><td>500</td></tr></table>
+<p>Find: (a) P(Premium), (b) P(Satisfied | Premium), (c) P(Satisfied &cup; Premium).</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_7')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_7"><div class="sol-label">Solution</div>
+<p>(a) \(P(\text{Premium}) = 200/500 = 0.40\)</p>
+<p>(b) \(P(\text{Satisfied}|\text{Premium}) = 160/200 = 0.80\)</p>
+<p>(c) \(P(\text{Satisfied}\cup\text{Premium}) = 340/500+200/500-160/500 = 380/500 = 0.76\)</p>
+<div class="ans-box">(a) 0.40 &nbsp; (b) 0.80 &nbsp; (c) 0.76</div></div>
+</div>
+<div class="prob-card" id="E3.8">
+  <div class="prob-head">
+    <span class="prob-num">E3.8</span>
+    <span class="prob-title">Bayes’ theorem · washer factory quality control</span>
+  </div>
+  <div class="prob-body"><p>Three procedures A, B, C produce 25%, 35%, and 40% of the washers in a factory, with defect rates of 0.5%, 0.4%, and 0.2% respectively. A randomly selected washer is found to be defective. Find the probability it came from each procedure.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_8')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_8"><div class="sol-label">Solution</div>
+<p>\(P(D)=0.25(0.005)+0.35(0.004)+0.40(0.002)=0.00125+0.00140+0.00080=0.00345\)</p>
+<p>\(P(A|D)=\dfrac{0.25\times0.005}{0.00345}=\dfrac{0.00125}{0.00345}=0.3623\)</p>
+<p>\(P(B|D)=\dfrac{0.35\times0.004}{0.00345}=\dfrac{0.00140}{0.00345}=0.4058\)</p>
+<p>\(P(C|D)=\dfrac{0.40\times0.002}{0.00345}=\dfrac{0.00080}{0.00345}=0.2319\)</p>
+<div class="ans-box">P(A|D) = 36.23%, P(B|D) = 40.58%, P(C|D) = 23.19%. Procedure B is most likely responsible.</div></div>
+</div>
+<h2 class="section-title">Group 2 &nbsp;&middot;&nbsp; Discrete Probability Distributions: Binomial, Poisson, Geometric &nbsp;(E3.9·E3.20)</h2>
+<div class="prob-card" id="E3.9">
+  <div class="prob-head">
+    <span class="prob-num">E3.9</span>
+    <span class="prob-title">Practical uses of discrete probability distributions</span>
+  </div>
+  <div class="prob-body"><p>Explain the practical uses of discrete probability distributions in engineering and technology.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_9')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_9"><div class="sol-label">Solution</div>
+<p><strong>Binomial distribution</strong> \(B(n,p)\): used when there are \(n\) independent trials, each with two outcomes, and constant probability \(p\). Engineering uses: number of defective items in a batch, number of error bits in a data packet, number of machines failing in a day.</p>
+<p><strong>Poisson distribution</strong> \(\text{Po}(\lambda)\): models the number of rare events occurring randomly in a fixed interval of time, length, or area. Examples: network packet arrivals per second, defects per metre of wire, accidents per month on a highway, HTTP requests to a server per minute.</p>
+<p><strong>Geometric distribution</strong>: number of trials until the first success. Examples: number of bits transmitted until the first error, number of parts tested until the first defective is found, number of oil wells drilled until the first strike.</p></div>
+</div>
+<div class="prob-card" id="E3.10">
+  <div class="prob-head">
+    <span class="prob-num">E3.10</span>
+    <span class="prob-title">When the binomial distribution approximates the Poisson</span>
+  </div>
+  <div class="prob-body"><p>State the conditions under which the Poisson distribution is used as an approximation to the binomial distribution.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_10')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_10"><div class="sol-label">Solution</div>
+<p>The Poisson distribution approximates \(\text{Binomial}(n,p)\) when:</p>
+<p>1. The number of trials \(n\) is <strong>large</strong> (conventionally \(n\ge30\) or \(n\ge50\)).</p>
+<p>2. The probability of success \(p\) is <strong>small</strong> (conventionally \(p\le0.05\)).</p>
+<p>3. The mean \(\lambda=np\) is <strong>moderate</strong> (typically \(\lambda\le5\)).</p>
+<p>Under these conditions, \(\text{Binomial}(n,p)\approx\text{Poisson}(\lambda=np)\), which is easier to compute because it has only one parameter. The approximation improves as \(n\to\infty\) and \(p\to0\) with \(np\) held constant.</p></div>
+</div>
+<div class="prob-card" id="E3.11">
+  <div class="prob-head">
+    <span class="prob-num">E3.11</span>
+    <span class="prob-title">Binomial · error detection in a data packet</span>
+  </div>
+  <div class="prob-body"><p>A data packet contains 20 bits. Each bit is independently corrupted with probability 0.05. Find the probability that: (a) exactly 2 bits are corrupted, (b) at most 1 bit is corrupted.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_11')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_11"><div class="sol-label">Solution</div>
+<p>\(X\sim B(20,\;0.05)\), \(q=0.95\).</p>
+<p>(a) \(P(X=2)=\binom{20}{2}(0.05)^2(0.95)^{18}=190\times0.0025\times0.3972=0.1887\)</p>
+<p>(b) \(P(X=0)=(0.95)^{20}=0.3585\); \(P(X=1)=20(0.05)(0.95)^{19}=0.3774\)</p>
+<p>\(P(X\le1)=0.3585+0.3774=0.7359\)</p>
+<div class="ans-box">(a) 0.1887 &nbsp; (b) 0.7359</div></div>
+</div>
+<div class="prob-card" id="E3.12">
+  <div class="prob-head">
+    <span class="prob-num">E3.12</span>
+    <span class="prob-title">Binomial · airline no shows</span>
+  </div>
+  <div class="prob-body"><p>An airline knows 8% of passengers with a ticket do not show up. The airline sells 10 tickets for a plane with 9 seats. Find: (a) P(all 10 show up), (b) P(exactly 9 show up), (c) P(fewer than 9 show up).</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_12')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_12"><div class="sol-label">Solution</div>
+<p>\(X\sim B(10,\;0.92)\) (number who show up), \(q=0.08\).</p>
+<p>(a) \(P(X=10)=(0.92)^{10}=0.4344\)</p>
+<p>(b) \(P(X=9)=10(0.92)^9(0.08)=10\times0.4722\times0.08=0.3777\)</p>
+<p>(c) \(P(X\le8)=1-P(9)-P(10)=1-0.3777-0.4344=0.1879\)</p>
+<div class="ans-box">(a) 0.4344 &nbsp; (b) 0.3777 &nbsp; (c) 0.1879</div></div>
+</div>
+<div class="prob-card" id="E3.13">
+  <div class="prob-head">
+    <span class="prob-num">E3.13</span>
+    <span class="prob-title">Binomial · security system false alarms</span>
+  </div>
+  <div class="prob-body"><p>A building has 15 independent sensors, each triggering a false alarm with probability 0.03 on any given day. Find the probability that on a given day: (a) no false alarm, (b) exactly one false alarm, (c) at least two false alarms.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_13')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_13"><div class="sol-label">Solution</div>
+<p>\(X\sim B(15,\;0.03)\), \(q=0.97\).</p>
+<p>(a) \(P(X=0)=(0.97)^{15}=0.6333\)</p>
+<p>(b) \(P(X=1)=15(0.03)(0.97)^{14}=0.4500\times0.6528=0.2938\)</p>
+<p>(c) \(P(X\ge2)=1-0.6333-0.2938=0.0729\)</p>
+<div class="ans-box">(a) 0.6333 &nbsp; (b) 0.2938 &nbsp; (c) 0.0729</div></div>
+</div>
+<div class="prob-card" id="E3.14">
+  <div class="prob-head">
+    <span class="prob-num">E3.14</span>
+    <span class="prob-title">Binomial · quality control, batch of 10</span>
+  </div>
+  <div class="prob-body"><p>A manufacturing process produces items with a 10% defect rate. A batch of 10 items is sampled. Find: (a) P(none are defective), (b) P(at most 2 are defective).</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_14')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_14"><div class="sol-label">Solution</div>
+<p>\(X\sim B(10,\;0.10)\), \(q=0.90\).</p>
+<p>(a) \(P(0)=(0.90)^{10}=0.3487\)</p>
+<p>(b) \(P(1)=10(0.10)(0.90)^9=0.3874\); \(P(2)=45(0.01)(0.90)^8=0.1937\)</p>
+<p>\(P(X\le2)=0.3487+0.3874+0.1937=0.9298\)</p>
+<div class="ans-box">(a) 0.3487 &nbsp; (b) 0.9298</div></div>
+</div>
+<div class="prob-card" id="E3.15">
+  <div class="prob-head">
+    <span class="prob-num">E3.15</span>
+    <span class="prob-title">Binomial · network packet loss</span>
+  </div>
+  <div class="prob-body"><p>In a network transmission, each of 8 independent packets is lost with probability 0.15. Find: (a) P(no packet lost), (b) P(exactly 2 lost), (c) P(more than 2 lost).</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_15')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_15"><div class="sol-label">Solution</div>
+<p>\(X\sim B(8,\;0.15)\), \(q=0.85\).</p>
+<p>(a) \(P(0)=(0.85)^8=0.2725\)</p>
+<p>(b) \(P(2)=28(0.15)^2(0.85)^6=28\times0.0225\times0.3771=0.2376\)</p>
+<p>(c) \(P(1)=8(0.15)(0.85)^7=0.3847\); \(P(X\gt2)=1-0.2725-0.3847-0.2376=0.1052\)</p>
+<div class="ans-box">(a) 0.2725 &nbsp; (b) 0.2376 &nbsp; (c) 0.1052</div></div>
+</div>
+<div class="prob-card" id="E3.16">
+  <div class="prob-head">
+    <span class="prob-num">E3.16</span>
+    <span class="prob-title">Poisson approximation to binomial · bit errors</span>
+  </div>
+  <div class="prob-body"><p>A data stream of 1000 bits is transmitted. Each bit is independently in error with probability 0.001. Use an appropriate approximation to find P(at least 2 bits are in error).</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_16')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_16"><div class="sol-label">Solution</div>
+<p>Since \(n=1000\) (large) and \(p=0.001\) (small), use the Poisson approximation with \(\lambda=np=1\).</p>
+<p>\(P(X=0)=e^{-1}=0.3679,\quad P(X=1)=e^{-1}=0.3679\)</p>
+<p>\(P(X\ge2)=1-0.3679-0.3679=0.2642\)</p>
+<div class="ans-box">P(X ≥ 2) = 0.2642</div></div>
+</div>
+<div class="prob-card" id="E3.17">
+  <div class="prob-head">
+    <span class="prob-num">E3.17</span>
+    <span class="prob-title">Geometric / Negative Binomial · oil drilling</span>
+  </div>
+  <div class="prob-body"><p>An oil company estimates the probability of striking oil on any single drilling is \(p=0.12\). (a) What is the probability of striking oil at least once in a 6-attempt programme? (b) The company will go bankrupt if it fails to strike oil in 8 attempts. What is the probability of bankruptcy?</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_17')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_17"><div class="sol-label">Solution</div>
+<p>(a) \(P(\text{at least one success in 6}) = 1-(1-0.12)^6 = 1-0.88^6 = 1-0.4644 = 0.5356\)</p>
+<p>(b) Bankrupt means 0 successes in 8 attempts:</p>
+<p>\(P(\text{bankrupt})=(0.88)^8=0.3596\)</p>
+<div class="ans-box">(a) P(at least one in 6) = 0.5356 &nbsp; (b) P(bankruptcy) = 0.3596</div></div>
+</div>
+<div class="prob-card" id="E3.18">
+  <div class="prob-head">
+    <span class="prob-num">E3.18</span>
+    <span class="prob-title">Poisson · copper wire flaws</span>
+  </div>
+  <div class="prob-body"><p>Flaws in a type of copper wire follow a Poisson distribution with mean \(\lambda=2.3\) flaws/mm. Find: (a) P(exactly 2 flaws) in a 1 mm piece, (b) P(at least 1 flaw) in a 2 mm piece.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_18')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_18"><div class="sol-label">Solution</div>
+<p>(a) 1 mm, \(\lambda=2.3\): \(P(X=2)=e^{-2.3}\cdot2.3^2/2!=0.1003\times5.29/2=0.2652\)</p>
+<p>(b) 2 mm, \(\lambda=4.6\): \(P(X\ge1)=1-e^{-4.6}=1-0.0101=0.9899\)</p>
+<div class="ans-box">(a) 0.2652 &nbsp; (b) 0.9899</div></div>
+</div>
+<div class="prob-card" id="E3.19">
+  <div class="prob-head">
+    <span class="prob-num">E3.19</span>
+    <span class="prob-title">Poisson · website content changes</span>
+  </div>
+  <div class="prob-body"><p>A website is updated on average 0.25 times per hour. Find: (a) P(at least 2 updates) in a 3-hour period, (b) P(no update) in a 24-hour day.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_19')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_19"><div class="sol-label">Solution</div>
+<p>(a) 3 hours: \(\lambda=0.75\); \(P(0)=e^{-0.75}=0.4724\), \(P(1)=0.75e^{-0.75}=0.3543\)</p>
+<p>\(P(X\ge2)=1-0.4724-0.3543=0.1733\)</p>
+<p>(b) 24 hours: \(\lambda=6\); \(P(0)=e^{-6}=0.00248\)</p>
+<div class="ans-box">(a) 0.1734 &nbsp; (b) 0.00248</div></div>
+</div>
+<div class="prob-card" id="E3.20">
+  <div class="prob-head">
+    <span class="prob-num">E3.20</span>
+    <span class="prob-title">Poisson · highway cracks</span>
+  </div>
+  <div class="prob-body"><p>Cracks occur in a highway at a rate of 3 per mile (Poisson). Find: (a) P(no crack) in a 5-mile stretch, (b) P(at least 1 crack) in a 0.5-mile stretch, (c) P(at most 2 cracks) in a 1-mile stretch.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_20')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_20"><div class="sol-label">Solution</div>
+<p>(a) 5 miles: \(\lambda=15\); \(P(0)=e^{-15}\approx0\)</p>
+<p>(b) 0.5 miles: \(\lambda=1.5\); \(P(X\ge1)=1-e^{-1.5}=1-0.2231=0.7769\)</p>
+<p>(c) 1 mile: \(\lambda=3\); \(P(0)+P(1)+P(2)=0.0498+0.1494+0.2240=0.4232\)</p>
+<div class="ans-box">(a) ≈ 0 &nbsp; (b) 0.7769 &nbsp; (c) 0.4232</div></div>
+</div>
+<h2 class="section-title">Group 3 &nbsp;&middot;&nbsp; The Normal (Gaussian) Distribution &nbsp;(E3.21·E3.29)</h2>
+<div class="prob-card" id="E3.21">
+  <div class="prob-head">
+    <span class="prob-num">E3.21</span>
+    <span class="prob-title">Normal distribution · area properties and the empirical rule</span>
+  </div>
+  <div class="prob-body"><p>State the area properties of the normal distribution and the empirical rule.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_21')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_21"><div class="sol-label">Solution</div>
+<p>The standard normal curve \(Z\sim N(0,1)\) is symmetric about zero, bell shaped, and the total area under the curve equals 1.</p>
+<p><strong>Empirical rule</strong> for \(X\sim N(\mu,\sigma^2)\):</p>
+<p>\[P(\mu-\sigma &lt; X &lt; \mu+\sigma) = 68.27\%\]</p>
+<p>\[P(\mu-2\sigma &lt; X &lt; \mu+2\sigma) = 95.45\%\]</p>
+<p>\[P(\mu-3\sigma &lt; X &lt; \mu+3\sigma) = 99.73\%\]</p>
+<p>These follow from the standard normal table: \(\Phi(1)-\Phi(-1)=0.6827\), \(\Phi(2)-\Phi(-2)=0.9545\), \(\Phi(3)-\Phi(-3)=0.9973\).</p></div>
+</div>
+<div class="prob-card" id="E3.22">
+  <div class="prob-head">
+    <span class="prob-num">E3.22</span>
+    <span class="prob-title">Normal · file transfer speed</span>
+  </div>
+  <div class="prob-body"><p>File transfer speed \(X\sim N(\mu=60,\;\sigma=4)\) kb/s. Find: (a) P(X &ge; 70), (b) P(X &le; 65), (c) the 98th percentile.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_22')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_22"><div class="sol-label">Solution</div>
+<p>(a) \(z=(70-60)/4=2.5\); \(P(X\ge70)=1-\Phi(2.5)=1-0.9938=0.0062\)</p>
+<p>(b) \(z=(65-60)/4=1.25\); \(P(X\le65)=\Phi(1.25)=0.8944\)</p>
+<p>(c) \(z_{0.98}=2.054\); \(x=60+2.054\times4=68.22\) kb/s</p>
+<div class="ans-box">(a) 0.0062 &nbsp; (b) 0.8944 &nbsp; (c) 98th percentile = 68.22 kb/s</div></div>
+</div>
+<div class="prob-card" id="E3.23">
+  <div class="prob-head">
+    <span class="prob-num">E3.23</span>
+    <span class="prob-title">Normal · digital signal detection</span>
+  </div>
+  <div class="prob-body"><p>A digital signal detector records noise \(X\sim N(0.0001,\;0.35^2)\) V. Find: (a) P(X &gt; 0.9 V), (b) the 98th percentile.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_23')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_23"><div class="sol-label">Solution</div>
+<p>(a) \(z=(0.9-0.0001)/0.35=2.571\); \(P(X\gt0.9)=1-\Phi(2.57)=1-0.9949=0.0051\)</p>
+<p>(b) \(z_{0.98}=2.054\); \(x=0.0001+2.054\times0.35=0.7190\) V</p>
+<div class="ans-box">(a) 0.0051 &nbsp; (b) 98th percentile = 0.7189 V</div></div>
+</div>
+<div class="prob-card" id="E3.24">
+  <div class="prob-head">
+    <span class="prob-num">E3.24</span>
+    <span class="prob-title">Normal · resistors</span>
+  </div>
+  <div class="prob-body"><p>Resistances \(X\sim N(40,\;2^2)\;\Omega\). Find: (a) P(X &gt; 43), (b) P(39 &lt; X &lt; 42), (c) P(X &le; 38).</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_24')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_24"><div class="sol-label">Solution</div>
+<p>(a) \(z=(43-40)/2=1.5\); \(P(X\gt43)=1-\Phi(1.5)=0.0668\)</p>
+<p>(b) \(z_1=-0.5\), \(z_2=1.0\); \(P=\Phi(1.0)-\Phi(-0.5)=0.8413-0.3085=0.5328\)</p>
+<p>(c) \(z=-1.0\); \(P(X\le38)=\Phi(-1)=0.1587\)</p>
+<div class="ans-box">(a) 6.68% &nbsp; (b) 53.28% &nbsp; (c) 15.87%</div></div>
+</div>
+<div class="prob-card" id="E3.25">
+  <div class="prob-head">
+    <span class="prob-num">E3.25</span>
+    <span class="prob-title">Normal · component dimension</span>
+  </div>
+  <div class="prob-body"><p>Component length \(X\sim N(2.34,\;0.05616^2)\) cm. Find: (a) P(X &lt; 2.45), (b) P(2.25 &lt; X &lt; 2.45), (c) the 95th percentile.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_25')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_25"><div class="sol-label">Solution</div>
+<p>(a) \(z=(2.45-2.34)/0.05616=1.96\); \(P(X\lt2.45)=\Phi(1.96)=0.9750\)</p>
+<p>(b) \(z_1=(2.25-2.34)/0.05616=-1.602\); \(P=\Phi(1.96)-\Phi(-1.602)=0.9750-0.0546=0.9204\)</p>
+<p>(c) \(z_{0.95}=1.645\); \(x=2.34+1.645\times0.05616=2.4324\) cm</p>
+<div class="ans-box">(a) 97.50% &nbsp; (b) 92.04% &nbsp; (c) 95th percentile = 2.4324 cm</div></div>
+</div>
+<div class="prob-card" id="E3.26">
+  <div class="prob-head">
+    <span class="prob-num">E3.26</span>
+    <span class="prob-title">Normal · electronic chip lifespan</span>
+  </div>
+  <div class="prob-body"><p>Chip lifespan \(X\sim N(730,\;30^2)\) days. Find: (a) P(X &lt; 730), (b) the time \(t\) such that 97% of chips survive beyond \(t\).</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_26')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_26"><div class="sol-label">Solution</div>
+<p>(a) \(z=0\); \(P(X\lt730)=\Phi(0)=0.5000=50\%\)</p>
+<p>(b) \(P(X\gt t)=0.97 \Rightarrow P(X\le t)=0.03\); \(z_{0.03}=-1.881\)</p>
+<p>\(t=730-1.881\times30=730-56.43=673.57\approx673.58\) days</p>
+<div class="ans-box">(a) 50% &nbsp; (b) 97% of chips last beyond 673.58 days</div></div>
+</div>
+<div class="prob-card" id="E3.27">
+  <div class="prob-head">
+    <span class="prob-num">E3.27</span>
+    <span class="prob-title">Normal · cement compressive strength</span>
+  </div>
+  <div class="prob-body"><p>Cement strength \(X\sim N(6000,\;100^2)\) psi. Find: (a) P(X &gt; 6250), (b) P(5800 &lt; X &lt; 5900).</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_27')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_27"><div class="sol-label">Solution</div>
+<p>(a) \(z=(6250-6000)/100=2.5\); \(P(X\gt6250)=1-\Phi(2.5)=0.0062\)</p>
+<p>(b) \(z_1=-2.0\), \(z_2=-1.0\); \(P=\Phi(-1)-\Phi(-2)=0.1587-0.0228=0.1359\)</p>
+<div class="ans-box">(a) 0.62% &nbsp; (b) 13.59%</div></div>
+</div>
+<div class="prob-card" id="E3.28">
+  <div class="prob-head">
+    <span class="prob-num">E3.28</span>
+    <span class="prob-title">Normal · aluminium cylinder wall thickness</span>
+  </div>
+  <div class="prob-body"><p>Cylinder wall thickness \(X\sim N(1.41,\;0.01^2)\) cm. Find: (a) P(X &gt; 1.42), (b) thickness exceeded by 95% of cylinders, (c) P(1.39 &lt; X &lt; 1.43).</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_28')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_28"><div class="sol-label">Solution</div>
+<p>(a) \(z=1.0\); \(P(X\gt1.42)=1-\Phi(1)=0.1587\)</p>
+<p>(b) \(P(X\gt t)=0.95 \Rightarrow P(X\le t)=0.05\); \(z_{0.05}=-1.645\); \(t=1.41-0.01645=1.3936\) cm</p>
+<p>(c) \(z_1=-2.0\), \(z_2=2.0\); \(P=\Phi(2)-\Phi(-2)=0.9773-0.0227=0.9546\)</p>
+<div class="ans-box">(a) 15.87% &nbsp; (b) 1.3936 cm &nbsp; (c) 95.46%</div></div>
+</div>
+<div class="prob-card" id="E3.29">
+  <div class="prob-head">
+    <span class="prob-num">E3.29</span>
+    <span class="prob-title">Normal · semiconductor line width</span>
+  </div>
+  <div class="prob-body"><p>Semiconductor line width \(X\sim N(0.5,\;0.05^2)\;\mu\)m. Find: (a) P(X &gt; 0.62), (b) P(0.47 &lt; X &lt; 0.63), (c) the 90th percentile.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_29')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_29"><div class="sol-label">Solution</div>
+<p>(a) \(z=(0.62-0.5)/0.05=2.4\); \(P(X\gt0.62)=1-\Phi(2.4)=0.0082\)</p>
+<p>(b) \(z_1=-0.6\), \(z_2=2.6\); \(P=\Phi(2.6)-\Phi(-0.6)=0.9953-0.2743=0.7210\)</p>
+<p>(c) \(z_{0.90}=1.282\); \(x=0.5+1.282\times0.05=0.5641\;\mu\)m</p>
+<div class="ans-box">(a) 0.82% &nbsp; (b) 72.10% &nbsp; (c) 90th percentile = 0.5641 μm</div></div>
+</div>
+<div class="prob-card" id="E3.30">
+  <div class="prob-head">
+    <span class="prob-num">E3.30</span>
+    <span class="prob-title">Normal distribution · satellite missile targeting</span>
+  </div>
+  <div class="prob-body"><p>A satellite missile manufacturer claims his newly produced missile will strike within 10 feet of the target (defined as a &ldquo;success&rdquo;). Previous records show the mean targeting offset from the target is 1.5 feet with a standard deviation of 10 feet, and the striking range follows approximately a Gaussian distribution.</p>
+<p>(i) Find the probability that the missile will <em>fail</em> the target. (ii) Find the chance of hitting the target (within the 10-foot range). (iii) Find the range of target area for which there is a 90% chance on the lower side of the normal curve.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E3_30')">Show Solution</button>
+  </div>
+  <div class="solution" id="E3_30"><div class="sol-label">Solution</div>
+<p>Let \(X\sim N(\mu=1.5,\;\sigma^2=10^2)\) be the signed offset from the target. &ldquo;Success&rdquo; means \(-10\le X\le 10\).</p>
+<p><strong>(i) P(fail) = P(X &lt; &minus;10) + P(X &gt; 10)</strong></p>
+<p>\[z_1=\frac{-10-1.5}{10}=-1.15,\qquad z_2=\frac{10-1.5}{10}=0.85\]</p>
+<p>\[P(X\lt-10)=\Phi(-1.15)=1-\Phi(1.15)=1-0.8749=0.1251\]</p>
+<p>\[P(X\gt10)=1-\Phi(0.85)=1-0.8023=0.1977\]</p>
+<p>\[P(\text{fail})=0.1251+0.1977=\mathbf{0.3228}\]</p>
+<p><strong>(ii) P(hit within 10 feet) = 1 &minus; P(fail)</strong></p>
+<p>\[P(\text{success})=1-0.3228=\mathbf{0.6772}\]</p>
+<p>So there is roughly a <strong>67.72%</strong> chance of a successful strike.</p>
+<p><strong>(iii) 90th percentile on the lower side:</strong> Find \(x\) such that \(P(X\le x)=0.90\).</p>
+<p>\[z_{0.90}=1.2816\]</p>
+<p>\[x=\mu+z\sigma=1.5+1.2816\times10=1.5+12.82=\mathbf{14.32}\text{ feet}\]</p>
+<p>There is a 90% chance that the missile strikes within <strong>14.32 feet</strong> of the aim point on the lower side of the curve.</p>
+<div class="ans-box">P(fail) = 32.28% &nbsp;|&nbsp; P(success within 10 ft) = 67.72% &nbsp;|&nbsp; 90% lower-side range = 14.32 ft</div></div>
+</div>
+
+</div>
+<script>
+function toggleSolution(btn,id){
+  var s=document.getElementById(id);
+  s.classList.toggle('show');
+  btn.classList.toggle('shown');
+  btn.textContent=s.classList.contains('show')?'Hide Solution':'Show Solution';
+}
+</script>
+</body>
+</html>

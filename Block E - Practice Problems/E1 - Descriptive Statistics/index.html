@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>E1 · Descriptive Statistics | Block E</title>
+<script>
+MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+  options:{skipHtmlTags:['script','noscript','style','textarea','pre']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;
+  --primary:#2563eb;--accent:#4f46e5;--success:#059669;
+  --border:#e2e8f0;--radius:14px;--radius-sm:10px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.08);
+}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:var(--bg);
+  color:var(--text);line-height:1.65;min-height:100vh;-webkit-font-smoothing:antialiased}
+.app{max-width:900px;margin:0 auto;padding:24px 18px 80px}
+.topbar{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.back-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);
+  color:var(--primary);font-size:.9rem;font-weight:600;text-decoration:none;
+  box-shadow:var(--shadow);transition:.15s}
+.back-btn:hover{background:var(--primary);color:#fff}
+.page-header{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 60%,#7c3aed 100%);
+  color:#fff;padding:36px 32px;border-radius:var(--radius);margin-bottom:28px;
+  box-shadow:var(--shadow-lg);position:relative;overflow:hidden}
+.page-header::before{content:"";position:absolute;top:-40%;right:-8%;width:360px;height:360px;
+  background:radial-gradient(circle,rgba(255,255,255,.12),transparent 70%);border-radius:50%}
+.page-header-inner{position:relative;z-index:1}
+.ph-kicker{display:inline-block;background:rgba(255,255,255,.18);padding:5px 13px;
+  border-radius:999px;font-size:.75rem;font-weight:700;letter-spacing:.5px;
+  text-transform:uppercase;margin-bottom:12px}
+.ph-title{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;letter-spacing:-.03em;margin-bottom:8px}
+.ph-desc{font-size:.95rem;opacity:.88;max-width:540px;line-height:1.55}
+.section-title{font-size:1.05rem;font-weight:700;color:var(--primary);
+  margin:32px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--border)}
+.prob-card{background:var(--card);border-radius:var(--radius);
+  box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:14px;overflow:hidden}
+.prob-head{display:flex;align-items:flex-start;gap:14px;
+  padding:16px 20px 12px;border-bottom:1px solid var(--border)}
+.prob-num{flex-shrink:0;background:var(--primary);color:#fff;
+  font-size:.78rem;font-weight:700;padding:4px 10px;border-radius:6px;letter-spacing:.4px;margin-top:2px}
+.prob-title{font-size:.97rem;font-weight:700;color:var(--text)}
+.prob-body{padding:14px 20px}
+.prob-body p{margin-bottom:.8em;font-size:.93rem}
+.prob-body p:last-child{margin-bottom:0}
+.prob-body table,.solution table{border-collapse:collapse;width:100%;margin:10px 0;font-size:.88rem}
+.prob-body th,.prob-body td,.solution th,.solution td{border:1px solid var(--border);padding:6px 10px;text-align:center}
+.prob-body th,.solution th{background:#f1f5f9;font-weight:600}
+.prob-foot{padding:8px 20px 14px}
+.reveal-btn{border:1.5px solid var(--accent);color:var(--accent);background:transparent;
+  padding:7px 18px;border-radius:var(--radius-sm);font-size:.87rem;font-weight:600;
+  cursor:pointer;transition:.15s}
+.reveal-btn:hover,.reveal-btn.shown{background:var(--accent);color:#fff}
+.solution{display:none;border-top:1px solid var(--border);
+  padding:16px 20px;background:#f8fafc;font-size:.91rem}
+.solution.show{display:block}
+.solution p{margin-bottom:.75em}
+.solution p:last-child{margin-bottom:0}
+.sol-label{font-weight:700;color:var(--accent);margin-bottom:8px;font-size:.88rem;text-transform:uppercase;letter-spacing:.4px}
+.ans-box{background:var(--success);color:#fff;border-radius:8px;
+  padding:9px 15px;margin-top:12px;font-weight:600;font-size:.91rem}
+
+.cheat-sheet{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+  border:2px solid var(--primary);margin-bottom:24px;overflow:hidden}
+.cs-head{background:linear-gradient(90deg,var(--primary),var(--accent));color:#fff;
+  padding:12px 20px;font-weight:700;font-size:.92rem;letter-spacing:.3px}
+.cs-body{padding:14px 20px;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:4px 28px}
+.cs-row{font-size:.88rem;padding:5px 0;border-bottom:1px solid #f1f5f9;line-height:1.5}
+.cs-row:last-child{border-bottom:none}
+.cs-row strong{color:var(--primary)}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <a class="back-btn" href="../../index.html">&#8592; Back to Portal</a>
+  </div>
+  <header class="page-header">
+    <div class="page-header-inner">
+      <div class="ph-kicker">Block E · Section 1</div>
+      <h1 class="ph-title">E1 · Descriptive Statistics</h1>
+      <p class="ph-desc">11 practice problems on types of data, sampling methods, measures of central tendency and variation. Problems E1.1 to E1.11.</p>
+    </div>
+  </header>
+<div class="cheat-sheet">
+  <div class="cs-head">Key Formulas · Descriptive Statistics</div>
+  <div class="cs-body">
+    <div class="cs-row"><strong>Direct mean:</strong> \(\bar{x} = \dfrac{\sum x}{n}\)</div>
+    <div class="cs-row"><strong>Step-deviation mean:</strong> \(\bar{x} = A + \dfrac{\sum d_i}{n},\quad d_i = x_i - A\)</div>
+    <div class="cs-row"><strong>Sample variance:</strong> \(s^2 = \dfrac{\sum x^2 - (\sum x)^2/n}{n-1}\)</div>
+    <div class="cs-row"><strong>Standard deviation:</strong> \(s = \sqrt{s^2}\)</div>
+    <div class="cs-row"><strong>Coefficient of Variation:</strong> \(\text{CV} = \dfrac{s}{\bar{x}} \times 100\%\)</div>
+    <div class="cs-row"><strong>Harmonic Mean:</strong> \(\text{HM} = \dfrac{n}{\sum(1/x_i)}\) &nbsp; (use for equal-distance speeds)</div>
+    <div class="cs-row"><strong>Geometric Mean (growth rates):</strong> \(\text{GM} = \left[(1+r_1)(1+r_2)\cdots(1+r_n)\right]^{1/n} - 1\) &nbsp; (use for compounding returns; handles negative rates)</div>
+    <div class="cs-row"><strong>Symmetric distribution:</strong> Mean = Median = Mode</div>
+    <div class="cs-row"><strong>Right skewed:</strong> Mode &lt; Median &lt; Mean</div>
+    <div class="cs-row"><strong>Left skewed:</strong> Mean &lt; Median &lt; Mode</div>
+    <div class="cs-row"><strong>Decision rule:</strong> Smaller CV = more consistent = better instrument / process</div>
+  </div>
+</div>
+<div class="prob-card" id="E1.1">
+  <div class="prob-head">
+    <span class="prob-num">E1.1</span>
+    <span class="prob-title">Types of data according to the collection procedure</span>
+  </div>
+  <div class="prob-body"><p>Explain the types of data according to the types of collection procedure, using a practical example for each type.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E1_1')">Show Solution</button>
+  </div>
+  <div class="solution" id="E1_1"><div class="sol-label">Solution</div>
+<p>According to how data are collected, data fall into two types.</p>
+<p><strong>1. Primary data</strong> · collected by the investigator directly from the source, for the first time, for the specific purpose of the present enquiry. Collection is costly but the data are more accurate and relevant.</p>
+<p><em>EEE example:</em> a student measures output voltage of a multimeter at five current settings in his own Ohm's law lab · he generates those readings himself, so they are primary data. Other EEE examples: strain gauge readings from a materials lab, current and voltage data logged from a circuit under test.<br><em>CSE example:</em> a programmer runs a sorting algorithm on 20 different input files and records the execution time for each run directly from their own machine · those timing measurements are primary data. Other CSE examples: response times measured by running a custom benchmark on a new CPU, or user-survey data collected by the student themselves.</p>
+<p><strong>2. Secondary data</strong> · data collected by somebody else, for some other purpose, and reused by the present investigator. Cheap and immediately available, but the investigator cannot control the definitions or quality.</p>
+<p><em>EEE example:</em> the 1999 city population figures taken from a world population database to study ozone concentration; annual road accident records published by BRTA; a manufacturer's failure rate tables for a device.<br><em>CSE example:</em> benchmark results downloaded from the SPEC CPU suite published by a third party; a public dataset from Kaggle used to train a machine learning model; GitHub repository statistics pulled via API · all collected by someone else for a different purpose.</p>
+<div class="ans-box">Key point: the same figure can be primary for the original collector and secondary for any later user.</div></div>
+</div>
+<div class="prob-card" id="E1.2">
+  <div class="prob-head">
+    <span class="prob-num">E1.2</span>
+    <span class="prob-title">Quota sampling</span>
+  </div>
+  <div class="prob-body"><p>Discuss the method of quota sampling with a practical example.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E1_2')">Show Solution</button>
+  </div>
+  <div class="solution" id="E1_2"><div class="sol-label">Solution</div>
+<p><strong>Quota sampling</strong> is a non probability sampling method. The population is divided into mutually exclusive groups. A fixed quota · usually proportional to each group's size · is decided in advance. The interviewer then fills each quota by selecting whichever units are convenient; there is no random selection at the last stage.</p>
+<p><strong>Steps:</strong> (i) Choose control characteristics and divide the population. (ii) Fix the quota for each group. (iii) Field workers select units until each quota is complete.</p>
+<p><strong>Practical example.</strong> A company wants the opinion of 200 AUST students on a new mobile app. The student body is 60% engineering, 25% business, 15% others, so the quotas are 120, 50 and 30. The interviewer stands at the campus gate and interviews any 120 engineering students, any 50 business students and any 30 others who pass by.</p>
+<p><strong>Merits:</strong> fast, cheap, no sampling frame needed, guarantees group representation. <strong>Demerits:</strong> not random at the last stage, so interviewer bias enters; no valid confidence interval can be attached to the result.</p></div>
+</div>
+<div class="prob-card" id="E1.3">
+  <div class="prob-head">
+    <span class="prob-num">E1.3</span>
+    <span class="prob-title">Shape of a distribution and relative positions of mean, median and mode</span>
+  </div>
+  <div class="prob-body"><p>Discuss the shape of the distribution of any assumed population data regarding the relative positions of the arithmetic mean, median and mode.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E1_3')">Show Solution</button>
+  </div>
+  <div class="solution" id="E1_3"><div class="sol-label">Solution</div>
+<p>The three averages sit in a fixed order that reveals the shape of the distribution.</p>
+<p><strong>(i) Symmetric:</strong> \(\text{Mean} = \text{Median} = \text{Mode}\). Example: resistance values from a well controlled machine.</p>
+<p><strong>(ii) Positively skewed (right skewed):</strong> \(\text{Mode} &lt; \text{Median} &lt; \text{Mean}\). A few large values pull the mean right. Example: repair times, incomes, waiting times.</p>
+<p><strong>(iii) Negatively skewed (left skewed):</strong> \(\text{Mean} &lt; \text{Median} &lt; \text{Mode}\). A few very small values pull the mean left. Example: lifetime of a well designed component.</p>
+<p><strong>Empirical rule:</strong> \(\text{Mean} - \text{Mode} \approx 3(\text{Mean} - \text{Median})\). This is the basis of Pearson's coefficient of skewness \(S_k = (\bar{x} - \text{Mode})/s\).</p></div>
+</div>
+<div class="prob-card" id="E1.4">
+  <div class="prob-head">
+    <span class="prob-num">E1.4</span>
+    <span class="prob-title">How measures of variation help in engineering</span>
+  </div>
+  <div class="prob-body"><p>Explain, with a practical example, how measures of variation help us in the field of engineering, and in particular how they help us select the better of two instruments in the lab.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E1_4')">Show Solution</button>
+  </div>
+  <div class="solution" id="E1_4"><div class="sol-label">Solution</div>
+<p>An average alone hides the risk. Two instruments can have the same mean and still behave completely differently · it is the variation that decides which is acceptable.</p>
+<p><strong>Why variation matters:</strong> (1) Precision: a smaller \(s\) means readings cluster close to the mean. (2) Quality control: control limits are built from \(\sigma\), not \(\bar{x}\). (3) Unit free comparison: \(\text{CV} = (s/\bar{x})\times100\%\) compares instruments on different scales. (4) Risk: in reliability, the spread of the lifetime distribution decides the warranty period.</p>
+<p><strong>EEE example.</strong> Two multimeters checked at the same input: Meter 1 \(\bar{x}=2.975\) V, \(s=0.25\) V, CV = 8.40%; Meter 2 \(\bar{x}=2.925\) V, \(s=0.15\) V, CV = 5.13%. Both read almost the same average, but Meter 2 scatters only about half as much. Without the measure of variation, the two meters would look identical.</p><p><strong>CSE example.</strong> Two sorting algorithms are timed on the same 10 input files. Algorithm A: \(\bar{x}=120\) ms, \(s=18\) ms, CV = 15%. Algorithm B: \(\bar{x}=130\) ms, \(s=10.4\) ms, CV = 8%. Algorithm A is faster on average, but Algorithm B is more consistent. For a real-time system where worst-case performance matters, Algorithm B is preferable · a judgment that is impossible without the measure of variation.</p>
+<div class="ans-box">Meter 2 is the better instrument (lower CV = more consistent).</div></div>
+</div>
+<div class="prob-card" id="E1.5">
+  <div class="prob-head">
+    <span class="prob-num">E1.5</span>
+    <span class="prob-title">Mean processing time of a CPU by two different methods</span>
+  </div>
+  <div class="prob-body"><p>A computer hardware company measures the CPU processing time (in milliseconds) for executing a set of tasks under heavy load. The data are:</p>
+<p style="text-align:center;font-weight:600;margin:10px 0">32, 45, 38, 40, 47, 42, 36, 50, 43, 39</p>
+<p>Calculate the mean processing time by an appropriate method. Also use another method, different from the first, and compare the two results.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E1_5')">Show Solution</button>
+  </div>
+  <div class="solution" id="E1_5"><div class="sol-label">Solution</div>
+<p><strong>Method 1 · Direct method.</strong></p>
+<p>\(\displaystyle\bar{x} = \frac{\sum x}{n} = \frac{32+45+38+40+47+42+36+50+43+39}{10} = \frac{412}{10} = 41.2 \text{ ms}\)</p>
+<p><strong>Method 2 · Step deviation method.</strong> Take assumed mean \(A = 40\), \(d_i = x_i - A\):</p>
+<table><tr><th>\(x_i\)</th><td>32</td><td>45</td><td>38</td><td>40</td><td>47</td><td>42</td><td>36</td><td>50</td><td>43</td><td>39</td></tr>
+<tr><th>\(d_i\)</th><td>&minus;8</td><td>5</td><td>&minus;2</td><td>0</td><td>7</td><td>2</td><td>&minus;4</td><td>10</td><td>3</td><td>&minus;1</td></tr></table>
+<p>\(\sum d_i = 12\), so \(\bar{x} = 40 + 12/10 = 41.2\text{ ms}\)</p>
+<p>Both methods give exactly 41.2 ms. The step deviation method is algebraically identical; its advantage is that the deviations are smaller numbers, reducing arithmetic errors.</p>
+<div class="ans-box">Mean CPU processing time = 41.2 ms (both methods agree)</div></div>
+</div>
+<div class="prob-card" id="E1.6">
+  <div class="prob-head">
+    <span class="prob-num">E1.6</span>
+    <span class="prob-title">Which server configuration is more consistent?</span>
+  </div>
+  <div class="prob-body"><p>Configuration A: mean response time 125 ms, standard deviation 10 ms. Configuration B: mean response time 130 ms, standard deviation 12 ms.</p>
+<p>(i) Calculate the coefficient of variation for both. &nbsp; (ii) Decide which is more consistent and justify.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E1_6')">Show Solution</button>
+  </div>
+  <div class="solution" id="E1_6"><div class="sol-label">Solution</div>
+<p>Since the means differ, use the <strong>coefficient of variation</strong>: \(\text{CV} = \dfrac{s}{\bar{x}}\times 100\%\)</p>
+<p>(i) \(\text{CV}_A = \dfrac{10}{125}\times100 = 8.00\%\) &nbsp;&nbsp; \(\text{CV}_B = \dfrac{12}{130}\times100 = 9.23\%\)</p>
+<p>(ii) Consistency means small relative variation. Since \(\text{CV}_A = 8.00\% &lt; \text{CV}_B = 9.23\%\), Configuration A is more consistent. Configuration A also has the smaller mean (125 ms vs 130 ms), so it is better on both counts.</p>
+<div class="ans-box">Configuration A is more consistent: CV = 8.00% vs 9.23%.</div></div>
+</div>
+<div class="prob-card" id="E1.7">
+  <div class="prob-head">
+    <span class="prob-num">E1.7</span>
+    <span class="prob-title">Choosing the better multimeter · four readings each</span>
+  </div>
+  <div class="prob-body"><p>An Ohm's law experiment is run with two multimeters, each at the same input current levels. Apply the proper statistical method to choose the better multimeter.</p>
+<table><tr><th>Multimeter</th><th colspan="4">Output Voltage (V)</th></tr>
+<tr><td>Meter 1</td><td>2.7</td><td>3.0</td><td>2.9</td><td>3.3</td></tr>
+<tr><td>Meter 2</td><td>2.8</td><td>3.1</td><td>2.8</td><td>3.0</td></tr></table></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E1_7')">Show Solution</button>
+  </div>
+  <div class="solution" id="E1_7"><div class="sol-label">Solution · Coefficient of Variation</div>
+<p>The two meters have different means, so use CV for a unit free comparison.</p>
+<p><strong>Meter 1:</strong> \(n=4\), \(\sum x=11.9\), \(\bar{x}_1=2.975\) V, \(\sum x^2=35.59\)</p>
+<p>\(s_1=\sqrt{(35.59-11.9^2/4)/3}=\sqrt{0.1875/3}=0.25\text{ V}\), \(\;\text{CV}_1=0.25/2.975\times100=8.40\%\)</p>
+<p><strong>Meter 2:</strong> \(n=4\), \(\sum x=11.7\), \(\bar{x}_2=2.925\) V, \(\sum x^2=34.29\)</p>
+<p>\(s_2=\sqrt{(34.29-11.7^2/4)/3}=\sqrt{0.0675/3}=0.15\text{ V}\), \(\;\text{CV}_2=0.15/2.925\times100=5.13\%\)</p>
+<div class="ans-box">CV₂ = 5.13% &lt; CV₁ = 8.40% → Multimeter 2 is the better (more consistent) instrument.</div></div>
+</div>
+<div class="prob-card" id="E1.8">
+  <div class="prob-head">
+    <span class="prob-num">E1.8</span>
+    <span class="prob-title">Choosing the better multimeter · five readings each</span>
+  </div>
+  <div class="prob-body"><p>Same experiment as E1.7, with one additional reading from each meter:</p>
+<table><tr><th>Multimeter</th><th colspan="5">Output Voltage (V)</th></tr>
+<tr><td>Meter 1</td><td>2.7</td><td>3.0</td><td>2.9</td><td>3.3</td><td>3.5</td></tr>
+<tr><td>Meter 2</td><td>2.8</td><td>3.1</td><td>2.8</td><td>3.0</td><td>3.2</td></tr></table></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E1_8')">Show Solution</button>
+  </div>
+  <div class="solution" id="E1_8"><div class="sol-label">Solution</div>
+<p><strong>Meter 1:</strong> \(\sum x=15.4\), \(\bar{x}_1=3.08\), \(\sum x^2=47.84\)</p>
+<p>\(s_1=\sqrt{(47.84-15.4^2/5)/4}=\sqrt{0.408/4}=0.3194\text{ V}\), \(\;\text{CV}_1=10.37\%\)</p>
+<p><strong>Meter 2:</strong> \(\sum x=14.9\), \(\bar{x}_2=2.98\), \(\sum x^2=44.53\)</p>
+<p>\(s_2=\sqrt{(44.53-14.9^2/5)/4}=\sqrt{0.128/4}=0.1789\text{ V}\), \(\;\text{CV}_2=6.00\%\)</p>
+<p>Adding the fifth reading increased both CVs slightly but did not change the ranking.</p>
+<div class="ans-box">CV₂ = 6.00% &lt; CV₁ = 10.37% → Multimeter 2 is again the better instrument.</div></div>
+</div>
+<div class="prob-card" id="E1.9">
+  <div class="prob-head">
+    <span class="prob-num">E1.9</span>
+    <span class="prob-title">Comparing two multimeters over a wide range of input currents</span>
+  </div>
+  <div class="prob-body"><p>The output voltages at the same input currents are:</p>
+<table><tr><th>I (amp)</th><td>0.5</td><td>0.7</td><td>1</td><td>3</td><td>5</td></tr>
+<tr><th>Meter 1 (V)</th><td>2.5</td><td>3.5</td><td>9</td><td>15</td><td>23</td></tr>
+<tr><th>Meter 2 (V)</th><td>2.4</td><td>3.2</td><td>9</td><td>15</td><td>22</td></tr></table>
+<p>Apply a suitable statistical method to decide which meter is better.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E1_9')">Show Solution</button>
+  </div>
+  <div class="solution" id="E1_9"><div class="sol-label">Solution</div>
+<p><strong>Meter 1:</strong> \(\sum x=53\), \(\bar{x}_1=10.6\), \(\sum x^2=853.5\)</p>
+<p>\(s_1=\sqrt{(853.5-53^2/5)/4}=\sqrt{291.7/4}=8.540\text{ V}\), \(\;\text{CV}_1=80.56\%\)</p>
+<p><strong>Meter 2:</strong> \(\sum x=51.6\), \(\bar{x}_2=10.32\), \(\sum x^2=806.0\)</p>
+<p>\(s_2=\sqrt{(806.0-51.6^2/5)/4}=\sqrt{273.49/4}=8.269\text{ V}\), \(\;\text{CV}_2=80.12\%\)</p>
+<p><strong>Important caution:</strong> both CVs are ~80% because the current was deliberately varied from 0.5 A to 5 A · most variation is genuine signal, not instrument noise. The CVs are nearly equal and the ranking is marginal.</p>
+<div class="ans-box">CV₂ = 80.12% &lt; CV₁ = 80.56% → Multimeter 2 is marginally more consistent.</div></div>
+</div>
+<div class="prob-card" id="E1.10">
+  <div class="prob-head">
+    <span class="prob-num">E1.10</span>
+    <span class="prob-title">Percentage variation of concrete density</span>
+  </div>
+  <div class="prob-body"><p>The recorded densities (kg/m³) of a type of concrete under varying moisture conditions are:</p>
+<p style="text-align:center;font-weight:600;margin:10px 0">2400, 2425, 2430, 2410, 2385</p>
+<p>Find the percentage of variation of the densities and discuss the finding.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E1_10')">Show Solution</button>
+  </div>
+  <div class="solution" id="E1_10"><div class="sol-label">Solution</div>
+<p>\(\sum x=12050\), \(n=5\), \(\bar{x}=12050/5=2410\text{ kg/m}^3\)</p>
+<p>\(\sum x^2=29{,}041{,}850\), \(\quad \sum x^2 - (\sum x)^2/n = 29{,}041{,}850 - 12050^2/5 = 1350\)</p>
+<p>\(s=\sqrt{1350/4}=\sqrt{337.5}=18.37\text{ kg/m}^3\)</p>
+<p>\(\text{CV}=18.37/2410\times100=0.76\%\)</p>
+<p><strong>Discussion:</strong> A CV below 1% is extremely small. The density is almost unaffected by moisture variation · readings deviate from the mean by less than 1%. For a construction material this is very desirable: the mix is homogeneous, and design values based on 2410 kg/m³ can be used with confidence.</p>
+<div class="ans-box">CV = 0.76% · extremely low; concrete density is very consistent.</div></div>
+</div>
+<div class="prob-card" id="E1.11">
+  <div class="prob-head">
+    <span class="prob-num">E1.11</span>
+    <span class="prob-title">Average speed over four routes of equal distance</span>
+  </div>
+  <div class="prob-body"><p>You rode a bike at 55.5, 83, 77, and 89.5 km/hr through four routes of <em>equal distance</em>. Choose the best average, give the reason, and find the result.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E1_11')">Show Solution</button>
+  </div>
+  <div class="solution" id="E1_11"><div class="sol-label">Solution</div>
+<p><strong>Choice: Harmonic Mean.</strong> Speed is distance/time. When a rate is averaged over a constant numerator (equal distances), the harmonic mean gives the correct result · total distance / total time. The arithmetic mean is correct only for equal times, which is not the case here.</p>
+<p>\(\dfrac{1}{55.5}=0.018018,\quad \dfrac{1}{83}=0.012048,\quad \dfrac{1}{77}=0.012987,\quad \dfrac{1}{89.5}=0.011173\)</p>
+<p>\(\sum(1/x_i)=0.054226\)</p>
+<p>\(\text{HM}=\dfrac{n}{\sum(1/x_i)}=\dfrac{4}{0.054226}=73.76\text{ km/hr}\)</p>
+<p>The arithmetic mean (76.25 km/hr) overstates the true average speed by about 2.5 km/hr.</p>
+<div class="ans-box">Average speed = 73.76 km/hr (Harmonic Mean)</div></div>
+</div>
+<div class="prob-card" id="E1.12">
+  <div class="prob-head">
+    <span class="prob-num">E1.12</span>
+    <span class="prob-title">Mean rate of return · SHELL group investment</span>
+  </div>
+  <div class="prob-body"><p>SHELL group had an investment which produced returns of 22, 30, &minus;15 and 8 percent in four successive years. Choose the best option for finding the mean rate of return, give the reason for your choice, and then find the mean return.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E1_12')">Show Solution</button>
+  </div>
+  <div class="solution" id="E1_12"><div class="sol-label">Solution</div>
+<p><strong>Choice: Geometric Mean.</strong> Rates of return compound multiplicatively · each year's ending value equals the starting value multiplied by \((1+r)\). The arithmetic mean ignores compounding and overstates the true average growth. The harmonic mean applies when a constant numerator is divided by varying rates (e.g. equal distances at different speeds) · not the situation here. Since one return is negative (\(-15\%\)), the standard GM formula (direct product of raw percentages) cannot be used; we apply the modified form with \((1+r)\) factors instead.</p>
+<p><strong>Formula:</strong> \[\text{GM} = \left[(1+r_1)(1+r_2)(1+r_3)(1+r_4)\right]^{1/4} - 1\]</p>
+<p><strong>Calculation:</strong></p>
+<p>\[(1.22)\times(1.30)\times(0.85)\times(1.08) = 1.4559\]</p>
+<p>\[\text{GM} = (1.4559)^{1/4} - 1 = 1.0985 - 1 = 0.0985\]</p>
+<div class="ans-box">Mean rate of return = 9.85% (Geometric Mean)</div></div>
+</div>
+<div class="prob-card" id="E1.13">
+  <div class="prob-head">
+    <span class="prob-num">E1.13</span>
+    <span class="prob-title">Geometric mean and graphical median for grouped windmill data</span>
+  </div>
+  <div class="prob-body"><p>Windmills in a power project field were tested over a certain week. Compute the mean power production using the geometric mean, and estimate the median using the graphical method.</p>
+<table style="table-layout:fixed"><tr><th style="width:30%">Power (KWh)</th><th style="width:14%">1–3</th><th style="width:14%">3–5</th><th style="width:14%">5–7</th><th style="width:14%">7–9</th><th style="width:14%">9–11</th></tr>
+<tr><td>No. of windmills</td><td>4</td><td>9</td><td>10</td><td>3</td><td>1</td></tr></table></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E1_13')">Show Solution</button>
+  </div>
+  <div class="solution" id="E1_13"><div class="sol-label">Solution</div>
+<p><strong>Part 1 · Geometric Mean (grouped data).</strong> Take midpoints \(x\) for each class, compute \(f\cdot\log_{10}x\), sum, and divide by \(n\).</p>
+<table>
+<tr><th>Class</th><th>Midpoint \(x\)</th><th>\(f\)</th><th>\(\log_{10}x\)</th><th>\(f\cdot\log_{10}x\)</th></tr>
+<tr><td>1–3</td><td>2</td><td>4</td><td>0.3010</td><td>1.2040</td></tr>
+<tr><td>3–5</td><td>4</td><td>9</td><td>0.6021</td><td>5.4189</td></tr>
+<tr><td>5–7</td><td>6</td><td>10</td><td>0.7782</td><td>7.7820</td></tr>
+<tr><td>7–9</td><td>8</td><td>3</td><td>0.9031</td><td>2.7093</td></tr>
+<tr><td>9–11</td><td>10</td><td>1</td><td>1.0000</td><td>1.0000</td></tr>
+<tr><th>Total</th><th></th><th>27</th><th></th><th>18.1142</th></tr>
+</table>
+<p>\[\log(\text{GM})=\frac{\sum f\cdot\log x}{n}=\frac{18.1142}{27}=0.6709\]</p>
+<p>\[\text{GM}=10^{0.6709}=4.69\text{ KWh}\]</p>
+<p><strong>Part 2 · Graphical Median (Ogive method).</strong> Build the less-than cumulative frequency table and draw a smooth ogive curve. Read off the value on the x-axis at cumulative frequency \(n/2=13.5\).</p>
+<table>
+<tr><th>Less than</th><th>Cumulative \(f\)</th></tr>
+<tr><td>3</td><td>4</td></tr>
+<tr><td>5</td><td>13</td></tr>
+<tr><td>7</td><td>23</td></tr>
+<tr><td>9</td><td>26</td></tr>
+<tr><td>11</td><td>27</td></tr>
+</table>
+<p>The 13.5th value falls in the class [5, 7). Using the interpolation formula to verify the graphical reading:</p>
+<p>\[\text{Median}=5+\frac{13.5-13}{10}\times2=5+0.1=5.1\text{ KWh}\]</p>
+<div class="ans-box">GM = 4.69 KWh &nbsp;|&nbsp; Graphical Median = 5.1 KWh</div></div>
+</div>
+
+<div class="prob-card" id="E1.14">
+  <div class="prob-head">
+    <span class="prob-num">E1.14</span>
+    <span class="prob-title">Frequency table and histogram for National Bank account balances</span>
+  </div>
+  <div class="prob-body"><p>National Bank selected a sample of 30 student checking accounts. End-of-month balances (hundred tk.): 404, 74, 234, 149, 279, 215, 123, 55, 43, 321, 87, 234, 68, 489, 57, 185, 141, 758, 72, 863, 703, 125, 350, 440, 37, 252, 27, 521, 302, 127. Represent the data through a proper tabulation method and describe a histogram from your table.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E1_14')">Show Solution</button>
+  </div>
+  <div class="solution" id="E1_14"><div class="sol-label">Solution</div>
+<p><strong>Step 1 · Determine number of classes.</strong> Sturges' rule: \(k=1+3.322\log_{10}(30)=1+4.91\approx 6\) classes. Range \(=863-27=836\). Class width \(=836/6\approx139\); round up to <strong>150</strong>.</p>
+<p><strong>Step 2 · Frequency table.</strong></p>
+<table>
+<tr><th>Class (hundred tk.)</th><th>Tally</th><th>Frequency</th><th>Relative freq. (%)</th></tr>
+<tr><td>0 · 149</td><td>|||| |||| ||||</td><td>14</td><td>46.67</td></tr>
+<tr><td>150 · 299</td><td>|||| |</td><td>6</td><td>20.00</td></tr>
+<tr><td>300 · 449</td><td>||||</td><td>5</td><td>16.67</td></tr>
+<tr><td>450 · 599</td><td>||</td><td>2</td><td>6.67</td></tr>
+<tr><td>600 · 749</td><td>|</td><td>1</td><td>3.33</td></tr>
+<tr><td>750 · 899</td><td>||</td><td>2</td><td>6.67</td></tr>
+<tr><th>Total</th><th></th><th>30</th><th>100.00</th></tr>
+</table>
+<p><strong>Step 3 · Histogram description.</strong> Draw 6 adjacent vertical bars (no gaps) with class boundaries on the x-axis and frequency on the y-axis. The tallest bar (height 14) is at [0, 150), showing most students keep low balances. Bars decrease sharply for higher balance classes, indicating a strong right-skewed distribution. The long right tail (up to 863) is caused by a few high-balance accounts.</p>
+<div class="ans-box">Distribution is strongly right skewed · most balances fall below 150 hundred tk. · class width = 150, 6 classes by Sturges' rule.</div></div>
+</div>
+
+<div class="prob-card" id="E1.15">
+  <div class="prob-head">
+    <span class="prob-num">E1.15</span>
+    <span class="prob-title">Stratified random sampling · method and practical example</span>
+  </div>
+  <div class="prob-body"><p>Discuss the stratified random sampling method with a practical example.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E1_15')">Show Solution</button>
+  </div>
+  <div class="solution" id="E1_15"><div class="sol-label">Solution</div>
+<p><strong>Definition.</strong> The population is first divided into non-overlapping, homogeneous subgroups called <em>strata</em>. A random sample (simple or systematic) is then drawn independently from every stratum. Observations within a stratum are similar to each other; observations across strata are different.</p>
+<p><strong>Procedure.</strong> (1) Identify a stratifying variable (department, gender, region, grade). (2) List every member of each stratum as a sampling frame. (3) Decide the sample size per stratum · proportional allocation: \(n_i = n \times N_i/N\). (4) Draw a random sample of size \(n_i\) from stratum \(i\). (5) Combine all sub-samples.</p>
+<p><strong>EEE example.</strong> A quality engineer surveys 100 out of 500 electronic components from three production shifts (Morning: 200, Afternoon: 200, Night: 100). Proportional allocation: Morning 40, Afternoon 40, Night 20. Random samples are drawn from each shift's output independently, ensuring all shifts are represented.</p>
+<p><strong>CSE example.</strong> A software QA team tests 60 modules from a codebase split into three layers (UI: 150 modules, Backend: 250, Database: 100). Proportional allocation: UI 18, Backend 30, Database 12. Random samples from each layer guarantee all architectural tiers are covered.</p>
+<p><strong>Advantage:</strong> guarantees representation from every stratum; reduces sampling error compared to simple random sampling when strata differ meaningfully.</p>
+<div class="ans-box">Stratified sampling = divide into homogeneous strata, random sample from each. Guarantees representation of all subgroups.</div></div>
+</div>
+
+<div class="prob-card" id="E1.16">
+  <div class="prob-head">
+    <span class="prob-num">E1.16</span>
+    <span class="prob-title">Cluster sampling · method, example, and difference from stratified</span>
+  </div>
+  <div class="prob-body"><p>Explain the method of cluster sampling with an example, and state its key difference from stratified random sampling.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E1_16')">Show Solution</button>
+  </div>
+  <div class="solution" id="E1_16"><div class="sol-label">Solution</div>
+<p><strong>Definition.</strong> The population is divided into naturally occurring groups called <em>clusters</em> (e.g. city blocks, school classes, factory batches). A random sample of clusters is selected; then <em>all</em> members of the chosen clusters are surveyed.</p>
+<p><strong>Procedure.</strong> (1) Identify natural groupings (clusters). (2) Randomly select \(k\) clusters. (3) Collect data from every unit in those \(k\) clusters.</p>
+<p><strong>EEE example.</strong> An engineer must inspect circuit boards produced in 50 daily batches. Randomly selecting 8 batches and inspecting every board in those 8 batches is cluster sampling · far cheaper than inspecting selected boards from every batch.</p>
+<p><strong>CSE example.</strong> A researcher studying server logs selects 5 data centers at random from 30 and downloads all logs from those 5 centers. Each data center is a cluster containing all the servers and logs for that site.</p>
+<p><strong>Key difference from stratified sampling:</strong></p>
+<table>
+<tr><th>Feature</th><th>Stratified</th><th>Cluster</th></tr>
+<tr><td>Internal composition</td><td>Homogeneous within strata</td><td>Heterogeneous within clusters</td></tr>
+<tr><td>Who is sampled</td><td>Selected units from <em>every</em> stratum</td><td><em>All</em> units from selected clusters only</td></tr>
+<tr><td>Purpose</td><td>Precision · represent all subgroups</td><td>Cost efficiency · reduce travel/access cost</td></tr>
+<tr><td>Missing groups</td><td>No stratum is omitted</td><td>Unselected clusters are entirely ignored</td></tr>
+</table>
+<div class="ans-box">Cluster: randomly choose groups, survey everyone inside. Stratified: divide into groups, randomly pick from each. Strata = homogeneous; clusters = heterogeneous.</div></div>
+</div>
+
+<div class="prob-card" id="E1.17">
+  <div class="prob-head">
+    <span class="prob-num">E1.17</span>
+    <span class="prob-title">Simple random sampling · method and difference from stratified</span>
+  </div>
+  <div class="prob-body"><p>Discuss the method of simple random sampling with an example. Also explain the basic difference between stratified and simple random sampling.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E1_17')">Show Solution</button>
+  </div>
+  <div class="solution" id="E1_17"><div class="sol-label">Solution</div>
+<p><strong>Definition.</strong> Every member of the population has an equal and independent probability of being selected. No sub-grouping is made. The sample is drawn by lottery, random number tables, or a random number generator.</p>
+<p><strong>Procedure.</strong> (1) List every population member and assign a unique number. (2) Use a random number table or software to select \(n\) distinct numbers. (3) Include the corresponding members in the sample.</p>
+<p><strong>EEE example.</strong> A factory produces 800 resistors per day. An engineer numbers them 001·800 and uses a random number generator to pick 40 for quality testing · each resistor has the same 40/800 = 5% chance of selection.</p>
+<p><strong>CSE example.</strong> A database holds 5000 user accounts. A developer randomly selects 200 account IDs using a computer-generated list to test a new search feature · each account is equally likely to be chosen, so the sample is unbiased.</p>
+<p><strong>Difference between simple random and stratified sampling:</strong></p>
+<table>
+<tr><th>Feature</th><th>Simple Random Sampling</th><th>Stratified Sampling</th></tr>
+<tr><td>Grouping</td><td>No prior grouping</td><td>Population divided into strata first</td></tr>
+<tr><td>Representation</td><td>Subgroups may be under or over represented by chance</td><td>Every stratum is guaranteed a fixed representation</td></tr>
+<tr><td>Precision</td><td>Lower precision when population is heterogeneous</td><td>Higher precision for heterogeneous populations</td></tr>
+<tr><td>Complexity</td><td>Simple to execute</td><td>Requires knowledge of the population structure</td></tr>
+<tr><td>Best for</td><td>Homogeneous populations or when no grouping is known</td><td>Populations with clearly defined, distinct subgroups</td></tr>
+</table>
+<div class="ans-box">SRS: every member equally likely; no structure assumed. Stratified: sub-populations defined first; each is sampled separately · better precision for heterogeneous populations.</div></div>
+</div>
+
+</div>
+<script>
+function toggleSolution(btn,id){
+  var s=document.getElementById(id);
+  s.classList.toggle('show');
+  btn.classList.toggle('shown');
+  btn.textContent=s.classList.contains('show')?'Hide Solution':'Show Solution';
+}
+</script>
+</body>
+</html>

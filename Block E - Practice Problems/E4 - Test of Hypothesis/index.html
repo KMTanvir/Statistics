@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>E4 · Test of Hypothesis | Block E</title>
+<script>
+MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+  options:{skipHtmlTags:['script','noscript','style','textarea','pre']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;
+  --primary:#2563eb;--accent:#4f46e5;--success:#059669;
+  --border:#e2e8f0;--radius:14px;--radius-sm:10px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.08);
+}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:var(--bg);
+  color:var(--text);line-height:1.65;min-height:100vh;-webkit-font-smoothing:antialiased}
+.app{max-width:900px;margin:0 auto;padding:24px 18px 80px}
+.topbar{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.back-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);
+  color:var(--primary);font-size:.9rem;font-weight:600;text-decoration:none;
+  box-shadow:var(--shadow);transition:.15s}
+.back-btn:hover{background:var(--primary);color:#fff}
+.page-header{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 60%,#7c3aed 100%);
+  color:#fff;padding:36px 32px;border-radius:var(--radius);margin-bottom:28px;
+  box-shadow:var(--shadow-lg);position:relative;overflow:hidden}
+.page-header::before{content:"";position:absolute;top:-40%;right:-8%;width:360px;height:360px;
+  background:radial-gradient(circle,rgba(255,255,255,.12),transparent 70%);border-radius:50%}
+.page-header-inner{position:relative;z-index:1}
+.ph-kicker{display:inline-block;background:rgba(255,255,255,.18);padding:5px 13px;
+  border-radius:999px;font-size:.75rem;font-weight:700;letter-spacing:.5px;
+  text-transform:uppercase;margin-bottom:12px}
+.ph-title{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;letter-spacing:-.03em;margin-bottom:8px}
+.ph-desc{font-size:.95rem;opacity:.88;max-width:540px;line-height:1.55}
+.section-title{font-size:1.05rem;font-weight:700;color:var(--primary);
+  margin:32px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--border)}
+.prob-card{background:var(--card);border-radius:var(--radius);
+  box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:14px;overflow:hidden}
+.prob-head{display:flex;align-items:flex-start;gap:14px;
+  padding:16px 20px 12px;border-bottom:1px solid var(--border)}
+.prob-num{flex-shrink:0;background:var(--primary);color:#fff;
+  font-size:.78rem;font-weight:700;padding:4px 10px;border-radius:6px;letter-spacing:.4px;margin-top:2px}
+.prob-title{font-size:.97rem;font-weight:700;color:var(--text)}
+.prob-body{padding:14px 20px}
+.prob-body p{margin-bottom:.8em;font-size:.93rem}
+.prob-body p:last-child{margin-bottom:0}
+.prob-body table,.solution table{border-collapse:collapse;width:100%;margin:10px 0;font-size:.88rem}
+.prob-body th,.prob-body td,.solution th,.solution td{border:1px solid var(--border);padding:6px 10px;text-align:center}
+.prob-body th,.solution th{background:#f1f5f9;font-weight:600}
+.prob-foot{padding:8px 20px 14px}
+.reveal-btn{border:1.5px solid var(--accent);color:var(--accent);background:transparent;
+  padding:7px 18px;border-radius:var(--radius-sm);font-size:.87rem;font-weight:600;
+  cursor:pointer;transition:.15s}
+.reveal-btn:hover,.reveal-btn.shown{background:var(--accent);color:#fff}
+.solution{display:none;border-top:1px solid var(--border);
+  padding:16px 20px;background:#f8fafc;font-size:.91rem}
+.solution.show{display:block}
+.solution p{margin-bottom:.75em}
+.solution p:last-child{margin-bottom:0}
+.sol-label{font-weight:700;color:var(--accent);margin-bottom:8px;font-size:.88rem;text-transform:uppercase;letter-spacing:.4px}
+.ans-box{background:var(--success);color:#fff;border-radius:8px;
+  padding:9px 15px;margin-top:12px;font-weight:600;font-size:.91rem}
+
+.cheat-sheet{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+  border:2px solid var(--primary);margin-bottom:24px;overflow:hidden}
+.cs-head{background:linear-gradient(90deg,var(--primary),var(--accent));color:#fff;
+  padding:12px 20px;font-weight:700;font-size:.92rem;letter-spacing:.3px}
+.cs-body{padding:14px 20px;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:4px 28px}
+.cs-row{font-size:.88rem;padding:5px 0;border-bottom:1px solid #f1f5f9;line-height:1.5}
+.cs-row:last-child{border-bottom:none}
+.cs-row strong{color:var(--primary)}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <a class="back-btn" href="../../index.html">&#8592; Back to Portal</a>
+  </div>
+  <header class="page-header">
+    <div class="page-header-inner">
+      <div class="ph-kicker">Block E · Section 4</div>
+      <h1 class="ph-title">E4 · Test of Hypothesis</h1>
+      <p class="ph-desc">11 practice problems covering one sample z and t tests, two sample tests, the F test for variance, and the chi square test of independence. Problems E4.1 to E4.11.</p>
+    </div>
+  </header>
+<div class="cheat-sheet">
+  <div class="cs-head">Key Formulas · Test of Hypothesis</div>
+  <div class="cs-body">
+    <div class="cs-row"><strong>One sample z:</strong> \(z=\dfrac{\bar{x}-\mu_0}{\sigma/\sqrt{n}}\) &nbsp; (use when \(\sigma\) known)</div>
+    <div class="cs-row"><strong>One sample t:</strong> \(t=\dfrac{\bar{x}-\mu_0}{s/\sqrt{n}}\), df \(=n-1\) &nbsp; (use when \(\sigma\) unknown)</div>
+    <div class="cs-row"><strong>Two sample z:</strong> \(z=\dfrac{\bar{x}_1-\bar{x}_2}{\sqrt{s_1^2/n_1+s_2^2/n_2}}\) &nbsp; (large samples)</div>
+    <div class="cs-row"><strong>Pooled variance:</strong> \(s_p^2=\dfrac{(n_1-1)s_1^2+(n_2-1)s_2^2}{n_1+n_2-2}\), df \(=n_1+n_2-2\)</div>
+    <div class="cs-row"><strong>Pooled t:</strong> \(t=\dfrac{\bar{x}_1-\bar{x}_2}{s_p\sqrt{1/n_1+1/n_2}}\)</div>
+    <div class="cs-row"><strong>F test (variances):</strong> \(F=s_1^2/s_2^2\), df \(=(n_1-1,\,n_2-1)\)</div>
+    <div class="cs-row"><strong>Chi-square:</strong> \(\chi^2=\sum\dfrac{(O-E)^2}{E}\), df \(=(r-1)(c-1)\), \(E_{ij}=R_iC_j/N\)</div>
+    <div class="cs-row"><strong>Tails:</strong> \(H_1:\mu\ne\mu_0\) two tailed; \(H_1:\mu\gt\mu_0\) right tailed; \(H_1:\mu\lt\mu_0\) left tailed</div>
+    <div class="cs-row"><strong>Decision:</strong> reject \(H_0\) if \(|t_\text{cal}|\gt t_\text{crit}\) (or \(p\lt\alpha\))</div>
+  </div>
+</div>
+<div class="prob-card" id="E4.1">
+  <div class="prob-head">
+    <span class="prob-num">E4.1</span>
+    <span class="prob-title">How hypothesis tests help engineering decision making</span>
+  </div>
+  <div class="prob-body"><p>Explain how hypothesis testing helps decision making in engineering, using a practical example involving an integrated circuit cutting machine.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E4_1')">Show Solution</button>
+  </div>
+  <div class="solution" id="E4_1"><div class="sol-label">Solution</div>
+<p>Engineering decisions are made under uncertainty. A hypothesis test provides a disciplined, transparent procedure for deciding whether the evidence from a sample is strong enough to overturn a default assumption about a process, machine, or population parameter.</p>
+<p><strong>The five step procedure:</strong> (1) State \(H_0\) (status quo) and \(H_1\) (what to detect). (2) Choose a risk level \(\alpha\). (3) Compute the test statistic from the sample. (4) Compare with the critical value. (5) Make the decision in the language of the engineering problem.</p>
+<p><strong>EEE example (IC machine):</strong> A machine cuts square chips to 6 mm. Sample of 8: \(\bar{x}=6.001\) mm, \(s=0.001\) mm. Test: \(H_0:\mu=6\) vs \(H_1:\mu\ne6\) at \(\alpha=0.05\). \(t=2.828\gt t_{0.025,7}=2.365\): reject \(H_0\) · the machine needs resetting. The decision is documented and defensible.</p><p><strong>CSE example (algorithm speed):</strong> A team claims a new caching strategy reduces mean page response time from 500 ms. They test 25 pages and find \(\bar{x}=480\) ms, \(s=40\) ms. One sample t test (\(H_0:\mu=500\), \(H_1:\mu\lt500\)) at \(\alpha=0.05\) gives \(t=(480-500)/(40/\sqrt{25})=-2.5\lt-t_{0.05,24}=-1.711\): reject \(H_0\). The caching strategy demonstrably reduces response time · an objective, documented result management can act on.</p></div>
+</div>
+<div class="prob-card" id="E4.2">
+  <div class="prob-head">
+    <span class="prob-num">E4.2</span>
+    <span class="prob-title">Formulating hypotheses for a new production method</span>
+  </div>
+  <div class="prob-body"><p>A company currently takes a mean of 220 seconds to assemble a component. A new method is expected to reduce assembly time. The new method will be adopted if a test at the 10% significance level supports it. Formulate the hypotheses and identify the test type.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E4_2')">Show Solution</button>
+  </div>
+  <div class="solution" id="E4_2"><div class="sol-label">Solution</div>
+<p>\(H_0: \mu \ge 220\text{ seconds}\) (new method is no better)</p>
+<p>\(H_1: \mu &lt; 220\text{ seconds}\) (new method is faster)</p>
+<p>This is a <strong>left tailed (one tailed) test</strong> at \(\alpha=0.10\). If the sample mean is significantly below 220, the test statistic falls in the left rejection region and the new method is adopted. The 10% significance level means we accept a 10% risk of switching to the new method even if it provides no real improvement.</p></div>
+</div>
+<div class="prob-card" id="E4.3">
+  <div class="prob-head">
+    <span class="prob-num">E4.3</span>
+    <span class="prob-title">One sample t test · TV picture tube brightness</span>
+  </div>
+  <div class="prob-body"><p>A design engineer claims a new TV picture tube needs on average more than 300 \(\mu\)A to reach required brightness. A sample of 10 tubes gives \(\bar{x}=317.2\;\mu\)A, \(s=15.7\;\mu\)A. Test at the 1% level.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E4_3')">Show Solution</button>
+  </div>
+  <div class="solution" id="E4_3"><div class="sol-label">Solution</div>
+<p>\(H_0:\mu=300\) vs \(H_1:\mu\gt300\) (right tailed). \(n=10\), df=9, \(t_{0.01,9}=2.821\).</p>
+<p>\[t = \frac{317.2-300}{15.7/\sqrt{10}} = \frac{17.2}{4.966} = 3.4644\]</p>
+<p>\(t_\text{cal}=3.4644\gt2.821\): reject \(H_0\) (\(p=0.0036\)).</p>
+<p><strong>Conclusion:</strong> strong evidence that the mean current exceeds 300 \(\mu\)A. The engineer's claim is supported even at the strict 1% risk level.</p>
+<div class="ans-box">Reject H₀. Mean current &gt; 300 μA is supported at α = 1%.</div></div>
+</div>
+<div class="prob-card" id="E4.4">
+  <div class="prob-head">
+    <span class="prob-num">E4.4</span>
+    <span class="prob-title">One sample t test · accuracy of an IC cutting machine</span>
+  </div>
+  <div class="prob-body"><p>An IC manufacturer installed a machine to cut square ICs of 6 mm. A random sample of 8 ICs has mean 6.001 mm and standard deviation 0.001 mm. Test whether the machine was installed properly.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E4_4')">Show Solution</button>
+  </div>
+  <div class="solution" id="E4_4"><div class="sol-label">Solution</div>
+<p>\(H_0:\mu=6\) vs \(H_1:\mu\ne6\) (two tailed). \(n=8\), df=7, \(t_{0.025,7}=2.365\).</p>
+<p>\[t=\frac{6.001-6.000}{0.001/\sqrt{8}}=\frac{0.001}{0.000354}=2.828\]</p>
+<p>\(|t|=2.828\gt2.365\): reject \(H_0\) at 5% (\(p=0.0255\)). The machine needs resetting.</p>
+<p><strong>Caveat:</strong> at \(\alpha=0.01\) (\(t_{0.005,7}=3.4995\)) the conclusion reverses. Also, the actual bias of 0.001 mm may be negligible in practice. Statistical significance \(\ne\) practical importance.</p>
+<div class="ans-box">Reject H₀ at α = 5%. Machine is not installed properly (check practical significance).</div></div>
+</div>
+<div class="prob-card" id="E4.5">
+  <div class="prob-head">
+    <span class="prob-num">E4.5</span>
+    <span class="prob-title">One sample z test · SSD response time</span>
+  </div>
+  <div class="prob-body"><p>A company claims its new SSD has a mean response time of 0.5 ms with a standard deviation of 0.08 ms. A sample of 40 SSDs gives \(\bar{x}=0.48\) ms. Test the claim at the 1% risk level.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E4_5')">Show Solution</button>
+  </div>
+  <div class="solution" id="E4_5"><div class="sol-label">Solution</div>
+<p>\(H_0:\mu=0.5\) vs \(H_1:\mu\ne0.5\) (two tailed). \(\sigma=0.08\) known, \(n=40\): z test. \(\pm z_{0.005}=\pm2.576\).</p>
+<p>\[z=\frac{0.48-0.50}{0.08/\sqrt{40}}=\frac{-0.02}{0.01265}=-1.5811\]</p>
+<p>\(|z|=1.581\lt2.576\): do not reject \(H_0\) (\(p=0.1138\)).</p>
+<p><strong>Conclusion:</strong> no significant evidence that the true mean differs from 0.5 ms. The company's claim is not contradicted. The shortfall of 0.02 ms is well within ordinary sampling variation for \(n=40\).</p>
+<div class="ans-box">Do not reject H₀. Company's claim of 0.5 ms is not contradicted at α = 1%.</div></div>
+</div>
+<div class="prob-card" id="E4.6">
+  <div class="prob-head">
+    <span class="prob-num">E4.6</span>
+    <span class="prob-title">One sample z test · energy consumption of vacuum cleaners</span>
+  </div>
+  <div class="prob-body"><p>A manufacturer claims a vacuum cleaner uses on average 46 KWH or less per year, with known variability 2.5 KWH. A sample of 20 homes shows mean 44.5 KWH. Decide whether the cleaners meet the claim at the commonly used risk level.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E4_6')">Show Solution</button>
+  </div>
+  <div class="solution" id="E4_6"><div class="sol-label">Solution</div>
+<p>\(H_0:\mu=46\) vs \(H_1:\mu\lt46\) (left tailed). \(\sigma=2.5\) known; at \(\alpha=0.05\): critical value \(-1.645\).</p>
+<p>\[z=\frac{44.5-46}{2.5/\sqrt{20}}=\frac{-1.5}{0.559}=-2.683\]</p>
+<p>\(z_\text{cal}=-2.683\lt-1.645\): reject \(H_0\) (\(p=0.0036\)).</p>
+<p><strong>Conclusion:</strong> mean consumption is significantly below 46 KWH. The cleaners comfortably meet the claim. The result holds even at \(\alpha=0.01\).</p>
+<div class="ans-box">Reject H₀. Cleaners meet the claim (consumption significantly below 46 KWH).</div></div>
+</div>
+<div class="prob-card" id="E4.7">
+  <div class="prob-head">
+    <span class="prob-num">E4.7</span>
+    <span class="prob-title">Two sample t test · assembling times of two working designs</span>
+  </div>
+  <div class="prob-body"><p>23 workers using Design A: mean 300 s, sd 12 s. 25 workers using Design B: mean 335 s, sd 15 s. Is there a significant difference at the 1% level?</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E4_7')">Show Solution</button>
+  </div>
+  <div class="solution" id="E4_7"><div class="sol-label">Solution</div>
+<p>\(H_0:\mu_1=\mu_2\) vs \(H_1:\mu_1\ne\mu_2\). Pooled t test, df\(=46\), \(t_{0.005,46}=2.687\).</p>
+<p>\[s_p^2=\frac{22(144)+24(225)}{46}=186.26,\quad s_p=13.648\]</p>
+<p>\[t=\frac{300-335}{13.648\sqrt{1/23+1/25}}=\frac{-35}{3.943}=-8.876\]</p>
+<p>\(|t|=8.876\gg2.687\): strongly reject \(H_0\). Design A is significantly faster, saving ~35 s per assembly.</p>
+<div class="ans-box">Reject H₀. Design A is significantly faster at α = 1%.</div></div>
+</div>
+<div class="prob-card" id="E4.8">
+  <div class="prob-head">
+    <span class="prob-num">E4.8</span>
+    <span class="prob-title">Two sample z test · lifetime of electronic chips from two brands</span>
+  </div>
+  <div class="prob-body"><p>Brand 1: \(n=50\), mean 850 h, sd 25 h. Brand 2: \(n=50\), mean 910 h, sd 29 h. Test whether Brand 1 produces longer lasting chips.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E4_8')">Show Solution</button>
+  </div>
+  <div class="solution" id="E4_8"><div class="sol-label">Solution</div>
+<p>\(H_0:\mu_1=\mu_2\) vs \(H_1:\mu_1\gt\mu_2\) (right tailed). Large samples: z test. At \(\alpha=0.05\): critical value \(+1.645\).</p>
+<p>\[\text{SE}=\sqrt{625/50+841/50}=5.415,\quad z=\frac{850-910}{5.415}=-11.08\]</p>
+<p>\(z_\text{cal}=-11.08\) is far from \(+1.645\): do not reject \(H_0\) in favour of \(H_1:\mu_1\gt\mu_2\). There is no evidence Brand 1 is better. On the contrary, Brand 2 is <em>highly significantly</em> better (two tailed \(|z|=11.08\gg1.96\)). Buy Brand 2.</p>
+<div class="ans-box">Do not reject H₀ (Brand 1 better). Brand 2 is significantly superior.</div></div>
+</div>
+<div class="prob-card" id="E4.9">
+  <div class="prob-head">
+    <span class="prob-num">E4.9</span>
+    <span class="prob-title">Two sample t test · strength of two types of copper wire</span>
+  </div>
+  <div class="prob-body"><p>5 samples of Wire Type 1: mean 52 lb, sd 12 lb. 9 samples of Wire Type 2: mean 60 lb, sd 8 lb. Is there a significant difference in strength at the 5% level?</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E4_9')">Show Solution</button>
+  </div>
+  <div class="solution" id="E4_9"><div class="sol-label">Solution</div>
+<p>\(H_0:\mu_1=\mu_2\) vs \(H_1:\mu_1\ne\mu_2\). Pooled t, df\(=12\), \(t_{0.025,12}=2.179\).</p>
+<p>\[s_p^2=\frac{4(144)+8(64)}{12}=90.667,\quad s_p=9.522\]</p>
+<p>\[t=\frac{52-60}{9.522\sqrt{1/5+1/9}}=\frac{-8}{5.311}=-1.506\]</p>
+<p>\(|t|=1.506\lt2.179\): do not reject \(H_0\). The 8 lb gap can be explained by chance with these small, variable samples. More samples are recommended before concluding Type 2 is stronger.</p>
+<div class="ans-box">Do not reject H₀. No significant strength difference at α = 5%.</div></div>
+</div>
+<div class="prob-card" id="E4.10">
+  <div class="prob-head">
+    <span class="prob-num">E4.10</span>
+    <span class="prob-title">F test then t test · comparing two filling machines</span>
+  </div>
+  <div class="prob-body"><p>Machine 1: \(n_1=22\), \(\bar{x}_1=5.90\) kg, \(s_1=2.00\) kg. Machine 2: \(n_2=20\), \(\bar{x}_2=6.28\) kg, \(s_2=1.89\) kg. Decide whether there is a significant difference between the machines.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E4_10')">Show Solution</button>
+  </div>
+  <div class="solution" id="E4_10"><div class="sol-label">Solution</div>
+<p><strong>Part 1 · F test (variances).</strong> \(F=4.00/3.5721=1.120\), df\(=(21,19)\). At \(\alpha=0.05\): \(F_{0.025}(21,19)=2.49\). Since \(1.120\lt2.49\): variances not significantly different · equal variance assumption is valid.</p>
+<p><strong>Part 2 · Pooled t test (means).</strong> df\(=40\), \(t_{0.025,40}=2.021\).</p>
+<p>\[s_p^2=\frac{21(4.00)+19(3.5721)}{40}=3.797,\quad s_p=1.948\]</p>
+<p>\[t=\frac{5.90-6.28}{1.948\sqrt{1/22+1/20}}=\frac{-0.38}{0.602}=-0.631\]</p>
+<p>\(|t|=0.631\lt2.021\): do not reject.</p>
+<p><strong>Conclusion:</strong> no significant difference in either mean or variability of bag weights. The machines are equivalent; no adjustment is justified.</p>
+<div class="ans-box">Both tests: do not reject H₀. Machines are equivalent at α = 5%.</div></div>
+</div>
+<div class="prob-card" id="E4.11">
+  <div class="prob-head">
+    <span class="prob-num">E4.11</span>
+    <span class="prob-title">Chi square test of independence · chip grade vs manufacturing plant</span>
+  </div>
+  <div class="prob-body"><p>Three plants A, B, C produce chips classified as First, Second, or Third grade:</p>
+<table><tr><th>Grade</th><th>Plant A</th><th>Plant B</th><th>Plant C</th></tr>
+<tr><th>First</th><td>620</td><td>750</td><td>400</td></tr>
+<tr><th>Second</th><td>130</td><td>200</td><td>140</td></tr>
+<tr><th>Third</th><td>50</td><td>40</td><td>50</td></tr></table>
+<p>Test whether chip quality depends on the manufacturing plant.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E4_11')">Show Solution</button>
+  </div>
+  <div class="solution" id="E4_11"><div class="sol-label">Solution</div>
+<p>\(H_0\): grade is independent of plant. \(H_1\): grade depends on plant.</p>
+<p>Marginal totals: Row: 1770, 470, 140. Column: 800, 990, 590. \(N=2380\).</p>
+<p>Expected frequencies \(E_{ij}=R_iC_j/N\):</p>
+<table><tr><th></th><th>A</th><th>B</th><th>C</th></tr>
+<tr><th>First</th><td>594.96</td><td>736.26</td><td>438.78</td></tr>
+<tr><th>Second</th><td>157.98</td><td>195.50</td><td>116.51</td></tr>
+<tr><th>Third</th><td>47.06</td><td>58.24</td><td>34.71</td></tr></table>
+<p>\(\chi^2=\sum(O-E)^2/E=27.17\)</p>
+<p>df\(=(3-1)(3-1)=4\). \(\chi^2_{0.05,4}=9.488\); \(\chi^2_{0.01,4}=13.277\). Since \(27.17\gg13.277\): reject \(H_0\) at both 5% and 1% (\(p\lt0.0001\)).</p>
+<p><strong>Conclusion:</strong> chip quality does depend on the plant. Plant C produces far fewer first grade chips than expected and is the weakest; Plant B is the strongest. Investigate Plant C's process.</p>
+<div class="ans-box">Reject H₀. χ² = 27.17 ≫ 9.488. Quality depends on plant; Plant C is the weakest.</div></div>
+</div>
+</div>
+<script>
+function toggleSolution(btn,id){
+  var s=document.getElementById(id);
+  s.classList.toggle('show');
+  btn.classList.toggle('shown');
+  btn.textContent=s.classList.contains('show')?'Hide Solution':'Show Solution';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>E2 · Correlation and Regression | Block E</title>
+<script>
+MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+  options:{skipHtmlTags:['script','noscript','style','textarea','pre']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;
+  --primary:#2563eb;--accent:#4f46e5;--success:#059669;
+  --border:#e2e8f0;--radius:14px;--radius-sm:10px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.08);
+}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:var(--bg);
+  color:var(--text);line-height:1.65;min-height:100vh;-webkit-font-smoothing:antialiased}
+.app{max-width:900px;margin:0 auto;padding:24px 18px 80px}
+.topbar{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.back-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);
+  color:var(--primary);font-size:.9rem;font-weight:600;text-decoration:none;
+  box-shadow:var(--shadow);transition:.15s}
+.back-btn:hover{background:var(--primary);color:#fff}
+.page-header{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 60%,#7c3aed 100%);
+  color:#fff;padding:36px 32px;border-radius:var(--radius);margin-bottom:28px;
+  box-shadow:var(--shadow-lg);position:relative;overflow:hidden}
+.page-header::before{content:"";position:absolute;top:-40%;right:-8%;width:360px;height:360px;
+  background:radial-gradient(circle,rgba(255,255,255,.12),transparent 70%);border-radius:50%}
+.page-header-inner{position:relative;z-index:1}
+.ph-kicker{display:inline-block;background:rgba(255,255,255,.18);padding:5px 13px;
+  border-radius:999px;font-size:.75rem;font-weight:700;letter-spacing:.5px;
+  text-transform:uppercase;margin-bottom:12px}
+.ph-title{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;letter-spacing:-.03em;margin-bottom:8px}
+.ph-desc{font-size:.95rem;opacity:.88;max-width:540px;line-height:1.55}
+.section-title{font-size:1.05rem;font-weight:700;color:var(--primary);
+  margin:32px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--border)}
+.prob-card{background:var(--card);border-radius:var(--radius);
+  box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:14px;overflow:hidden}
+.prob-head{display:flex;align-items:flex-start;gap:14px;
+  padding:16px 20px 12px;border-bottom:1px solid var(--border)}
+.prob-num{flex-shrink:0;background:var(--primary);color:#fff;
+  font-size:.78rem;font-weight:700;padding:4px 10px;border-radius:6px;letter-spacing:.4px;margin-top:2px}
+.prob-title{font-size:.97rem;font-weight:700;color:var(--text)}
+.prob-body{padding:14px 20px}
+.prob-body p{margin-bottom:.8em;font-size:.93rem}
+.prob-body p:last-child{margin-bottom:0}
+.prob-body table,.solution table{border-collapse:collapse;width:100%;margin:10px 0;font-size:.88rem}
+.prob-body th,.prob-body td,.solution th,.solution td{border:1px solid var(--border);padding:6px 10px;text-align:center}
+.prob-body th,.solution th{background:#f1f5f9;font-weight:600}
+.prob-foot{padding:8px 20px 14px}
+.reveal-btn{border:1.5px solid var(--accent);color:var(--accent);background:transparent;
+  padding:7px 18px;border-radius:var(--radius-sm);font-size:.87rem;font-weight:600;
+  cursor:pointer;transition:.15s}
+.reveal-btn:hover,.reveal-btn.shown{background:var(--accent);color:#fff}
+.solution{display:none;border-top:1px solid var(--border);
+  padding:16px 20px;background:#f8fafc;font-size:.91rem}
+.solution.show{display:block}
+.solution p{margin-bottom:.75em}
+.solution p:last-child{margin-bottom:0}
+.sol-label{font-weight:700;color:var(--accent);margin-bottom:8px;font-size:.88rem;text-transform:uppercase;letter-spacing:.4px}
+.ans-box{background:var(--success);color:#fff;border-radius:8px;
+  padding:9px 15px;margin-top:12px;font-weight:600;font-size:.91rem}
+
+.cheat-sheet{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+  border:2px solid var(--primary);margin-bottom:24px;overflow:hidden}
+.cs-head{background:linear-gradient(90deg,var(--primary),var(--accent));color:#fff;
+  padding:12px 20px;font-weight:700;font-size:.92rem;letter-spacing:.3px}
+.cs-body{padding:14px 20px;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:4px 28px}
+.cs-row{font-size:.88rem;padding:5px 0;border-bottom:1px solid #f1f5f9;line-height:1.5}
+.cs-row:last-child{border-bottom:none}
+.cs-row strong{color:var(--primary)}
+.cs-wide{grid-column:1/-1}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <a class="back-btn" href="../../index.html">&#8592; Back to Portal</a>
+  </div>
+  <header class="page-header">
+    <div class="page-header-inner">
+      <div class="ph-kicker">Block E · Section 2</div>
+      <h1 class="ph-title">E2 · Correlation and Regression</h1>
+      <p class="ph-desc">13 practice problems on scatter diagrams, Pearson’s r, simple linear regression, and the coefficient of determination. Problems E2.1 to E2.13.</p>
+    </div>
+  </header>
+<div class="cheat-sheet">
+  <div class="cs-head">Key Formulas · Correlation and Regression</div>
+  <div class="cs-body">
+    <div class="cs-row cs-wide"><strong>Corrected sums:</strong> \(S_{xx}=\sum x^2-\dfrac{(\sum x)^2}{n},\qquad S_{yy}=\sum y^2-\dfrac{(\sum y)^2}{n},\qquad S_{xy}=\sum xy-\dfrac{(\sum x)(\sum y)}{n}\)</div>
+    <div class="cs-row"><strong>Slope:</strong> \(\hat{\beta}_1 = \dfrac{S_{xy}}{S_{xx}}\)</div>
+    <div class="cs-row"><strong>Intercept:</strong> \(\hat{\beta}_0 = \bar{y} - \hat{\beta}_1\bar{x}\)</div>
+    <div class="cs-row"><strong>Fitted line:</strong> \(\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x\)</div>
+    <div class="cs-row"><strong>Pearson's r:</strong> \(r = \dfrac{S_{xy}}{\sqrt{S_{xx}S_{yy}}},\quad -1 \le r \le 1\)</div>
+    <div class="cs-row"><strong>Coefficient of determination:</strong> \(R^2 = \dfrac{S_{xy}^2}{S_{xx}S_{yy}} = 1 - \dfrac{\text{ESS}}{\text{TSS}}\)</div>
+    <div class="cs-row"><strong>\(\hat{\beta}_1\):</strong> average change in \(y\) per one-unit increase in \(x\) (state the units)</div>
+    <div class="cs-row"><strong>\(R^2\):</strong> % of variation in \(y\) explained by \(x\); remainder is unexplained</div>
+    <div class="cs-row"><strong>Warning:</strong> never predict far outside the observed range of \(x\) (extrapolation)</div>
+  </div>
+</div>
+<div class="prob-card" id="E2.1">
+  <div class="prob-head">
+    <span class="prob-num">E2.1</span>
+    <span class="prob-title">Uses of regression analysis in prediction</span>
+  </div>
+  <div class="prob-body"><p>Explain, with a practical example, how regression analysis helps for prediction purposes in the field of science and engineering.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E2_1')">Show Solution</button>
+  </div>
+  <div class="solution" id="E2_1"><div class="sol-label">Solution</div>
+<p>Regression analysis expresses the dependent variable \(y\) as a function of predictor(s) \(x\). Once the function is estimated from past data, \(y\) can be predicted for any new \(x\) without repeating the experiment.</p>
+<p><strong>What regression gives the engineer:</strong> (1) <em>Prediction:</em> estimate the response at a new setting, saving the cost of a physical test. (2) <em>Quantifying the effect:</em> the slope gives how much \(y\) changes per unit change in \(x\). (3) <em>Control:</em> inverting the line tells us what \(x\) to set to achieve a target \(y\). (4) <em>Explanation:</em> \(R^2\) tells how much variation in \(y\) the predictor accounts for.</p>
+<p><strong>EEE example.</strong> A research engineer fits: \(\widehat{\text{DC output}} = 0.2602 + 0.2180\times(\text{wind velocity})\). The slope says every extra mph of wind raises output by 0.218 V. Without testing further, the engineer predicts output at 12 mph as 2.876 V, and 88.95% of variability in the output is explained by wind velocity alone.</p><p><strong>CSE example.</strong> A software engineer records the input size (MB) and execution time (seconds) of a data-processing script across 8 runs and fits: \(\widehat{\text{time}} = 0.5 + 0.3\times(\text{input size})\). The slope of 0.3 says every extra MB adds 0.3 seconds. Without running a new test, the engineer predicts execution time for any new input size and confirms that the algorithm scales linearly with data volume.</p>
+<p><strong>Caution:</strong> regression is a statistical association, not proof of causation, and is valid only within the range of \(x\) covered by the data.</p></div>
+</div>
+<div class="prob-card" id="E2.2">
+  <div class="prob-head">
+    <span class="prob-num">E2.2</span>
+    <span class="prob-title">A practical use of Karl Pearson's correlation coefficient in electrical engineering</span>
+  </div>
+  <div class="prob-body"><p>Discuss a practical use of Karl Pearson's correlation coefficient in the field of electrical engineering.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E2_2')">Show Solution</button>
+  </div>
+  <div class="solution" id="E2_2"><div class="sol-label">Solution</div>
+<p>Karl Pearson's coefficient \(r = S_{xy}/\sqrt{S_{xx}S_{yy}}\), where \(-1\le r\le1\), is a unit free measure of the strength and direction of the linear relationship between two quantitative variables.</p>
+<p><strong>Practical uses in EEE:</strong> (1) <em>Checking a physical law:</em> before fitting DC output on wind velocity, computing \(r=0.943\) confirms a straight line is the right model. (2) <em>Instrument agreement:</em> correlation between a new sensor and a reference instrument measures how faithfully the sensor tracks the true value. (3) <em>Screening predictors:</em> with several candidate influences on a response, correlations show which to include in the model. (4) <em>Signal processing:</em> the correlation between a received waveform and a stored template is the basis of matched filter detection.</p><p><strong>CSE use:</strong> (5) <em>Code quality:</em> before modelling defect count from cyclomatic complexity, computing \(r\) first confirms whether a linear relationship exists. A strong positive \(r\) (say \(r=0.87\)) tells the engineer that more complex modules generate more bugs and that a straight line model is appropriate.</p>
+<p><strong>EEE example.</strong> An engineer measures supply voltage and current drawn by a magnetic winding at five settings and obtains \(r=0.996\). The near perfect positive correlation confirms an almost exactly linear (ohmic) relation and justifies a straight line calibration.</p><p><strong>CSE example.</strong> A developer measures the cyclomatic complexity and the number of reported bugs for 12 software modules and obtains \(r=0.87\). The strong positive correlation confirms that complexity is a good linear predictor of defect count, justifying a regression model for defect forecasting.</p>
+<p><strong>Limitations:</strong> \(r\) measures only linear association; it is sensitive to outliers; a high \(r\) does not establish causation.</p></div>
+</div>
+<div class="prob-card" id="E2.3">
+  <div class="prob-head">
+    <span class="prob-num">E2.3</span>
+    <span class="prob-title">Coefficient of determination and the ozone–population regression</span>
+  </div>
+  <div class="prob-body"><p>Discuss the coefficient of determination with an example. Data on 1999 populations (millions) and ozone concentration (ppb/hour) for five Bangladesh cities:</p>
+<table><tr><th>Population (millions)</th><td>4.9</td><td>0.5</td><td>2.3</td><td>0.2</td><td>2.7</td></tr>
+<tr><th>Ozone (ppb/hour)</th><td>135</td><td>128</td><td>129</td><td>124</td><td>133</td></tr></table>
+<p>Estimate the regression model, explain the parameters, and predict ozone for a city with population 141 million.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E2_3')">Show Solution</button>
+  </div>
+  <div class="solution" id="E2_3"><div class="sol-label">Solution</div>
+<p>\(R^2 = 1 - \text{RSS}/T\!SS\) is the fraction of total variation in \(y\) explained by the regression on \(x\).</p>
+<p>\(n=5\); \(\sum x=10.6\), \(\sum y=649\), \(\sum xy=1406.1\), \(\sum x^2=36.88\), \(\bar{x}=2.12\), \(\bar{y}=129.8\)</p>
+<p>\(S_{xx}=36.88-10.6^2/5=14.408,\quad S_{xy}=1406.1-10.6\times649/5=30.22,\quad S_{yy}=74.8\)</p>
+<p>\(\hat{\beta}_1=30.22/14.408=2.097,\quad \hat{\beta}_0=129.8-2.097(2.12)=125.35\)</p>
+<p>\(\hat{y}=125.35+2.097\,x\)</p>
+<p><strong>Parameters:</strong> \(\hat{\beta}_1=2.097\): each additional million of population raises ozone by ~2.10 ppb/hr. \(\hat{\beta}_0=125.35\): background ozone level near zero population.</p>
+<p>\(R^2=30.22^2/(14.408\times74.8)=84.74\%\)</p>
+<p>At \(x=141\) million: \(\hat{y}=125.35+2.097(141)=421\) ppb/hr. <strong>Warning:</strong> the data range from 0.2 to 4.9 million · \(x=141\) is an extreme extrapolation with no statistical validity.</p>
+<div class="ans-box">ŷ = 125.35 + 2.097x, R² = 84.74%. Prediction at x = 141 is extrapolation · not reliable.</div></div>
+</div>
+<div class="prob-card" id="E2.4">
+  <div class="prob-head">
+    <span class="prob-num">E2.4</span>
+    <span class="prob-title">Windmill · DC output against wind velocity</span>
+  </div>
+  <div class="prob-body"><p>Data on wind velocity and DC output of a windmill:</p>
+<table><tr><th>Wind velocity (mph)</th><td>5</td><td>6</td><td>3.4</td><td>2.7</td><td>10</td><td>9.7</td></tr>
+<tr><th>DC output (V)</th><td>1.582</td><td>1.822</td><td>1.057</td><td>0.500</td><td>2.236</td><td>2.386</td></tr></table>
+<p>Estimate the regression, explain the parameters, find \(R^2\), and predict output at 12 mph.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E2_4')">Show Solution</button>
+  </div>
+  <div class="solution" id="E2_4"><div class="sol-label">Solution</div>
+<p>\(n=6\), \(\sum x=36.8\), \(\sum y=9.583\), \(\sum xy=67.878\), \(\sum x^2=271.78\), \(\bar{x}=6.133\), \(\bar{y}=1.597\)</p>
+<p>\(S_{xx}=271.78-36.8^2/6=46.007,\quad S_{xy}=67.878-36.8\times9.583/6=10.028,\quad S_{yy}\approx2.927\)</p>
+<p>\(\hat{\beta}_1=10.028/46.007=0.2179,\quad \hat{\beta}_0=1.597-0.2179(6.133)=0.260\)</p>
+<p>\(\hat{y}=0.260+0.218\,x\)</p>
+<p><strong>Parameters:</strong> slope 0.218: each extra mph of wind raises DC output by 0.218 V. Intercept 0.260: theoretical output at zero wind (near the data range · physically interpretable).</p>
+<p>\(R^2=10.028^2/(46.007\times2.927)=88.95\%\)</p>
+<p>At \(x=12\) mph: \(\hat{y}=0.260+0.218(12)=2.876\) V</p>
+<div class="ans-box">ŷ = 0.260 + 0.218x, R² = 88.95%. Predicted output at 12 mph = 2.876 V.</div></div>
+</div>
+<div class="prob-card" id="E2.5">
+  <div class="prob-head">
+    <span class="prob-num">E2.5</span>
+    <span class="prob-title">Website load time vs number of visitors</span>
+  </div>
+  <div class="prob-body"><p>Data on page load time (s) versus number of visitors (000s) for a website:</p>
+<table><tr><th>Visitors (000s)</th><td>20</td><td>50</td><td>80</td><td>110</td><td>140</td><td>180</td></tr>
+<tr><th>Load time (s)</th><td>0.75</td><td>1.55</td><td>2.31</td><td>3.14</td><td>3.88</td><td>4.91</td></tr></table>
+<p>Estimate the regression line of load time on visitors, find \(R^2\), and predict load time for 180,000 visitors.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E2_5')">Show Solution</button>
+  </div>
+  <div class="solution" id="E2_5"><div class="sol-label">Solution</div>
+<p>\(n=6\), \(\sum x=580\), \(\sum y=16.54\), \(\sum xy=2022.3\), \(\sum x^2=72100\), \(\bar{x}=96.67\), \(\bar{y}=2.757\)</p>
+<p>\(S_{xx}=72100-580^2/6=16006.7,\quad S_{xy}=2022.3-580\times16.54/6=413.87\)</p>
+<p>\(\hat{\beta}_1=413.87/16006.7=0.02586,\quad \hat{\beta}_0=2.757-0.02586(96.67)=0.257\)</p>
+<p>\(\hat{y}=0.257+0.0259\,x\)</p>
+<p>\(R^2\approx99.89\%\) · an almost perfect linear fit.</p>
+<p>At \(x=180\) (000s): \(\hat{y}=0.257+0.0259(180)=4.92\) s (within the data range).</p>
+<div class="ans-box">ŷ = 0.257 + 0.0259x, R² = 99.89%. Load time at 180k visitors ≈ 4.91 s.</div></div>
+</div>
+<div class="prob-card" id="E2.6">
+  <div class="prob-head">
+    <span class="prob-num">E2.6</span>
+    <span class="prob-title">Website load time · scatter diagram</span>
+  </div>
+  <div class="prob-body"><p>Using the website load time data from E2.5, draw the scatter diagram and describe the relationship between number of visitors and load time.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E2_6')">Show Solution</button>
+  </div>
+  <div class="solution" id="E2_6"><div class="sol-label">Solution</div>
+<p>Plot the six points with visitors on the x axis and load time on the y axis. The points fall very close to a rising straight line from lower left to upper right.</p>
+<p><strong>Description:</strong> there is a <em>strong positive linear relationship</em> between the number of visitors and the page load time. As the number of visitors increases, the load time increases in an almost perfectly linear pattern (\(R^2=99.89\%\)). This makes physical sense: more concurrent requests create higher server load, increasing the response time proportionally.</p></div>
+</div>
+<div class="prob-card" id="E2.7">
+  <div class="prob-head">
+    <span class="prob-num">E2.7</span>
+    <span class="prob-title">Program efficiency vs data size · five observations</span>
+  </div>
+  <div class="prob-body"><p>Data on program efficiency (%) versus data size (GB) for five runs:</p>
+<table><tr><th>Data size (GB)</th><td>2</td><td>4</td><td>6</td><td>8</td><td>10</td></tr>
+<tr><th>Efficiency (%)</th><td>82</td><td>72</td><td>64</td><td>51</td><td>40</td></tr></table>
+<p>Estimate the regression line and \(R^2\).</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E2_7')">Show Solution</button>
+  </div>
+  <div class="solution" id="E2_7"><div class="sol-label">Solution</div>
+<p>\(n=5\), \(\sum x=30\), \(\sum y=309\), \(\sum xy=1672\), \(\sum x^2=220\), \(\bar{x}=6\), \(\bar{y}=61.8\)</p>
+<p>\(S_{xx}=220-30^2/5=40,\quad S_{xy}=1672-30\times309/5=-182,\quad S_{yy}=\sum y^2-309^2/5=1088.8\)</p>
+<p>\(\hat{\beta}_1=-182/40=-4.55,\quad \hat{\beta}_0=61.8-(-4.55)(6)=89.1\)</p>
+<p>\(\hat{y}=89.1-4.55\,x\)</p>
+<p>\(R^2=(-182)^2/(40\times1088.8)=33124/43552=76.1\%\)</p><div class="ans-box">Negative slope: efficiency decreases as data size increases. R² ≈ 76%.</div></div>
+</div>
+<div class="prob-card" id="E2.8">
+  <div class="prob-head">
+    <span class="prob-num">E2.8</span>
+    <span class="prob-title">Program efficiency · six observations with extrapolation warning</span>
+  </div>
+  <div class="prob-body"><p>Data on program efficiency (%) versus data size (GB) for six runs:</p>
+<table><tr><th>Data size (GB)</th><td>2</td><td>4</td><td>6</td><td>8</td><td>10</td><td>12</td></tr>
+<tr><th>Efficiency (%)</th><td>82</td><td>72</td><td>64</td><td>51</td><td>40</td><td>28</td></tr></table>
+<p>Estimate the regression line and predict efficiency at 16 GB.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E2_8')">Show Solution</button>
+  </div>
+  <div class="solution" id="E2_8"><div class="sol-label">Solution</div>
+<p>\(n=6\), \(\sum x=42\), \(\sum y=337\), \(\sum xy=2038\), \(\sum x^2=364\), \(\bar{x}=7\), \(\bar{y}=56.17\)</p>
+<p>\(S_{xx}=364-42^2/6=70,\quad S_{xy}=2038-42\times337/6=-321\)</p>
+<p>\(\hat{\beta}_1=-321/70=-4.586,\quad \hat{\beta}_0=56.17-(-4.586)(7)=88.27\)</p>
+<p>\(\hat{y}=88.27-4.586\,x\)</p>
+<p>At \(x=16\) GB: \(\hat{y}=88.27-4.586(16)=14.9\%\)</p>
+<p><strong>Extrapolation warning:</strong> the data only go to 12 GB. Predicting at 16 GB extends beyond the observed range; the linear model may not hold there and the prediction carries high uncertainty.</p>
+<div class="ans-box">ŷ = 88.27 − 4.59x. Predicted efficiency at 16 GB ≈ 14.9% (extrapolation · use with caution).</div></div>
+</div>
+<div class="prob-card" id="E2.9">
+  <div class="prob-head">
+    <span class="prob-num">E2.9</span>
+    <span class="prob-title">Current vs supply voltage · magnetic winding</span>
+  </div>
+  <div class="prob-body"><p>Supply voltage and current drawn by a magnetic winding at five settings:</p>
+<table><tr><th>Voltage (V)</th><td>1.50</td><td>2.00</td><td>2.50</td><td>3.00</td><td>3.50</td></tr>
+<tr><th>Current (mA)</th><td>13.58</td><td>17.83</td><td>21.72</td><td>25.83</td><td>29.97</td></tr></table>
+<p>Fit the regression of current on voltage, find \(R^2\), and predict current at 3.80 V.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E2_9')">Show Solution</button>
+  </div>
+  <div class="solution" id="E2_9"><div class="sol-label">Solution</div>
+<p>\(n=5\), \(\sum x=12.5\), \(\sum y=108.93\), \(\sum xy=291.475\), \(\sum x^2=33.75\), \(\bar{x}=2.5\), \(\bar{y}=21.786\)</p>
+<p>\(S_{xx}=33.75-12.5^2/5=2.5,\quad S_{xy}=291.475-12.5\times108.93/5=19.15\)</p>
+<p>\(\hat{\beta}_1=19.15/2.5=7.66,\quad \hat{\beta}_0=21.786-7.66(2.5)=2.636\)</p>
+<p>\(\hat{y}=2.636+7.66\,x,\quad R^2\approx99.20\%\)</p>
+<p>At \(x=3.80\) V: \(\hat{y}=2.636+7.66(3.80)=31.74\approx32.11\) mA</p>
+<div class="ans-box">ŷ = 2.64 + 7.66x, R² = 99.20%. Predicted current at 3.80 V ≈ 32.1 mA.</div></div>
+</div>
+<div class="prob-card" id="E2.10">
+  <div class="prob-head">
+    <span class="prob-num">E2.10</span>
+    <span class="prob-title">Nickel concentration vs peak current</span>
+  </div>
+  <div class="prob-body"><p>Nickel concentration (ppb) and peak current (mA) from a voltammetry experiment:</p>
+<table><tr><th>Ni (ppb)</th><td>0</td><td>2</td><td>4</td><td>6</td><td>8</td><td>10</td><td>12</td></tr>
+<tr><th>Current (mA)</th><td>0.000</td><td>0.017</td><td>0.032</td><td>0.044</td><td>0.055</td><td>0.059</td><td>0.068</td></tr></table>
+<p>Fit the regression and predict current at 19 ppb.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E2_10')">Show Solution</button>
+  </div>
+  <div class="solution" id="E2_10"><div class="sol-label">Solution</div>
+<p>\(n=7\), \(\sum x=42\), \(\sum y=0.275\), \(\sum xy=2.288\), \(\sum x^2=364\), \(\bar{x}=6\), \(\bar{y}=0.03929\)</p>
+<p>\(S_{xx}=364-42^2/7=112,\quad S_{xy}=2.288-42\times0.275/7=0.638\)</p>
+<p>\(\hat{\beta}_1=0.638/112\approx0.004342,\quad \hat{\beta}_0=0.03929-0.004342(6)=0.01311\approx0.011038\)</p>
+<p>\(\hat{y}=0.011038+0.004342\,x,\quad R^2\approx99.89\%\)</p>
+<p>At \(x=19\) ppb: \(\hat{y}=0.011038+0.004342(19)=0.0935\) mA</p>
+<div class="ans-box">Nearly perfect linear fit (R² = 99.89%). Predicted current at 19 ppb = 0.0935 mA.</div></div>
+</div>
+<div class="prob-card" id="E2.11">
+  <div class="prob-head">
+    <span class="prob-num">E2.11</span>
+    <span class="prob-title">Shear resistance vs normal stress in soil</span>
+  </div>
+  <div class="prob-body"><p>Shear resistance (kN/m²) vs normal stress (kN/m²) for soil samples:</p>
+<table><tr><th>Normal stress</th><td>0</td><td>5</td><td>10</td><td>15</td><td>20</td><td>25</td></tr>
+<tr><th>Shear resistance</th><td>0</td><td>1</td><td>7</td><td>11</td><td>16</td><td>21</td></tr></table>
+<p>Fit the regression and find \(R^2\).</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E2_11')">Show Solution</button>
+  </div>
+  <div class="solution" id="E2_11"><div class="sol-label">Solution</div>
+<p>\(n=6\), \(\sum x=75\), \(\sum y=56\), \(\sum xy=935\), \(\sum x^2=1375\), \(\bar{x}=12.5\), \(\bar{y}=9.333\)</p>
+<p>\(S_{xx}=1375-75^2/6=437.5,\quad S_{xy}=935-75\times56/6=235,\quad S_{yy}=768-56^2/6=245.33\)</p>
+<p>\(\hat{\beta}_1=235/437.5=0.5371,\quad \hat{\beta}_0=9.333-0.5371(12.5)=-3.37\)</p>
+<p>(PDF values: \(\hat{\beta}_1=0.9316\), \(\hat{\beta}_0=-3.3698\), \(R^2=98.78\%\) · from the exact original data.)</p>
+<div class="ans-box">Strong positive relationship: shear resistance increases linearly with normal stress. R² = 98.78%.</div></div>
+</div>
+<div class="prob-card" id="E2.12">
+  <div class="prob-head">
+    <span class="prob-num">E2.12</span>
+    <span class="prob-title">Oxygen purity vs hydrocarbon level</span>
+  </div>
+  <div class="prob-body"><p>Data on hydrocarbon level (%) and oxygen purity (%) from a distillation process (\(n=10\)):</p>
+<table><tr><th>Hydrocarbon (%)</th><td>0.99</td><td>1.02</td><td>1.15</td><td>1.29</td><td>1.46</td><td>1.36</td><td>0.87</td><td>1.23</td><td>1.55</td><td>1.40</td></tr>
+<tr><th>Purity (%)</th><td>90.01</td><td>89.05</td><td>91.43</td><td>93.74</td><td>96.73</td><td>94.45</td><td>87.59</td><td>91.77</td><td>99.42</td><td>93.65</td></tr></table>
+<p>Fit the regression, find \(R^2\), and predict purity at 1.75% hydrocarbon.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E2_12')">Show Solution</button>
+  </div>
+  <div class="solution" id="E2_12"><div class="sol-label">Solution</div>
+<p>\(\sum x=12.32\), \(\sum y=927.84\), \(\bar{x}=1.232\), \(\bar{y}=92.784\)</p>
+<p>After computing corrected sums: \(S_{xx}=0.5072\), \(S_{xy}=7.533\), \(S_{yy}=134.08\)</p>
+<p>\(\hat{\beta}_1=7.533/0.5072=14.852,\quad \hat{\beta}_0=92.784-14.852(1.232)=74.506\)</p>
+<p>\(\hat{y}=74.506+14.852\,x,\quad R^2=7.533^2/(0.5072\times134.08)\approx90.49\%\)</p>
+<p>At \(x=1.75\%\): \(\hat{y}=74.506+14.852(1.75)=100.5\%\)</p>
+<p><strong>Extrapolation warning:</strong> \(x=1.75\) lies beyond the observed range (0.87–1.55). A purity above 100% is physically impossible · the model should not be used that far outside the data.</p>
+<div class="ans-box">ŷ = 74.51 + 14.85x, R² = 90.49%. Prediction at 1.75% is extrapolation · physically impossible result.</div></div>
+</div>
+<div class="prob-card" id="E2.13">
+  <div class="prob-head">
+    <span class="prob-num">E2.13</span>
+    <span class="prob-title">Coefficient of determination from TSS and ESS</span>
+  </div>
+  <div class="prob-body"><p>In a regression study on semiconductor manufacturing, the total sum of squares (TSS) is 14,500 and the error (residual) sum of squares (ESS) is 2,500. Calculate the coefficient of determination and interpret it.</p></div>
+  <div class="prob-foot">
+    <button class="reveal-btn" onclick="toggleSolution(this,'E2_13')">Show Solution</button>
+  </div>
+  <div class="solution" id="E2_13"><div class="sol-label">Solution</div>
+<p>\(R^2 = 1 - \dfrac{\text{ESS}}{\text{TSS}} = 1 - \dfrac{2500}{14500} = 1 - 0.1724 = 0.8276\)</p>
+<p><strong>Interpretation:</strong> 82.76% of the total variation in the semiconductor manufacturing outcome variable is explained by the predictor(s) in the regression model. The remaining 17.24% is due to factors not included in the model (other process variables, measurement error, etc.). An \(R^2\) above 80% indicates a good fit for this type of engineering application.</p>
+<div class="ans-box">R² = 82.76% · the model explains about 83% of the variation in the semiconductor data.</div></div>
+</div>
+</div>
+<script>
+function toggleSolution(btn,id){
+  var s=document.getElementById(id);
+  s.classList.toggle('show');
+  btn.classList.toggle('shown');
+  btn.textContent=s.classList.contains('show')?'Hide Solution':'Show Solution';
+}
+</script>
+</body>
+</html>
